@@ -193,12 +193,12 @@ function generateGridQuestion(skillId, tier) {
   const gen = GRID_GENERATORS[skillId];
   if (!gen) return null;
   const base = gen(tier);
-  return {
+  return stampMathIds({
     ...base,
     origin: 'generated',
     difficulty: TIER_LABEL[tier] || 'Medium',
     timeTarget: (TIME_TARGETS.math[tier] || 90),
     tip: tipForSkill(base.skill),
-  };
+  }, 'grid', skillId);
 }
 function hasGrid(skillId) { return !!GRID_GENERATORS[skillId]; }

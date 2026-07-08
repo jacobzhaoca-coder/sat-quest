@@ -73,18 +73,33 @@ them for test-day planning._
 | Link to official resources. | The Resources screen links to the College Board **Student Question Bank**, **Bluebook** official practice tests, and **Khan Academy** Official Digital SAT Prep. | ✅ Aligned |
 | Trademark clarity. | Settings and Resources state: "SAT" is a trademark of the College Board, which does not endorse this app. | ✅ Aligned |
 
-## 8. Content-quality checks (automated)
+## 8. Content depth and quality checks (automated)
 
-The build includes tests (see the project's test scripts) that verify, across
-thousands of generated questions and the full authored bank:
+**Content depth (v3 expansion).** The authored Reading & Writing bank grew from
+71 to **201 original items**, balanced so every one of the 11 skills has at
+least 6 items in each of the three difficulty tiers (33 skill-tier cells, all
+≥ 6). Math is covered by **37 generator types** (multiple-choice, grid-in, and
+visual), which together produce **1,100+ validated randomized variants** — far
+beyond what a level or practice test can exhaust. The R&W bank is split by
+domain under `js/data/rw/` and is architected to grow toward 500+ items.
 
-- Every question has exactly **four unique answer choices**.
-- The labeled correct answer is always **one of the four choices**.
-- Every question carries a **skill tag, difficulty tag, and time target**.
+The build includes tests (`scripts/test_content.mjs`, `scripts/test_variety.mjs`)
+that verify, across every authored item and thousands of generated instances:
+
+- Every question has exactly **four unique answer choices** (MC) or a valid,
+  gradable numeric answer (grid-in).
+- The labeled correct answer is always **valid** (one of the four choices, or a
+  value the grid-in grader accepts).
+- Every question carries a **skill tag, difficulty tag, and time target**; every
+  R&W item has a **unique id** and every generated item a **type id + variant
+  signature**.
 - Every question includes an **explanation of why the answer is right**, and
   wrong choices carry **reasons they are wrong**.
-- No item text is copied from an official source (all content originates in
-  `js/data/mathgen.js` and `js/data/rwbank.js`).
+- **No exact-duplicate** authored passages, and no duplicate question within a
+  single quiz unless the relevant pool is genuinely exhausted.
+- No item text is copied from an official source. All content originates in
+  `js/data/mathgen.js`, `js/data/gridgen.js`, `js/data/mathviz.js`, and the
+  `js/data/rw/` domain files, written from scratch for this app.
 
 ## v3 additions (what changed since v2)
 

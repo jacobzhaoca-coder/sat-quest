@@ -191,13 +191,14 @@ const VISUAL_GENERATORS = {
 function generateVisualQuestion(skillId, tier) {
   const gens = VISUAL_GENERATORS[skillId];
   if (!gens) return null;
-  const base = gens[Math.floor(Math.random() * gens.length)](tier);
-  return {
+  const gi = Math.floor(Math.random() * gens.length);
+  const base = gens[gi](tier);
+  return stampMathIds({
     ...base,
     origin: 'generated',
     difficulty: TIER_LABEL[tier] || 'Medium',
     timeTarget: (TIME_TARGETS.math[tier] || 90),
     tip: base.tip || tipForSkill(base.skill),
-  };
+  }, `viz${gi}`, skillId);
 }
 function hasVisual(skillId) { return !!VISUAL_GENERATORS[skillId]; }

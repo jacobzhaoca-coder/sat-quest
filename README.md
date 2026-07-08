@@ -30,7 +30,7 @@ questions** generated and authored for this app.
 - **80 levels** on winding, unlockable paths — 10 per region, easy → medium → hard, ending in a hard mixed **Trial**.
 - **11 bosses**: 8 region bosses, 2 Section Champions (Reading & Writing Champion, Math Champion), and the final **Digital SAT Champion** — timed, with a boss health bar and your focus meter.
 - **Review Dungeons** that pull from your weak skills with **spaced review**, and an endless **Daily Tower** challenge.
-- **Infinite Math questions** from a procedural generator (randomized numbers every play) and a **hand-authored Reading & Writing bank** with original passages — every question tagged with **skill, difficulty, and a time target**.
+- **Infinite Math questions** from procedural generators (37 generator types across MC, grid-in, and visual problems — over 1,100 validated randomized variants) and a **hand-authored bank of 201 original Reading & Writing items** (every skill-tier cell has at least 6) — every question tagged with **skill, difficulty, and a time target**.
 - **Explanations for why the right answer is right and why each wrong answer is wrong.**
 - **Mistake log with 5 categories** (concept gap, careless error, time pressure, misread, trap answer) and a **“Why I missed it”** reflection after every wrong answer.
 - **Adaptive recommendations**, a personalized **daily study path**, a **weekly progress report** (accuracy by domain, average time per question, 7-day activity chart), and boss battle reports.
@@ -177,7 +177,12 @@ SATgame/
     │   ├── mathgen.js         # Procedural original Math generators (MC, why-wrong)
     │   ├── gridgen.js         # Grid-in (student-produced response) generators + grading
     │   ├── mathviz.js         # Math SVG visuals (scatter, line, bar, geometry, plane)
-    │   └── rwbank.js          # Authored original Reading & Writing bank (why-wrong)
+    │   └── rw/                # Authored original R&W bank, split by domain:
+    │       ├── information-ideas.js   # central ideas, evidence (text/quant), inferences
+    │       ├── craft-structure.js     # words in context, text structure, cross-text
+    │       ├── expression-ideas.js    # transitions, rhetorical synthesis
+    │       ├── conventions.js         # boundaries, form/structure/sense
+    │       └── index.js               # combines banks + rwPool/rwQuestionsFor loader
     ├── state.js               # Save/load, XP, streaks, quests, unlocks, badges,
     │                          #   spaced review, mistake categories, weekly log
     ├── upgrades.js            # Skill Points, Upgrade Hub upgrades, domain mastery
@@ -193,16 +198,24 @@ SATgame/
 
 ## 🛠️ Customizing
 
-- **Add a Reading/Writing question:** append an object to `RW_BANK` in
-  `js/data/rwbank.js` (copy an existing one — set `skill`, `tier`, `text`,
-  `choices`, `answer`, `explanation`).
+- **Add Reading/Writing questions:** append objects to the array in the matching
+  `js/data/rw/<domain>.js` file (copy an existing one — set `skill`, `tier`,
+  `text`, `choices`, `answer`, `explanation`, `whyWrong`, and a unique `id` of
+  the form `skill-tTier-NN`). The bank is designed to grow toward 500+ items;
+  keep each skill-tier cell balanced (aim for 6+ each). Validate with
+  `node scripts/test_content.mjs`.
 - **Add or tweak a Math generator:** edit the matching `gen_*` function in
-  `js/data/mathgen.js`. Use `mcFromValues` / `mcFromStrings` to guarantee four
-  unique answer choices.
+  `js/data/mathgen.js` (MC), `js/data/gridgen.js` (grid-in), or
+  `js/data/mathviz.js` (visual). Use `mcFromValues` / `mcFromStrings` to
+  guarantee four unique answer choices. Every generated item is auto-stamped
+  with a `typeId`, content `sig`, and `variantId`.
 - **Add a strategy tip:** add to `SKILL_TIPS` or `GENERAL_TIPS` in
   `js/data/tips.js`.
 - **Rename worlds/levels/bosses:** edit `js/data/worlds.js`.
 - **Regenerate icons:** `python3 scripts/make_icons.py`.
+- **Content/variety tests:** `node scripts/test_content.mjs` (bank + generator
+  validation) and `node scripts/test_variety.mjs` (anti-repeat / per-level
+  uniqueness).
 
 After changing files, bump the cache name in `service-worker.js`
 (`const CACHE = 'sat-quest-v5-audit'`) so **deployed** devices pick up the

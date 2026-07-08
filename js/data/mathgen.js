@@ -401,14 +401,34 @@ const MATH_GENERATORS = {
   'area-volume': gen_area_volume, 'angles': gen_angles, 'circles': gen_circles, 'trig': gen_trig,
 };
 
+/* Stable-ish content signature for a generated question instance. Combines the
+   prompt text with the answer/choices so two structurally identical instances
+   collide (used to avoid duplicates within a quiz) while parameter changes give
+   distinct signatures. Not cryptographic — a fast 32-bit string hash. */
+function qHash(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+function qSignature(q) {
+  const ans = q.type === 'grid' ? String(q.answer) : (q.answer + '|' + (q.choices || []).map(c => c.text).join('¦'));
+  return qHash((q.text || '') + '::' + ans);
+}
+/* Attach stable type + instance identifiers to a generated math question. */
+function stampMathIds(q, kind, skillId) {
+  const typeId = `${kind}-${skillId}`;
+  const sig = qSignature(q);
+  return { ...q, typeId, sig, variantId: `${typeId}#${sig}` };
+}
+
 function generateMathQuestion(skillId, tier) {
   const gen = MATH_GENERATORS[skillId] || gen_linear_eq;
   const base = gen(tier);
-  return {
+  return stampMathIds({
     ...base,
     origin: 'generated',
     difficulty: TIER_LABEL[tier] || 'Medium',
     timeTarget: (TIME_TARGETS.math[tier] || 90),
     tip: tipForSkill(base.skill),
-  };
+  }, 'mc', skillId);
 }
