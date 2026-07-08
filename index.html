@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <title>SAT Quest — SAT Study Adventure</title>
+  <meta name="description" content="SAT Quest turns SAT prep into an RPG. Advance through worlds, battle bosses, earn XP, and train every SAT skill with original SAT-style practice questions." />
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0b0812" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SAT Quest" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <div id="app"><!-- screens render here --></div>
+  <nav id="nav" aria-label="Main navigation"><!-- bottom nav --></nav>
+
+  <div id="toast-host" aria-live="polite"></div>
+  <div id="fx-host" aria-hidden="true"></div>
+
+  <!-- hidden file input for backup import -->
+  <input type="file" id="import-file" accept="application/json,.json" hidden />
+
+  <!-- Data (order matters: data before logic) -->
+  <script src="./js/data/worlds.js"></script>
+  <script src="./js/data/tips.js"></script>
+  <script src="./js/data/mathgen.js"></script>
+  <script src="./js/data/gridgen.js"></script>
+  <script src="./js/data/mathviz.js"></script>
+  <script src="./js/data/rwbank.js"></script>
+  <!-- Core -->
+  <script src="./js/state.js"></script>
+  <script src="./js/upgrades.js"></script>
+  <script src="./js/quiz.js"></script>
+  <script src="./js/exam.js"></script>
+  <script src="./js/sound.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
