@@ -18,10 +18,10 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ctx = { console, Math, window: undefined, STATE: { recentRW: [] } };
 vm.createContext(ctx);
 for (const f of ['js/data/worlds.js', 'js/data/tips.js', 'js/data/mathgen.js',
-  'js/data/gridgen.js', 'js/data/mathviz.js',
+  'js/data/gridgen.js', 'js/data/mathviz.js', 'js/data/mathgen2.js',
   'js/data/rw/information-ideas.js', 'js/data/rw/craft-structure.js',
   'js/data/rw/expression-ideas.js', 'js/data/rw/conventions.js',
-  'js/data/rw/index.js', 'js/quiz.js']) {
+  'js/data/rw/index.js', 'js/quiz.js', 'js/exam.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const run = (code) => vm.runInContext(code, ctx);
@@ -61,14 +61,33 @@ const varies = run(`(function(){
 })()`);
 check('same math level produces different questions on replay', varies);
 
-console.log('3) R&W levels reach beyond two authored items across replays');
+console.log('3) R&W levels produce strong variety across 10 replays');
+// A single R&W level replayed 10 times should surface many distinct authored
+// questions now that each skill/tier cell holds ~12 items.
+const rwLevels = run(`allLevels().filter(l => l.section==='rw').map(l => l.id)`);
 const spread = run(`(function(){
   STATE.recentRW = [];
   const seen = new Set();
-  for (let i=0;i<4;i++) for (const q of buildLevelQuiz('rw-ii-1')) seen.add(q.text);
+  for (let i=0;i<10;i++) for (const q of buildLevelQuiz('rw-ii-1')) seen.add(q.text);
   return seen.size;
 })()`);
-check(`4 replays of rw-ii-1 draw ${spread} distinct authored questions (>2 required)`, spread > 2);
+check(`10 replays of rw-ii-1 draw ${spread} distinct authored questions (>= 12 required)`, spread >= 12, `${spread}`);
+
+// Across several different R&W levels, 10 replays each should also be varied.
+const perLevel = run(`(function(){
+  const out = {};
+  for (const id of ${JSON.stringify(rwLevels.slice(0, 8))}) {
+    STATE.recentRW = [];
+    const seen = new Set();
+    for (let i=0;i<10;i++) for (const q of buildLevelQuiz(id)) seen.add(q.text);
+    out[id] = seen.size;
+  }
+  return out;
+})()`);
+const thinLevels = Object.entries(perLevel).filter(([, n]) => n < 10);
+check('10 replays of each R&W level yield >= 10 distinct questions', thinLevels.length === 0,
+  thinLevels.map(([id, n]) => `${id}:${n}`).join(', '));
+console.log('   per-level distinct-over-10-runs:', JSON.stringify(perLevel));
 
 console.log('4) No R&W skill/tier falls through to the math fallback');
 const rwOk = run(`(function(){
@@ -99,6 +118,64 @@ const reviewDupes = run(`(function(){
   return new Set(qs.map(q=>q.text)).size === qs.length;
 })()`);
 check('review quiz duplicate-free', reviewDupes);
+
+console.log('6) Review Dungeon: empty and populated skill sets both build a valid quiz');
+// Empty weak-skill list falls back to all skills; a populated list uses the weak ones.
+const reviewEmpty = run(`(function(){
+  STATE.recentRW = [];
+  const qs = buildReviewQuiz([], 6);
+  return qs.length === 6 && qs.every(q => q && q.text && q.choices);
+})()`);
+check('Review Dungeon empty state builds 6 valid questions', reviewEmpty);
+const reviewPop = run(`(function(){
+  STATE.recentRW = [];
+  const qs = buildReviewQuiz(['words-context','boundaries','inferences'], 6);
+  return qs.length === 6 && qs.every(q => q && q.text && q.choices) && new Set(qs.map(q=>q.text)).size === qs.length;
+})()`);
+check('Review Dungeon populated state builds 6 valid, distinct questions', reviewPop);
+
+console.log('7) Daily Tower: floors build valid questions and escalate in difficulty');
+const tower = run(`(function(){
+  const seen = new Set();
+  let invalid = 0;
+  // A valid question is either MC (4 choices) or a grid-in (answer, no choices).
+  const valid = q => q && q.text && ((Array.isArray(q.choices) && q.choices.length===4) || (q.type==='grid' && q.answer!==undefined && q.answer!==''));
+  for (let floor=1; floor<=12; floor++) {
+    const q = buildTowerQuestion(floor);
+    if (!valid(q)) { invalid++; continue; }
+    seen.add(q.text);
+  }
+  // Difficulty escalation is probabilistic (the tower retries to hit the target
+  // tier), so sample many draws and compare the low floors to the high floors.
+  const easyLow = []; const hardHigh = [];
+  for (let i=0;i<40;i++){ easyLow.push(buildTowerQuestion(1).difficulty); hardHigh.push(buildTowerQuestion(12).difficulty); }
+  const share = (arr, label) => arr.filter(d => d===label).length / arr.length;
+  return { invalid, distinct: seen.size, easyShare: share(easyLow,'Easy'), hardShare: share(hardHigh,'Hard') };
+})()`);
+check('Daily Tower builds valid questions on all 12 floors', tower.invalid === 0, `${tower.invalid} invalid`);
+check('Daily Tower questions vary across floors', tower.distinct >= 8, `${tower.distinct} distinct in 12 floors`);
+check('Daily Tower escalates difficulty (low floors mostly Easy, high floors mostly Hard)',
+  tower.easyShare >= 0.7 && tower.hardShare >= 0.7, `easy@1=${tower.easyShare.toFixed(2)}, hard@12=${tower.hardShare.toFixed(2)}`);
+
+console.log('8) Simulation Gate: R&W and Math exam modules build cleanly and vary');
+const exam = run(`(function(){
+  STATE.recentRW = [];
+  const rw = buildExamModule('rw1', false);
+  const rwHard = buildExamModule('rw2', true);
+  const math = buildExamModule('math1', false);
+  const rwOk = rw.length===12 && rw.every(q=>q&&q.text&&q.choices) && new Set(rw.map(q=>q.text)).size===rw.length;
+  const mathOk = math.length===10 && math.every(q=>q&&q.text);
+  // two independent R&W module draws should differ
+  STATE.recentRW = [];
+  const rwA = buildExamModule('rw1', false).map(q=>q.text).join('|');
+  STATE.recentRW = [];
+  const rwB = buildExamModule('rw1', false).map(q=>q.text).join('|');
+  return { rwOk, mathOk, hardOk: rwHard.length===12, vary: rwA!==rwB };
+})()`);
+check('Simulation Gate R&W module: 12 valid, non-duplicate questions', exam.rwOk);
+check('Simulation Gate Math module: 10 valid questions', exam.mathOk);
+check('Simulation Gate adaptive (hard) R&W module builds 12 questions', exam.hardOk);
+check('Simulation Gate R&W module varies between runs', exam.vary);
 
 console.log(`\n${fail === 0 ? '✅ ALL VARIETY CHECKS PASSED' : '❌ ' + fail + ' CHECK(S) FAILED'} (${pass} passed)`);
 process.exit(fail === 0 ? 0 : 1);

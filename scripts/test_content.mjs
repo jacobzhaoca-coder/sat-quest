@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ctx = { console, Math, window: undefined, STATE: { recentRW: [] } };
 vm.createContext(ctx);
-const files = ['js/data/worlds.js', 'js/data/tips.js', 'js/data/mathgen.js', 'js/data/gridgen.js', 'js/data/mathviz.js',
+const files = ['js/data/worlds.js', 'js/data/tips.js', 'js/data/mathgen.js', 'js/data/gridgen.js', 'js/data/mathviz.js', 'js/data/mathgen2.js',
   'js/data/rw/information-ideas.js', 'js/data/rw/craft-structure.js', 'js/data/rw/expression-ideas.js',
   'js/data/rw/conventions.js', 'js/data/rw/index.js', 'js/quiz.js'];
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
@@ -23,6 +23,8 @@ const check = (label, ok, detail = '') => { if (ok) { pass++; console.log('  ✅
 console.log('\n=== READING & WRITING ===');
 const bank = run('RW_BANK');
 console.log(`  Total R&W items: ${bank.length}`);
+
+check('R&W bank has at least 402 items (doubled from the 201 baseline)', bank.length >= 402, `only ${bank.length}`);
 
 const ids = bank.map(q => q.id);
 check('every item has a unique id', new Set(ids).size === ids.length, `${ids.length - new Set(ids).size} dupes`);
@@ -48,6 +50,43 @@ check('no exact duplicate passages/prompts', new Set(texts).size === texts.lengt
 const choiceDup = bank.filter(q => new Set(q.choices.map(c => c.text.trim())).size !== 4);
 check('no item has duplicate answer choices', choiceDup.length === 0, choiceDup.slice(0, 3).map(q => q.id).join(', '));
 
+// Near-duplicate scenario heuristic: compare only the passage/scenario content, with
+// the standard question stems and shared instruction boilerplate stripped out, and flag
+// any two items that share most of their remaining content words. This catches shallow
+// "template slop" (e.g. reusing the same scenario with a reworded stem) without firing
+// on the legitimately templated question stems many item types share.
+const BOILER = new Set(('which choice completes text conforms conventions standard english following adapted ' +
+  'from most logical precise word transition finding true would strongly support claim effectively uses ' +
+  'relevant information notes accomplish this goal describes overall structure best states main idea author ' +
+  'response respond based texts complete that so about article book story essay').split(/\s+/));
+const scenarioOf = t => {
+  let parts = t.split(/\n\n/).filter(p => !/^which choice|^complete the text so/i.test(p.trim()));
+  return parts.join(' ').replace(/which (choice|finding)[^?]*\?/gi, ' ');
+};
+const wordSet = s => new Set(s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 3 && !BOILER.has(w)));
+const jaccard = (a, b) => { const i = [...a].filter(x => b.has(x)).length; const u = new Set([...a, ...b]).size; return u ? i / u : 0; };
+const passages = bank.map(q => ({ id: q.id, skill: q.skill, w: wordSet(scenarioOf(q.text)) }));
+let nearDup = [];
+for (let i = 0; i < passages.length; i++) for (let j = i + 1; j < passages.length; j++) {
+  if (passages[i].w.size < 6 || passages[j].w.size < 6) continue;
+  const sim = jaccard(passages[i].w, passages[j].w);
+  if (sim > 0.6) nearDup.push(`${passages[i].id}~${passages[j].id} (${sim.toFixed(2)})`);
+}
+check('no two scenarios are near-duplicates (content-word overlap <= 0.6)', nearDup.length === 0, nearDup.slice(0, 5).join(', '));
+
+// Blueprint-generated items (batch 2) carry the source tag and are well formed.
+const bpItems = bank.filter(q => q.source === 'blueprint-generated');
+console.log(`  Blueprint-generated R&W items: ${bpItems.length}`);
+check('every blueprint-generated item has a source tag and 4 choices', bpItems.every(q => q.choices.length === 4 && q.whyWrong), '');
+
+// No official-source leakage: the reference folder is analyzed privately only.
+// Guard against any recognizable proper-noun scenarios from the reference set
+// slipping into the committed bank. (Names below are examples the private
+// reference happens to use; none should appear in app content.)
+const FORBIDDEN = ['lillie taylor', 'diné', 'navajo (diné)', 'in the path of the four seasons', 'arizona dock'];
+const leaks = bank.filter(q => { const t = (q.text + ' ' + q.explanation).toLowerCase(); return FORBIDDEN.some(f => t.includes(f)); });
+check('no committed item contains known official-reference text', leaks.length === 0, leaks.slice(0, 3).map(q => q.id).join(', '));
+
 // Coverage
 const stats = run('rwBankStats()');
 console.log('\n  Coverage by domain:');
@@ -57,9 +96,9 @@ console.log('  Coverage by skill (t1/t2/t3):');
 const thin = [];
 for (const [s, c] of Object.entries(stats.bySkill)) {
   console.log(`    ${s.padEnd(16)} ${c[1]}/${c[2]}/${c[3]} = ${c.total}`);
-  for (const t of [1, 2, 3]) if (c[t] < 6) thin.push(`${s}-t${t}:${c[t]}`);
+  for (const t of [1, 2, 3]) if (c[t] < 12) thin.push(`${s}-t${t}:${c[t]}`);
 }
-check('every skill-tier cell has >= 6 items', thin.length === 0, thin.join(', '));
+check('every skill-tier cell has >= 12 items', thin.length === 0, thin.join(', '));
 
 const skillsExpected = ['central-ideas', 'evidence-text', 'evidence-quant', 'inferences', 'words-context', 'structure', 'cross-text', 'transitions', 'synthesis', 'boundaries', 'form-sense'];
 check('all 11 skills are covered', skillsExpected.every(s => stats.bySkill[s] && stats.bySkill[s].total > 0));
@@ -86,16 +125,24 @@ const res = run(`(function(){
     if(q.visual && !(q.visual.html.includes('<svg') && q.visual.alt && q.visual.alt.length>10)) problems.push((q.typeId)+' bad-visual');
     seen.add(q.variantId);
   };
+  const bpSigs = new Set();
   const mathSkills = Object.keys(SKILLS).filter(s=>SKILLS[s].section==='math');
-  for(let rep=0; rep<12; rep++) for(const s of mathSkills) for(const t of [1,2,3]) {
+  for(let rep=0; rep<20; rep++) for(const s of mathSkills) for(const t of [1,2,3]) {
+    const before = seen.size;
     mk(generateMathQuestion, s, t, 'mc');
     if(hasGrid(s)) mk(generateGridQuestion, s, t, 'grid');
     if(hasVisual(s)) mk(generateVisualQuestion, s, t, 'viz');
+    // record blueprint-generated signatures
+    for (const gen of [generateMathQuestion, hasGrid(s)?generateGridQuestion:null].filter(Boolean)) {
+      const q = gen(s, t); if (q && q.source === 'blueprint-generated') bpSigs.add(q.variantId);
+    }
   }
-  return { total, invalid, uniqueVariants: seen.size, problems: problems.slice(0,8) };
+  return { total, invalid, uniqueVariants: seen.size, bpVariants: bpSigs.size, problems: problems.slice(0,8) };
 })()`);
 console.log(`  Generated ${res.total} instances, ${res.uniqueVariants} unique variant signatures, ${res.invalid} invalid`);
+console.log(`  Blueprint-generated math variants (sample): ${res.bpVariants}`);
 check('produced >= 500 unique validated math variants', res.uniqueVariants >= 500, `only ${res.uniqueVariants}`);
+check('produced >= 100 unique blueprint-generated math variants', res.bpVariants >= 100, `only ${res.bpVariants}`);
 check('all generated math instances are valid (solvable, keyed, explained)', res.invalid === 0, res.problems.join('; '));
 
 // Variation across runs for the same skill/tier

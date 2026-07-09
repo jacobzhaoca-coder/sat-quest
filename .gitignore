@@ -1,0 +1,14 @@
+# Official SAT reference materials — PRIVATE. Used only locally to extract
+# abstract blueprints. Must NEVER be committed, pushed, deployed, or cached.
+satquestionsreal/
+
+# Local reference-analysis artifacts (blueprints, notes) — also private.
+reference-blueprints/
+
+# Node artifacts (used only for local headless UI/screenshot testing)
+node_modules/
+package.json
+package-lock.json
+
+# macOS
+.DS_Store

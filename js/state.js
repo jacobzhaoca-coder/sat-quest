@@ -63,7 +63,10 @@ function todayKey(d = new Date()) {
 
 /* ---- XP & player level ---- */
 function xpForCurrentLevel() { return (STATE.playerLevel - 1) * XP_PER_LEVEL; }
-function xpIntoLevel() { return STATE.xp - xpForCurrentLevel(); }
+// Clamp to [0, XP_PER_LEVEL] so an imported or hand-edited save whose xp and
+// playerLevel are out of sync degrades gracefully instead of showing a negative
+// "progress to next level". Normal play keeps xp cumulative, so this never fires.
+function xpIntoLevel() { return Math.max(0, Math.min(XP_PER_LEVEL, STATE.xp - xpForCurrentLevel())); }
 function xpToNextLevel() { return XP_PER_LEVEL; }
 
 function addXP(amount) {

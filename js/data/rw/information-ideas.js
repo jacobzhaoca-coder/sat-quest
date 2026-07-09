@@ -2313,4 +2313,4713 @@ const RW_BANK_II = [
       "D": "Readers praised it."
     }
   },
+  {
+    "id": "central-ideas-t1-07",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "text": "The following text is from an article about urban gardens.\n\nRooftop gardens are spreading across crowded cities, and their appeal goes beyond fresh vegetables. A layer of soil and plants shades the roof beneath it, so buildings with green roofs stay cooler in summer and lose less heat in winter. Some building owners report that the plants have noticeably lowered their energy bills.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Rooftop gardens are difficult and expensive to maintain."
+      },
+      {
+        "letter": "B",
+        "text": "Rooftop gardens offer benefits beyond food, including reduced energy use."
+      },
+      {
+        "letter": "C",
+        "text": "Most city residents prefer fresh vegetables to canned ones."
+      },
+      {
+        "letter": "D",
+        "text": "Green roofs are found only on tall office buildings."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The passage says the appeal \"goes beyond fresh vegetables\" and then describes cooling, insulation, and lower energy bills. B captures that broader benefit.",
+    "whyWrong": {
+      "A": "The text never mentions cost or difficulty of upkeep.",
+      "C": "Vegetable preference is not the subject; energy and climate benefits are.",
+      "D": "No claim is made about which buildings have green roofs."
+    }
+  },
+  {
+    "id": "central-ideas-t1-08",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "text": "The following text is from a profile of a musician.\n\nBefore Ravi Shah filled concert halls, he spent a decade playing in small clubs where the audience often numbered fewer than twenty. He has said those years taught him to hold a listener's attention without relying on a big stage or a light show—just a voice, an instrument, and a room. That skill, he insists, is why his large shows still feel intimate.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Shah dislikes performing in large concert halls."
+      },
+      {
+        "letter": "B",
+        "text": "Small clubs pay musicians poorly."
+      },
+      {
+        "letter": "C",
+        "text": "Shah's years in small venues gave him a skill that still shapes his big performances."
+      },
+      {
+        "letter": "D",
+        "text": "Light shows are essential to a successful concert."
+      }
+    ],
+    "answer": "C",
+    "explanation": "The text connects Shah's decade in small clubs to a lasting skill that keeps his large shows intimate. C states that link.",
+    "whyWrong": {
+      "A": "He performs in large halls; nothing says he dislikes them.",
+      "B": "Pay is never discussed.",
+      "D": "He credits holding attention without a light show, the opposite of D."
+    }
+  },
+  {
+    "id": "central-ideas-t1-09",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "text": "The following text is from a science article about sleep.\n\nWhy do we yawn? For years the popular answer was that yawning pulls in extra oxygen. But recent studies find that oxygen levels barely change when people yawn. A newer idea is that a deep yawn cools the brain slightly, much as a fan cools a warm engine, helping us stay alert when we are drowsy.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Yawning is a sign of poor health."
+      },
+      {
+        "letter": "B",
+        "text": "The oxygen explanation for yawning has given way to a brain-cooling explanation."
+      },
+      {
+        "letter": "C",
+        "text": "People yawn most often in the morning."
+      },
+      {
+        "letter": "D",
+        "text": "Fans are the best way to stay alert."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The passage sets up the old oxygen theory, undercuts it, and offers a newer cooling theory. B tracks that shift.",
+    "whyWrong": {
+      "A": "Health is never mentioned.",
+      "C": "Timing of yawns is not discussed.",
+      "D": "The fan is a comparison, not a recommendation."
+    }
+  },
+  {
+    "id": "central-ideas-t1-10",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "text": "The following text is adapted from a short story.\n\nMara had promised herself she would not look back at the house. She kept her eyes on the road, on the mailbox, on the bend ahead—anywhere but the porch where her grandmother stood waving. Only when the car turned the corner and the house slipped out of sight did she let herself cry.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Mara is angry at her grandmother."
+      },
+      {
+        "letter": "B",
+        "text": "Mara struggles to hold back the emotion of leaving until she no longer has to."
+      },
+      {
+        "letter": "C",
+        "text": "Mara is lost and cannot find the right road."
+      },
+      {
+        "letter": "D",
+        "text": "Mara dislikes long car rides."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Mara forces her gaze away and holds back tears until the house disappears, then finally cries. B captures her restrained grief at leaving.",
+    "whyWrong": {
+      "A": "Nothing suggests anger; the grandmother waves fondly.",
+      "C": "She watches the road deliberately, not because she is lost.",
+      "D": "The car ride itself is not the source of feeling."
+    }
+  },
+  {
+    "id": "central-ideas-t1-11",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "text": "The following text is from an article about language.\n\nEmoji began as a small set of simple icons on Japanese phones in the late 1990s. Today there are thousands, and researchers who study communication argue they now do real linguistic work: a single smiling face can soften a blunt message, and a thumbs-up can close a conversation as clearly as the word \"okay.\"\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Emoji have grown from simple icons into tools that carry real communicative meaning."
+      },
+      {
+        "letter": "B",
+        "text": "Emoji were invented in the United States."
+      },
+      {
+        "letter": "C",
+        "text": "People send too many text messages."
+      },
+      {
+        "letter": "D",
+        "text": "The word \"okay\" is disappearing from English."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The text traces emoji from a few icons to thousands that now perform linguistic functions. A states that development.",
+    "whyWrong": {
+      "B": "The text says emoji began in Japan.",
+      "C": "Message volume is never criticized.",
+      "D": "\"Okay\" is used as a comparison, not described as vanishing."
+    }
+  },
+  {
+    "id": "central-ideas-t1-12",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "text": "The following text is from a nature essay.\n\nThe tide pool looked still, but it was anything but empty. Under the film of water, hermit crabs shuffled between borrowed shells, anemones folded and unfolded their soft arms, and tiny fish darted where a moment before there had seemed to be only stone. Patience, not a net, was what the pool rewarded.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Tide pools are dangerous places for small children."
+      },
+      {
+        "letter": "B",
+        "text": "A tide pool that appears empty is in fact full of quiet activity that patient watching reveals."
+      },
+      {
+        "letter": "C",
+        "text": "Hermit crabs are the most common tide-pool animal."
+      },
+      {
+        "letter": "D",
+        "text": "Nets are the best tool for studying tide pools."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The passage contrasts the pool's still surface with the hidden life patience reveals. B captures that.",
+    "whyWrong": {
+      "A": "Danger to children is never mentioned.",
+      "C": "No animal is ranked as most common.",
+      "D": "The text says patience, not a net, is rewarded."
+    }
+  },
+  {
+    "id": "central-ideas-t2-07",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "text": "The following text is from an article about scientific instruments.\n\nWhen the first telescopes turned toward the night sky, they did more than magnify distant points of light. By revealing moons around Jupiter and craters on the Moon, they showed that the heavens were not the perfect, unchanging realm that tradition had described. In that sense the telescope was not only a tool for seeing farther but an argument for looking again at what everyone thought they already knew.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Early telescopes were too weak to reveal anything useful."
+      },
+      {
+        "letter": "B",
+        "text": "The telescope both extended human sight and challenged long-held beliefs about the sky."
+      },
+      {
+        "letter": "C",
+        "text": "Jupiter has more moons than any other planet."
+      },
+      {
+        "letter": "D",
+        "text": "Astronomers of the past refused to use telescopes."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The passage says the telescope did \"more than magnify\"—it undercut the idea of a perfect, unchanging sky. B holds both the seeing and the challenging.",
+    "whyWrong": {
+      "A": "The text credits telescopes with real discoveries.",
+      "C": "Jupiter's rank among planets is not claimed.",
+      "D": "No refusal to use telescopes is described."
+    }
+  },
+  {
+    "id": "central-ideas-t2-08",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "text": "The following text is from a history of food.\n\nSalt seems ordinary now, but for most of human history it was a strategic resource. Because it could preserve meat and fish through long winters and long voyages, whole trade routes, taxes, and even wars grew up around who controlled it. The mineral we shake onto fries without a thought once helped determine which cities thrived and which went hungry.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Salt is unhealthy and should be eaten in moderation."
+      },
+      {
+        "letter": "B",
+        "text": "Modern cooks use far less salt than earlier cooks did."
+      },
+      {
+        "letter": "C",
+        "text": "Salt's power to preserve food once made it a resource that shaped trade and politics."
+      },
+      {
+        "letter": "D",
+        "text": "Fries taste better with salt than without it."
+      }
+    ],
+    "answer": "C",
+    "explanation": "The text explains that salt's preservative power drove trade routes, taxes, and wars. C names that historical importance.",
+    "whyWrong": {
+      "A": "Health effects are never discussed.",
+      "B": "The text does not compare quantities used across eras.",
+      "D": "The fries are an aside, not the main point."
+    }
+  },
+  {
+    "id": "central-ideas-t2-09",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "text": "The following text is from an article about animal behavior.\n\nBiologists once assumed that only humans and a few primates could recognize themselves in a mirror. But when researchers marked a cleaner wrasse—a small reef fish—with a spot it could see only in reflection, the fish repeatedly tried to scrape the spot off its own body. The result does not settle what the fish understands, but it does force scientists to ask whether self-recognition is as rare as they believed.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Cleaner wrasses are the most intelligent fish in the ocean."
+      },
+      {
+        "letter": "B",
+        "text": "A fish's response to a mirror test challenges the assumption that self-recognition is rare."
+      },
+      {
+        "letter": "C",
+        "text": "Mirror tests are useless for studying animals."
+      },
+      {
+        "letter": "D",
+        "text": "Only primates can pass any behavioral test."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The wrasse's behavior 'forces scientists to ask whether self-recognition is as rare as they believed.' B captures that reframing.",
+    "whyWrong": {
+      "A": "The text avoids ranking the fish's intelligence.",
+      "C": "The mirror test yielded a meaningful result here.",
+      "D": "The passage undercuts, rather than affirms, primate-only claims."
+    }
+  },
+  {
+    "id": "central-ideas-t2-10",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "text": "The following text is adapted from a novel set in a coastal town.\n\nThe lighthouse had been dark for thirty years, replaced by a small automated beacon that needed no keeper and told no stories. Still, on clear evenings the old men gathered at its base as if it might speak again. They did not miss the light so much as the reason it had once given them to climb the hill together.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The men gather at the lighthouse less for its light than for the shared purpose it once gave them."
+      },
+      {
+        "letter": "B",
+        "text": "The automated beacon is more reliable than the old lighthouse."
+      },
+      {
+        "letter": "C",
+        "text": "The town wants to tear down the lighthouse."
+      },
+      {
+        "letter": "D",
+        "text": "The old men are afraid of the dark."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The passage says the men 'did not miss the light so much as the reason it had once given them to climb the hill together.' A states that.",
+    "whyWrong": {
+      "B": "Reliability is mentioned only in passing, not the point.",
+      "C": "No plan to demolish it appears.",
+      "D": "Their gathering is about connection, not fear."
+    }
+  },
+  {
+    "id": "central-ideas-t2-11",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "text": "The following text is from an article about mapmaking.\n\nA map is often praised for what it shows, but its power lies equally in what it leaves out. A subway map, for instance, distorts real distances and ignores streets entirely, yet precisely because it discards that information it lets a rider grasp the whole system at a glance. Usefulness, in cartography, can depend as much on careful omission as on accurate inclusion.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Subway maps are drawn to exact scale."
+      },
+      {
+        "letter": "B",
+        "text": "A map's usefulness can depend as much on what it omits as on what it includes."
+      },
+      {
+        "letter": "C",
+        "text": "Riders prefer maps that show every street."
+      },
+      {
+        "letter": "D",
+        "text": "Cartography is a dying profession."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The passage argues that omission—not just accuracy—makes maps like the subway map useful. B states that thesis.",
+    "whyWrong": {
+      "A": "The text says the subway map distorts distances.",
+      "C": "It credits the map for leaving streets out, not showing them all.",
+      "D": "The profession's future is never mentioned."
+    }
+  },
+  {
+    "id": "central-ideas-t2-12",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "text": "The following text is from an essay about memory.\n\nWe tend to picture memory as a recording that plays back the past exactly. Research suggests something stranger: each time we recall an event, we subtly rebuild it, and small changes can slip in unnoticed. A memory revisited often is not necessarily the most accurate—it may simply be the one we have rewritten the most.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "People with good memories never forget anything."
+      },
+      {
+        "letter": "B",
+        "text": "Frequently recalled memories are always the most accurate."
+      },
+      {
+        "letter": "C",
+        "text": "Remembering is an act of rebuilding, so recall can quietly alter a memory."
+      },
+      {
+        "letter": "D",
+        "text": "Memories are stored like unchangeable video recordings."
+      }
+    ],
+    "answer": "C",
+    "explanation": "The passage contrasts the 'recording' image with research showing recall rebuilds and can alter memories. C states that.",
+    "whyWrong": {
+      "A": "The text is about accuracy of recall, not forgetting nothing.",
+      "B": "The passage says the opposite—frequent recall may mean more rewriting.",
+      "D": "That is the mistaken view the text corrects."
+    }
+  },
+  {
+    "id": "central-ideas-t3-07",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "text": "The following text is from a study of scientific collaboration.\n\nThe romantic image of the lone genius endures, but the record of modern discovery rarely supports it. Landmark papers increasingly carry dozens of authors, and breakthroughs tend to emerge where instruments, data, and specialists converge. This does not diminish individual brilliance; it relocates it, casting the exceptional scientist less as a solitary mind than as the person who can knit many minds into a working whole.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Individual talent no longer matters in science."
+      },
+      {
+        "letter": "B",
+        "text": "Modern discovery reframes scientific genius as the ability to coordinate collaborative work rather than to work alone."
+      },
+      {
+        "letter": "C",
+        "text": "Papers with many authors contain more errors."
+      },
+      {
+        "letter": "D",
+        "text": "The lone genius remains the most accurate model of discovery."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The text says brilliance is not diminished but 'relocated'—the exceptional scientist knits many minds together. B captures this reframing.",
+    "whyWrong": {
+      "A": "The text explicitly says individual brilliance is not diminished.",
+      "C": "Error rates are never discussed.",
+      "D": "The passage argues against the lone-genius model."
+    }
+  },
+  {
+    "id": "central-ideas-t3-08",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "text": "The following text is from a work of literary criticism.\n\nCritics have long treated the novel's abrupt final chapter as a flaw, a story cut off before its natural close. Yet the abruptness may be the point. By refusing the tidy resolution readers expect, the ending forces us to sit with the same uncertainty the characters face, making the discomfort of the last page an extension of the book's argument rather than a failure of craft.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The novel's ending is a clear mistake by an inexperienced writer."
+      },
+      {
+        "letter": "B",
+        "text": "Readers should skip the final chapter of the novel."
+      },
+      {
+        "letter": "C",
+        "text": "The novel's abrupt ending, often seen as a flaw, may be a deliberate device that serves the book's larger purpose."
+      },
+      {
+        "letter": "D",
+        "text": "All novels should end with a tidy resolution."
+      }
+    ],
+    "answer": "C",
+    "explanation": "The critic reinterprets the 'flaw' as intentional, making the discomfort part of the book's argument. C states that.",
+    "whyWrong": {
+      "A": "The text argues against calling it a mistake.",
+      "B": "No such advice is given; the ending is defended.",
+      "D": "The passage praises the refusal of a tidy resolution."
+    }
+  },
+  {
+    "id": "central-ideas-t3-09",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "text": "The following text is from an essay on economics and cities.\n\nPlanners often measure a neighborhood's health by its busyness—foot traffic, open shops, full cafés. But activity and vitality are not the same. A district can bustle with visitors while the residents who give it continuity are quietly priced out, so that the very liveliness taken as a sign of success masks the erosion of the community that produced it.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Busy neighborhoods are always the healthiest ones."
+      },
+      {
+        "letter": "B",
+        "text": "A neighborhood's visible busyness can conceal the displacement of the community that sustained it."
+      },
+      {
+        "letter": "C",
+        "text": "Cafés and shops harm local residents."
+      },
+      {
+        "letter": "D",
+        "text": "Planners should ignore foot traffic entirely."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The passage separates 'activity' from 'vitality,' warning that liveliness can mask residents being priced out. B captures the tension.",
+    "whyWrong": {
+      "A": "The text challenges equating busyness with health.",
+      "C": "Shops themselves are not blamed; displacement is the concern.",
+      "D": "It questions foot traffic as the sole measure, not observing it at all."
+    }
+  },
+  {
+    "id": "central-ideas-t3-10",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "text": "The following text is adapted from a nineteenth-century essay.\n\nWe praise the inventor who gives us the engine, yet we forget the many hands that first imagined it might be possible. Every machine is preceded by a change of mind—a moment when what had seemed fixed came to seem alterable. The true revolution, then, is not in the iron but in the temper of the age that dared to reshape it.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Inventors deserve no credit for their machines."
+      },
+      {
+        "letter": "B",
+        "text": "The deepest source of invention is a shift in how an age imagines what is possible, not the machine itself."
+      },
+      {
+        "letter": "C",
+        "text": "Engines are the most important machines ever built."
+      },
+      {
+        "letter": "D",
+        "text": "Iron is more valuable than ideas."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The essay locates 'the true revolution' not in the iron but in the age's willingness to imagine change. B states that.",
+    "whyWrong": {
+      "A": "The inventor is praised; the point is that a mental shift precedes the machine.",
+      "C": "The engine is an example, not ranked as most important.",
+      "D": "The essay elevates the change of mind over the iron, the opposite of D."
+    }
+  },
+  {
+    "id": "central-ideas-t3-11",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "text": "The following text is from an article about ecology.\n\nConservation once focused on fencing off pristine wilderness, as if nature were healthiest where people were absent. Ecologists now recognize that many landscapes praised as untouched were in fact shaped for centuries by the people who lived in them—burning, planting, and pruning in ways that increased diversity. Protecting such places, it turns out, may require not removing human hands but restoring the practices those hands once performed.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Human activity always destroys natural landscapes."
+      },
+      {
+        "letter": "B",
+        "text": "Wilderness should be fenced off from all human contact."
+      },
+      {
+        "letter": "C",
+        "text": "Some landscapes were shaped by human practices, so conserving them may mean restoring those practices rather than excluding people."
+      },
+      {
+        "letter": "D",
+        "text": "Ecologists no longer study wilderness at all."
+      }
+    ],
+    "answer": "C",
+    "explanation": "The passage overturns the 'people-free' model, arguing some 'untouched' places were human-shaped and may need those practices restored. C captures it.",
+    "whyWrong": {
+      "A": "The text describes human practices that increased diversity.",
+      "B": "This is the older view the passage revises.",
+      "D": "Ecologists are shown actively rethinking wilderness."
+    }
+  },
+  {
+    "id": "central-ideas-t3-12",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "text": "The following text is from a study of translation.\n\nA faithful translation, we assume, is one that changes as little as possible. But languages carve up the world differently—what one renders in a single word another can only circle with a phrase—so the translator who clings to the surface of the original often betrays its effect. Fidelity, paradoxically, can demand departure: to keep a poem's music or its wit, the translator may have to abandon its literal words.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The best translation reproduces the original word for word."
+      },
+      {
+        "letter": "B",
+        "text": "Staying faithful to a text's effect can require departing from its literal words."
+      },
+      {
+        "letter": "C",
+        "text": "Poems cannot be translated at all."
+      },
+      {
+        "letter": "D",
+        "text": "Translators should invent their own meanings freely."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The passage argues fidelity 'can demand departure'—keeping the effect may mean abandoning literal words. B states the paradox.",
+    "whyWrong": {
+      "A": "The text says clinging to the surface can betray the original.",
+      "C": "It discusses how to translate poems, not their impossibility.",
+      "D": "Departure serves fidelity here, not free invention."
+    }
+  },
+  {
+    "id": "evidence-text-t1-07",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "text": "A student claims that a school's new later start time has helped students get more sleep.\n\nWhich finding, if true, would most directly support the student's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The school cafeteria began serving breakfast later in the morning."
+      },
+      {
+        "letter": "B",
+        "text": "Surveys show students now report sleeping about 40 minutes more per night than before the change."
+      },
+      {
+        "letter": "C",
+        "text": "Attendance at after-school clubs rose slightly."
+      },
+      {
+        "letter": "D",
+        "text": "The school added several new elective courses this year."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is about more sleep. A survey showing students sleep about 40 minutes more directly supports it.",
+    "whyWrong": {
+      "A": "A later breakfast does not measure sleep.",
+      "C": "Club attendance is unrelated to hours slept.",
+      "D": "New electives say nothing about sleep."
+    }
+  },
+  {
+    "id": "evidence-text-t1-08",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "text": "A gardener claims that adding compost to the soil made her tomato plants healthier this season.\n\nWhich finding, if true, would most directly support the gardener's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The composted plants produced more fruit and had greener, fuller leaves than her uncomposted plants."
+      },
+      {
+        "letter": "B",
+        "text": "The gardener bought her seeds from a new store this year."
+      },
+      {
+        "letter": "C",
+        "text": "The summer was slightly warmer than the previous one."
+      },
+      {
+        "letter": "D",
+        "text": "Her neighbor also grows tomatoes."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Comparing composted plants to uncomposted ones and finding the composted ones healthier directly supports that compost helped.",
+    "whyWrong": {
+      "B": "A new seed source is an alternative cause, not support for compost.",
+      "C": "Warmer weather is another variable, not evidence for compost.",
+      "D": "A neighbor's gardening is irrelevant to her plants' health."
+    }
+  },
+  {
+    "id": "evidence-text-t1-09",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "text": "A researcher claims that a city's new bike lanes have made cycling safer.\n\nWhich finding, if true, would most directly support the researcher's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "More people say they enjoy cycling downtown."
+      },
+      {
+        "letter": "B",
+        "text": "The city painted the lanes bright green."
+      },
+      {
+        "letter": "C",
+        "text": "The number of collisions involving cyclists on those streets dropped after the lanes were added."
+      },
+      {
+        "letter": "D",
+        "text": "The bike lanes were expensive to build."
+      }
+    ],
+    "answer": "C",
+    "explanation": "Safety is best shown by fewer collisions. A drop in cyclist collisions after the lanes appeared directly supports the claim.",
+    "whyWrong": {
+      "A": "Enjoyment is not the same as safety.",
+      "B": "The lanes' color does not measure safety.",
+      "D": "Cost is unrelated to whether cycling is safer."
+    }
+  },
+  {
+    "id": "evidence-text-t1-10",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "text": "A coach claims that a team's new warm-up routine has reduced player injuries.\n\nWhich finding, if true, would most directly support the coach's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Players say the warm-up is more fun than the old one."
+      },
+      {
+        "letter": "B",
+        "text": "The team recorded far fewer injuries this season than in seasons before the routine began."
+      },
+      {
+        "letter": "C",
+        "text": "The warm-up takes about ten minutes to complete."
+      },
+      {
+        "letter": "D",
+        "text": "The team won more games this season."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim concerns fewer injuries, so a drop in recorded injuries after adopting the routine directly supports it.",
+    "whyWrong": {
+      "A": "Enjoyment does not measure injuries.",
+      "C": "The routine's length is not evidence about injuries.",
+      "D": "More wins could come from many causes unrelated to injuries."
+    }
+  },
+  {
+    "id": "evidence-text-t1-11",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "text": "A librarian claims that placing a display of staff-recommended books near the entrance has encouraged patrons to check out more of those titles.\n\nWhich finding, if true, would most directly support the librarian's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The display is decorated with colorful signs."
+      },
+      {
+        "letter": "B",
+        "text": "The library extended its weekend hours this month."
+      },
+      {
+        "letter": "C",
+        "text": "Checkouts of the recommended titles rose sharply after the display went up."
+      },
+      {
+        "letter": "D",
+        "text": "Patrons say the library is a pleasant place to read."
+      }
+    ],
+    "answer": "C",
+    "explanation": "The claim is that the display increased checkouts of those titles. A rise in their checkouts after the display appeared directly supports it.",
+    "whyWrong": {
+      "A": "Decoration does not measure checkouts.",
+      "B": "Longer hours are a separate factor that could affect checkouts.",
+      "D": "General pleasantness is not evidence about the display's effect."
+    }
+  },
+  {
+    "id": "evidence-text-t1-12",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "text": "A teacher claims that letting students explain problems to one another has improved their understanding of the material.\n\nWhich finding, if true, would most directly support the teacher's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Students who taught one another scored higher on later tests than they had before."
+      },
+      {
+        "letter": "B",
+        "text": "The classroom was rearranged into small groups."
+      },
+      {
+        "letter": "C",
+        "text": "Students say the class is louder than it used to be."
+      },
+      {
+        "letter": "D",
+        "text": "The teacher assigned less homework this term."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Improved understanding is best shown by higher test scores after the peer-teaching began. A supports the claim directly.",
+    "whyWrong": {
+      "B": "Rearranging desks is a setup detail, not evidence of understanding.",
+      "C": "Noise level says nothing about understanding.",
+      "D": "Less homework is a separate change, not support for the claim."
+    }
+  },
+  {
+    "id": "evidence-text-t2-07",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "text": "The following text is from a student's report.\n\nThe student argues that a species of desert lizard survives extreme midday heat mainly by changing its behavior rather than its body.\n\nWhich finding, if true, would most strongly support the student's argument?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The lizard's skin is a pale sandy color."
+      },
+      {
+        "letter": "B",
+        "text": "During the hottest hours, the lizard retreats into shaded burrows and emerges only when temperatures fall."
+      },
+      {
+        "letter": "C",
+        "text": "The lizard is closely related to species that live in cooler regions."
+      },
+      {
+        "letter": "D",
+        "text": "The lizard lays its eggs in early spring."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The argument is that behavior, not body, drives survival. Retreating to shade during peak heat is a behavioral response, directly supporting it.",
+    "whyWrong": {
+      "A": "Pale skin is a bodily trait, which would work against a behavior-based claim.",
+      "C": "Relation to cooler-region species does not show how it handles heat.",
+      "D": "Egg-laying timing does not address surviving midday heat."
+    }
+  },
+  {
+    "id": "evidence-text-t2-08",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "text": "The following text is from an article about archaeology.\n\nResearchers propose that an ancient settlement was abandoned gradually over many years rather than suddenly destroyed.\n\nWhich finding, if true, would most strongly support the researchers' proposal?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "A thick layer of ash covers the entire site at a single level."
+      },
+      {
+        "letter": "B",
+        "text": "Valuable tools and pottery were left broken and scattered across the floors."
+      },
+      {
+        "letter": "C",
+        "text": "Houses show signs of being repaired and then, one by one over decades, sealed up and left empty."
+      },
+      {
+        "letter": "D",
+        "text": "The settlement's walls collapsed inward all at once."
+      }
+    ],
+    "answer": "C",
+    "explanation": "Gradual abandonment predicts a slow, staggered emptying. Houses sealed 'one by one over decades' directly matches that pattern.",
+    "whyWrong": {
+      "A": "A single ash layer suggests a sudden fire, the opposite of gradual.",
+      "B": "Valuables left in ruin suggest a sudden disaster, not a slow departure.",
+      "D": "An all-at-once collapse points to sudden destruction."
+    }
+  },
+  {
+    "id": "evidence-text-t2-09",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "text": "The following text is from a review of an experiment.\n\nA nutritionist claims that a new cereal keeps people feeling full longer than a standard cereal with the same number of calories.\n\nWhich finding, if true, would most strongly support the nutritionist's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The new cereal comes in more flavors than the standard one."
+      },
+      {
+        "letter": "B",
+        "text": "In a trial, people who ate the new cereal reported hunger later, and ate less at lunch, than those given the standard cereal."
+      },
+      {
+        "letter": "C",
+        "text": "The new cereal is more expensive to produce."
+      },
+      {
+        "letter": "D",
+        "text": "The new cereal is marketed mainly to adults."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is about staying full longer at equal calories. A trial where the new cereal delayed hunger and reduced lunch intake supports it directly.",
+    "whyWrong": {
+      "A": "Flavor variety does not measure fullness.",
+      "C": "Production cost is irrelevant to satiety.",
+      "D": "Target market says nothing about how full people feel."
+    }
+  },
+  {
+    "id": "evidence-text-t2-10",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "text": "The following text is from a literary discussion.\n\nA critic argues that the poet's later work grew noticeably more hopeful than her early poems.\n\nWhich finding, if true, would most strongly support the critic's argument?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The poet published her later work with a different press."
+      },
+      {
+        "letter": "B",
+        "text": "The poet's early poems are shorter than her later ones."
+      },
+      {
+        "letter": "C",
+        "text": "Where early poems dwell on loss and closed doors, the later poems repeatedly turn toward light, renewal, and open horizons."
+      },
+      {
+        "letter": "D",
+        "text": "The poet wrote her later work in a coastal town."
+      }
+    ],
+    "answer": "C",
+    "explanation": "A shift toward hope should show in the poems' imagery and themes. Early poems of loss versus later ones of renewal directly demonstrate the change.",
+    "whyWrong": {
+      "A": "The publisher does not reveal the poems' mood.",
+      "B": "Length is unrelated to hopefulness.",
+      "D": "Where she wrote does not show a change in tone."
+    }
+  },
+  {
+    "id": "evidence-text-t2-11",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "text": "The following text is from an environmental report.\n\nScientists claim that a reintroduced predator has helped restore balance to a valley's ecosystem by controlling an overgrown deer population.\n\nWhich finding, if true, would most strongly support the scientists' claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "After the predator returned, deer numbers fell and young trees that deer had been overgrazing began to recover."
+      },
+      {
+        "letter": "B",
+        "text": "The predator is larger than most animals in the valley."
+      },
+      {
+        "letter": "C",
+        "text": "Tourists now visit the valley hoping to see the predator."
+      },
+      {
+        "letter": "D",
+        "text": "The valley receives more rainfall than nearby regions."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim links the predator to controlling deer and restoring balance. Falling deer numbers plus recovering trees directly show that chain of effects.",
+    "whyWrong": {
+      "B": "The predator's size does not demonstrate ecological balance.",
+      "C": "Tourism is unrelated to the ecosystem's health.",
+      "D": "Rainfall is a separate factor, not evidence about the predator."
+    }
+  },
+  {
+    "id": "evidence-text-t2-12",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "text": "The following text is from a study of learning.\n\nEducators propose that spacing study sessions across several days helps students remember material better than cramming it all at once.\n\nWhich finding, if true, would most strongly support the educators' proposal?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Students who spread their studying over a week recalled more on a delayed test than students who studied the same total time in one sitting."
+      },
+      {
+        "letter": "B",
+        "text": "Students who crammed reported feeling more confident right afterward."
+      },
+      {
+        "letter": "C",
+        "text": "Spaced study requires planning a schedule in advance."
+      },
+      {
+        "letter": "D",
+        "text": "Both groups spent the same number of total minutes studying."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The proposal is that spacing improves memory. Better recall on a delayed test for the spaced group directly supports it.",
+    "whyWrong": {
+      "B": "Confidence right after cramming is not the same as remembering later.",
+      "C": "Needing a schedule is a practical detail, not evidence of better memory.",
+      "D": "Equal total time sets up a fair comparison but does not itself show which worked better."
+    }
+  },
+  {
+    "id": "evidence-text-t3-07",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "text": "The following text is from a research summary.\n\nA team hypothesizes that a bird species' complex songs are learned from adults rather than inherited at birth. To test this, they raised some chicks in isolation, with no adult birds to hear.\n\nWhich result, if observed, would most strongly support the team's hypothesis?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The isolated chicks grew to the same size as chicks raised normally."
+      },
+      {
+        "letter": "B",
+        "text": "The isolated chicks produced only simple, incomplete songs, unlike the full songs of chicks raised among adults."
+      },
+      {
+        "letter": "C",
+        "text": "The isolated chicks were more aggressive than other chicks."
+      },
+      {
+        "letter": "D",
+        "text": "The isolated chicks ate the same food as chicks raised normally."
+      }
+    ],
+    "answer": "B",
+    "explanation": "If song is learned from adults, chicks deprived of adult models should fail to develop full songs. B is exactly that outcome, supporting the hypothesis.",
+    "whyWrong": {
+      "A": "Body size does not bear on whether song is learned.",
+      "C": "Aggression is unrelated to song learning.",
+      "D": "Diet is a control detail, not evidence about learning song."
+    }
+  },
+  {
+    "id": "evidence-text-t3-08",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "text": "The following text is from a historian's argument.\n\nA historian contends that a medieval town's prosperity depended less on its famous cathedral, which drew pilgrims, than on the river trade that quietly passed through it.\n\nWhich finding, if true, would most strongly support the historian's contention?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The cathedral took over a century to complete."
+      },
+      {
+        "letter": "B",
+        "text": "Town records show that tax revenue tracked the volume of river shipping closely, but barely changed during major pilgrimage years."
+      },
+      {
+        "letter": "C",
+        "text": "Pilgrims traveled from many distant regions to see the cathedral."
+      },
+      {
+        "letter": "D",
+        "text": "The cathedral was admired by architects across Europe."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is that trade, not pilgrimage, drove prosperity. Revenue tracking shipping but not pilgrimage years directly ties wealth to the river, supporting the argument.",
+    "whyWrong": {
+      "A": "Construction time says nothing about the town's economy.",
+      "C": "Distant pilgrims might suggest the cathedral mattered, weakening the claim.",
+      "D": "Architectural fame is unrelated to the source of prosperity."
+    }
+  },
+  {
+    "id": "evidence-text-t3-09",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "text": "The following text is from a psychology paper.\n\nResearchers suggest that people judge a room as more welcoming when it contains rounded shapes rather than sharp angles, even when they cannot say why.\n\nWhich result, if observed, would most strongly support the researchers' suggestion?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Participants rated rooms with curved furniture as friendlier than identical rooms with angular furniture, though they gave no consistent reason."
+      },
+      {
+        "letter": "B",
+        "text": "Participants preferred larger rooms to smaller ones."
+      },
+      {
+        "letter": "C",
+        "text": "Participants spent more time in brightly lit rooms."
+      },
+      {
+        "letter": "D",
+        "text": "Participants remembered angular rooms more accurately."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The suggestion pairs a preference for rounded shapes with an inability to explain it. A shows both: higher friendliness ratings for curves and no consistent stated reason.",
+    "whyWrong": {
+      "B": "Room size is a different variable than shape.",
+      "C": "Lighting is not the rounded-versus-angular contrast being tested.",
+      "D": "Better memory for angular rooms does not address perceived welcome."
+    }
+  },
+  {
+    "id": "evidence-text-t3-10",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "text": "The following text is from a study of migration.\n\nEcologists propose that a butterfly species navigates its long migration primarily by sensing the Earth's magnetic field rather than by following visual landmarks.\n\nWhich result, if observed, would most strongly support the ecologists' proposal?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Butterflies migrate during the warmer months of the year."
+      },
+      {
+        "letter": "B",
+        "text": "When placed in an altered magnetic field but shown a normal landscape, the butterflies shifted their flight direction accordingly."
+      },
+      {
+        "letter": "C",
+        "text": "The butterflies rest on the same species of tree each night."
+      },
+      {
+        "letter": "D",
+        "text": "The butterflies travel in large groups."
+      }
+    ],
+    "answer": "B",
+    "explanation": "If magnetism guides them, changing the magnetic field—while keeping the landscape normal—should redirect them. B is precisely that result, isolating the magnetic cue.",
+    "whyWrong": {
+      "A": "Season of travel does not distinguish magnetic from visual navigation.",
+      "C": "Resting trees are landmarks, if anything weakening the magnetic claim.",
+      "D": "Group travel does not reveal the navigation method."
+    }
+  },
+  {
+    "id": "evidence-text-t3-11",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "text": "The following text is from an economics study.\n\nAn economist argues that offering shoppers a smaller number of product choices can increase sales, because too many options overwhelm buyers into purchasing nothing.\n\nWhich finding, if true, would most strongly support the economist's argument?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "A store that reduced its jam selection from 24 kinds to 6 saw more customers actually complete a purchase."
+      },
+      {
+        "letter": "B",
+        "text": "Customers said they enjoyed browsing the larger selection."
+      },
+      {
+        "letter": "C",
+        "text": "The store with 24 kinds attracted more first-time visitors."
+      },
+      {
+        "letter": "D",
+        "text": "The six remaining jams were the store's least expensive."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The argument links fewer choices to more completed sales. A shows exactly that: cutting the selection raised the share who bought something.",
+    "whyWrong": {
+      "B": "Enjoying browsing is not the same as buying.",
+      "C": "More visitors to the large display does not mean more purchases.",
+      "D": "Lower price is an alternative cause, muddying rather than supporting the choice-overload claim."
+    }
+  },
+  {
+    "id": "evidence-text-t3-12",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "text": "The following text is from a linguistics paper.\n\nA linguist hypothesizes that a dialect's unusual vowel sounds arose from contact with a neighboring language rather than developing on their own.\n\nWhich finding, if true, would most strongly support the linguist's hypothesis?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The dialect is spoken by a relatively small community."
+      },
+      {
+        "letter": "B",
+        "text": "The distinctive vowels appear almost only in areas that historically bordered speakers of the neighboring language, and match that language's vowels closely."
+      },
+      {
+        "letter": "C",
+        "text": "The dialect has a rich tradition of spoken poetry."
+      },
+      {
+        "letter": "D",
+        "text": "Younger speakers use the dialect less than older ones."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Contact-based change predicts the features cluster near the border and resemble the neighbor's sounds. B shows both, strongly supporting the contact hypothesis.",
+    "whyWrong": {
+      "A": "Community size does not indicate the vowels' origin.",
+      "C": "A poetry tradition is unrelated to where the vowels came from.",
+      "D": "Generational decline concerns the dialect's future, not its origin."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-07",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "text": "A chart shows the number of trees planted by a volunteer group each year: 120 in 2019, 150 in 2020, 210 in 2021, and 260 in 2022.\n\nWhich choice most effectively uses the data to support the claim that the group planted more trees each year?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The group planted 210 trees in 2021."
+      },
+      {
+        "letter": "B",
+        "text": "The number of trees planted rose every year, from 120 in 2019 to 260 in 2022."
+      },
+      {
+        "letter": "C",
+        "text": "The group planted the fewest trees in 2019."
+      },
+      {
+        "letter": "D",
+        "text": "The group planted trees in four different years."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is a year-over-year increase. B shows the steady rise across all four years, from 120 up to 260.",
+    "whyWrong": {
+      "A": "A single year's figure does not show a yearly increase.",
+      "C": "A minimum in 2019 alone does not establish the upward trend.",
+      "D": "Merely planting in four years does not show the numbers grew."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-08",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "text": "A table lists average daily temperatures for four cities in July: 68°F, 74°F, 81°F, and 90°F.\n\nWhich choice most effectively uses the data to support the claim that the cities differ widely in July temperature?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "One city averaged 74°F in July."
+      },
+      {
+        "letter": "B",
+        "text": "All four cities were measured in July."
+      },
+      {
+        "letter": "C",
+        "text": "July temperatures ranged from 68°F in the coolest city to 90°F in the warmest, a spread of 22°F."
+      },
+      {
+        "letter": "D",
+        "text": "Three of the cities were above 70°F."
+      }
+    ],
+    "answer": "C",
+    "explanation": "A wide difference is shown by the full range. C gives the 22°F spread from coolest to warmest, directly supporting the claim.",
+    "whyWrong": {
+      "A": "One city's value does not show a wide difference.",
+      "B": "Sharing the same month is not about temperature spread.",
+      "D": "Counting cities above 70°F does not capture the range."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-09",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "text": "A survey found that of 200 students, 90 walk to school, 60 take the bus, 30 ride bikes, and 20 are driven.\n\nWhich choice most effectively uses the data to support the claim that walking is the most common way students get to school?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Thirty students ride bikes to school."
+      },
+      {
+        "letter": "B",
+        "text": "More students walk (90) than use any other single method."
+      },
+      {
+        "letter": "C",
+        "text": "Twenty students are driven to school."
+      },
+      {
+        "letter": "D",
+        "text": "The survey included 200 students."
+      }
+    ],
+    "answer": "B",
+    "explanation": "'Most common' means the largest single group. B shows 90 walkers exceed every other method's count.",
+    "whyWrong": {
+      "A": "Bike riders are one of the smaller groups, not evidence walking leads.",
+      "C": "The driven group is the smallest, not relevant to walking's lead.",
+      "D": "The total sample size does not identify the most common method."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-10",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "text": "A graph shows a store's monthly umbrella sales: 40 in April, 95 in May, 30 in June. Rainfall was highest in May.\n\nWhich choice most effectively uses the data to support the claim that umbrella sales peaked in the rainiest month?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The store sold 40 umbrellas in April."
+      },
+      {
+        "letter": "B",
+        "text": "Umbrella sales were higher in May (95) than in April or June, and May had the most rainfall."
+      },
+      {
+        "letter": "C",
+        "text": "The store sold umbrellas in three months."
+      },
+      {
+        "letter": "D",
+        "text": "June sales were lower than April sales."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim ties the sales peak to the rainiest month. B pairs May's highest sales (95) with May's highest rainfall.",
+    "whyWrong": {
+      "A": "April's figure alone does not show a peak in the rainiest month.",
+      "C": "Selling in three months does not identify the peak.",
+      "D": "Comparing June to April ignores May, the rainy peak."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-11",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "text": "A study measured how long four types of phone battery lasted on a single charge: 8 hours, 11 hours, 14 hours, and 19 hours.\n\nWhich choice most effectively uses the data to support the claim that battery life varied considerably among the phones?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "One phone lasted 11 hours."
+      },
+      {
+        "letter": "B",
+        "text": "All four phones were tested on a single charge."
+      },
+      {
+        "letter": "C",
+        "text": "Battery life ranged from 8 hours for the shortest to 19 hours for the longest."
+      },
+      {
+        "letter": "D",
+        "text": "Two of the phones lasted more than 10 hours."
+      }
+    ],
+    "answer": "C",
+    "explanation": "Considerable variation is shown by the full range. C reports the 8-to-19-hour spread, supporting the claim.",
+    "whyWrong": {
+      "A": "One phone's life does not show variation.",
+      "B": "The shared test method is not about variation in results.",
+      "D": "Counting phones over 10 hours omits the extremes that show the spread."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-12",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "text": "A club tracked attendance at its meetings: 12 members in week 1, 18 in week 2, 25 in week 3, and 31 in week 4.\n\nWhich choice most effectively uses the data to support the claim that the club's meetings grew steadily more popular?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Attendance rose each week, from 12 in week 1 to 31 in week 4."
+      },
+      {
+        "letter": "B",
+        "text": "The club held four meetings."
+      },
+      {
+        "letter": "C",
+        "text": "Eighteen members came in week 2."
+      },
+      {
+        "letter": "D",
+        "text": "Week 1 had the lowest attendance."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Steady growth is shown by attendance rising every week. A gives the full increase from 12 to 31.",
+    "whyWrong": {
+      "B": "The number of meetings does not show growing popularity.",
+      "C": "A single week's count does not establish the trend.",
+      "D": "A low starting point alone does not prove steady growth."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-07",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "text": "A study compared two fertilizers. Plants given Fertilizer X grew an average of 22 cm; plants given Fertilizer Y grew an average of 15 cm; untreated plants grew 12 cm.\n\nWhich choice most effectively uses the data to support the claim that Fertilizer X promoted the most growth?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Untreated plants grew 12 cm on average."
+      },
+      {
+        "letter": "B",
+        "text": "Plants given Fertilizer X grew an average of 22 cm, more than those given Fertilizer Y (15 cm) or no fertilizer (12 cm)."
+      },
+      {
+        "letter": "C",
+        "text": "Fertilizer Y outperformed no fertilizer."
+      },
+      {
+        "letter": "D",
+        "text": "Some plants received no fertilizer at all."
+      }
+    ],
+    "answer": "B",
+    "explanation": "'Most growth' requires comparing X to both alternatives. B shows X's 22 cm exceeds Y's 15 cm and the untreated 12 cm.",
+    "whyWrong": {
+      "A": "The untreated figure alone says nothing about X leading.",
+      "C": "Y beating no fertilizer does not show X is best.",
+      "D": "That a control group existed does not identify the top performer."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-08",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "text": "A report notes that a river's fish population fell from 5,000 in 2010 to 2,000 in 2015, then rose to 4,500 by 2020 after cleanup efforts began in 2015.\n\nWhich choice most effectively uses the data to support the claim that the cleanup helped the fish population recover?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The population was 5,000 in 2010."
+      },
+      {
+        "letter": "B",
+        "text": "The population fell between 2010 and 2015."
+      },
+      {
+        "letter": "C",
+        "text": "After cleanup began in 2015, the population rose from 2,000 to 4,500 by 2020."
+      },
+      {
+        "letter": "D",
+        "text": "The population never returned to its 2010 level."
+      }
+    ],
+    "answer": "C",
+    "explanation": "Recovery after the cleanup is shown by the rise following 2015. C reports the climb from 2,000 to 4,500 once cleanup began.",
+    "whyWrong": {
+      "A": "The 2010 figure predates the cleanup and shows no recovery.",
+      "B": "The earlier decline occurred before cleanup began.",
+      "D": "Falling short of 2010 does not demonstrate the recovery the cleanup produced."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-09",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "text": "A survey of readers found that 15% finished the novel in under a week, 45% in one to two weeks, 30% in three to four weeks, and 10% took longer than a month.\n\nWhich choice most effectively uses the data to support the claim that most readers finished the novel within two weeks?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Ten percent took longer than a month."
+      },
+      {
+        "letter": "B",
+        "text": "Combined, 60% of readers finished in two weeks or less (15% under a week plus 45% in one to two weeks)."
+      },
+      {
+        "letter": "C",
+        "text": "Thirty percent finished in three to four weeks."
+      },
+      {
+        "letter": "D",
+        "text": "Forty-five percent finished in one to two weeks."
+      }
+    ],
+    "answer": "B",
+    "explanation": "'Most' means over half. B adds the two fastest groups (15% + 45% = 60%) to show a majority finished within two weeks.",
+    "whyWrong": {
+      "A": "The slowest group works against the claim, not for it.",
+      "C": "Three-to-four-week readers took longer than two weeks.",
+      "D": "45% alone is not a majority; the under-a-week group must be added."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-10",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "text": "A city measured air pollution before and after limiting downtown traffic. A key pollutant averaged 48 units before the limit and 33 units after, while a nearby city with no limit stayed near 47 units.\n\nWhich choice most effectively uses the data to support the claim that the traffic limit improved downtown air quality?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The nearby city measured about 47 units."
+      },
+      {
+        "letter": "B",
+        "text": "The pollutant fell from 48 to 33 units where traffic was limited, while the comparison city without a limit stayed near 47."
+      },
+      {
+        "letter": "C",
+        "text": "The pollutant was measured in both cities."
+      },
+      {
+        "letter": "D",
+        "text": "Downtown traffic was limited to reduce pollution."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The strongest support pairs the drop where the limit was applied (48 to 33) with the unchanged comparison city (near 47), isolating the limit's effect. B does this.",
+    "whyWrong": {
+      "A": "The comparison city's value alone does not show downtown improved.",
+      "C": "That both were measured is method, not evidence of improvement.",
+      "D": "Stating the goal is not data showing the goal was met."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-11",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "text": "A bakery recorded that adding a small seating area coincided with average daily customers rising from 80 to 110, while daily customers at its other branch, which added no seating, held steady at about 82.\n\nWhich choice most effectively uses the data to support the claim that the seating area attracted more customers?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The other branch averaged about 82 customers a day."
+      },
+      {
+        "letter": "B",
+        "text": "Daily customers rose from 80 to 110 at the branch that added seating, while the branch without seating stayed near 82."
+      },
+      {
+        "letter": "C",
+        "text": "Both branches sell the same baked goods."
+      },
+      {
+        "letter": "D",
+        "text": "The seating area was small."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim credits the seating for more customers. B contrasts the rise where seating was added (80 to 110) with the flat branch (82), pointing to the seating.",
+    "whyWrong": {
+      "A": "The unchanged branch alone does not show the seating helped.",
+      "C": "Shared menu is background, not evidence of the seating's effect.",
+      "D": "The seating's size does not measure its effect on customers."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-12",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "text": "A test compared reading speeds under three lighting conditions. Readers averaged 210 words per minute in bright light, 205 in medium light, and 160 in dim light.\n\nWhich choice most effectively uses the data to support the claim that only dim lighting noticeably slowed reading?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Readers averaged 205 words per minute in medium light."
+      },
+      {
+        "letter": "B",
+        "text": "Reading speed was similar in bright (210) and medium (205) light but dropped sharply in dim light (160)."
+      },
+      {
+        "letter": "C",
+        "text": "Bright light produced the fastest reading."
+      },
+      {
+        "letter": "D",
+        "text": "Three lighting conditions were tested."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is that only dim light slowed reading. B shows bright and medium were close (210 vs. 205) while dim fell to 160.",
+    "whyWrong": {
+      "A": "The medium-light value alone does not show that only dim slowed reading.",
+      "C": "Bright being fastest ignores that medium was nearly the same.",
+      "D": "The number of conditions is not evidence about the slowdown."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-07",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "text": "A study measured a crop's yield at four planting densities (plants per square meter): 4 plants gave 3.2 kg, 8 plants gave 5.1 kg, 12 plants gave 5.4 kg, and 16 plants gave 4.6 kg.\n\nWhich choice most effectively uses the data to support the claim that yield rises with density only up to a point, after which it declines?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Yield increased from 3.2 kg at 4 plants to a peak of 5.4 kg at 12 plants, then fell to 4.6 kg at 16 plants."
+      },
+      {
+        "letter": "B",
+        "text": "The lowest yield occurred at the lowest density."
+      },
+      {
+        "letter": "C",
+        "text": "Yield at 8 plants was 5.1 kg."
+      },
+      {
+        "letter": "D",
+        "text": "Sixteen plants per square meter is the highest density tested."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim describes a rise then a fall. A traces the increase to a peak at 12 plants (5.4 kg) and the decline at 16 plants (4.6 kg).",
+    "whyWrong": {
+      "B": "The low-density minimum shows only the rising part, not the later decline.",
+      "C": "A single midpoint value does not show the up-then-down pattern.",
+      "D": "Naming the highest density does not describe the yield trend."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-08",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "text": "Researchers compared two teaching methods. On an easy test, Method A scored 88 and Method B scored 86—nearly equal. On a hard test, Method A scored 71 while Method B scored 55.\n\nWhich choice most effectively uses the data to support the claim that Method A's advantage appears mainly on more difficult material?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Method A scored 88 on the easy test."
+      },
+      {
+        "letter": "B",
+        "text": "The two methods scored nearly the same on the easy test (88 vs. 86) but Method A far outscored Method B on the hard test (71 vs. 55)."
+      },
+      {
+        "letter": "C",
+        "text": "Both methods scored above 50 on the hard test."
+      },
+      {
+        "letter": "D",
+        "text": "Method B scored 86 on the easy test."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is that A's edge shows up on hard material. B contrasts the near-tie on the easy test with A's large lead on the hard test.",
+    "whyWrong": {
+      "A": "One easy-test score does not reveal where A's advantage lies.",
+      "C": "Both clearing 50 ignores the gap that shows A's advantage.",
+      "D": "B's easy-test score alone does not address the difficulty pattern."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-09",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "text": "A survey reported that 70% of respondents said they recycle regularly, yet a separate audit of the same neighborhood's bins found recyclable material in only 40% of them.\n\nWhich choice most effectively uses the data to support the claim that people may overstate how often they recycle?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Seventy percent of respondents said they recycle regularly."
+      },
+      {
+        "letter": "B",
+        "text": "Although 70% reported recycling regularly, the bin audit found recyclables in only 40% of bins—a gap suggesting self-reports exceed actual behavior."
+      },
+      {
+        "letter": "C",
+        "text": "The audit examined the neighborhood's bins."
+      },
+      {
+        "letter": "D",
+        "text": "Forty percent of bins contained recyclable material."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Overstating is shown by the gap between what people say (70%) and what the audit found (40%). B pairs both figures to reveal that gap.",
+    "whyWrong": {
+      "A": "The self-report alone gives no basis for comparison.",
+      "C": "That an audit occurred is method, not the revealing contrast.",
+      "D": "The audit figure alone, without the 70% claim, does not show overstatement."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-10",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "text": "A clinic tracked two groups. In the group that received text-message reminders, 82% kept their appointments; in the group that did not, 61% did. The two groups were otherwise similar in age and distance from the clinic.\n\nWhich choice most effectively uses the data to support the claim that the reminders improved appointment attendance?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "In the reminder group, 82% kept their appointments, compared with 61% in the otherwise-similar group that received none."
+      },
+      {
+        "letter": "B",
+        "text": "Most patients in both groups kept their appointments."
+      },
+      {
+        "letter": "C",
+        "text": "The clinic sent text-message reminders to one group."
+      },
+      {
+        "letter": "D",
+        "text": "Both groups were similar in age and distance from the clinic."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The reminders' effect is shown by comparing the two similar groups: 82% with reminders versus 61% without. A gives that contrast.",
+    "whyWrong": {
+      "B": "Saying most kept appointments blurs the difference the reminders made.",
+      "C": "Describing the intervention is not the same as showing its effect.",
+      "D": "Group similarity supports a fair comparison but does not itself show the reminders helped."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-11",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "text": "A study found that a coastal wetland absorbed floodwater such that neighborhoods behind it flooded on average 6 cm deep during a storm, while similar neighborhoods behind a wetland that had been paved over flooded 21 cm deep in the same storm.\n\nWhich choice most effectively uses the data to support the claim that intact wetlands reduce flood depth?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Neighborhoods behind the intact wetland flooded to 6 cm, versus 21 cm behind the paved-over wetland during the same storm."
+      },
+      {
+        "letter": "B",
+        "text": "Both areas experienced the same storm."
+      },
+      {
+        "letter": "C",
+        "text": "The paved-over wetland no longer holds water."
+      },
+      {
+        "letter": "D",
+        "text": "Flooding reached 21 cm in one set of neighborhoods."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim credits intact wetlands with less flooding. A contrasts 6 cm behind the intact wetland with 21 cm behind the paved one in the same storm.",
+    "whyWrong": {
+      "B": "The shared storm sets up the comparison but is not itself the evidence.",
+      "C": "A general statement about paving lacks the comparative depths.",
+      "D": "The 21 cm figure alone omits the intact-wetland contrast."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-12",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "text": "A factory tested a new machine. Over four weeks, defect rates were 3.0%, 2.4%, 2.1%, and 2.0%, while output rose from 900 to 1,150 units per week.\n\nWhich choice most effectively uses the data to support the claim that the machine produced more units without sacrificing quality?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Output reached 1,150 units in the final week."
+      },
+      {
+        "letter": "B",
+        "text": "As weekly output climbed from 900 to 1,150 units, the defect rate did not rise but fell from 3.0% to 2.0%."
+      },
+      {
+        "letter": "C",
+        "text": "The defect rate was 2.4% in the second week."
+      },
+      {
+        "letter": "D",
+        "text": "The machine was tested over four weeks."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is more output with no loss of quality. B shows output rising while the defect rate actually fell, covering both parts.",
+    "whyWrong": {
+      "A": "Final output alone says nothing about quality.",
+      "C": "One week's defect rate does not show the joint trend.",
+      "D": "The test's length is not evidence about output or quality."
+    }
+  },
+  {
+    "id": "inferences-t1-07",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "text": "The following text is from an article about deserts.\n\nThe kangaroo rat lives in dry deserts where standing water is almost never available. Remarkably, it can survive its entire life without drinking, obtaining nearly all the moisture it needs from the seeds it eats and from water its body produces as it breaks down that food. This suggests that the kangaroo rat ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "must migrate to wetter regions during dry seasons."
+      },
+      {
+        "letter": "B",
+        "text": "is well adapted to survive where drinking water is scarce."
+      },
+      {
+        "letter": "C",
+        "text": "cannot survive in any environment but the desert."
+      },
+      {
+        "letter": "D",
+        "text": "prefers to drink water whenever it is available."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Getting nearly all its water from food, without drinking, shows the kangaroo rat is suited to dry places. B follows.",
+    "whyWrong": {
+      "A": "The text says it needs no standing water, so migration for water is unsupported.",
+      "C": "Nothing rules out other environments.",
+      "D": "The passage stresses it survives without drinking, not a preference to drink."
+    }
+  },
+  {
+    "id": "inferences-t1-08",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "text": "The following text is from a description of a small business.\n\nWhen the bakery posted its daily specials online each morning, those items regularly sold out by noon, while unlisted items often remained on the shelves at closing. The owner noticed that customers frequently arrived asking for the exact item she had posted. This suggests that the online posts ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "influenced which items customers came in to buy."
+      },
+      {
+        "letter": "B",
+        "text": "reduced the bakery's overall sales."
+      },
+      {
+        "letter": "C",
+        "text": "were seen by very few customers."
+      },
+      {
+        "letter": "D",
+        "text": "were posted only on weekends."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Posted items sold out and customers asked for them by name, so the posts shaped what customers bought. A follows.",
+    "whyWrong": {
+      "B": "Posted items sold well, so sales were not reduced.",
+      "C": "Customers arrived asking for posted items, so many saw them.",
+      "D": "The text says the specials were posted daily, not only weekends."
+    }
+  },
+  {
+    "id": "inferences-t1-09",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "text": "The following text is from a nature guide.\n\nCertain moths have wings patterned to look almost exactly like dead leaves. When such a moth rests motionless on the forest floor, birds searching for insects pass over it again and again. Only when the moth moves does a bird notice it at all. This suggests that the moth's leaf-like pattern ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "helps it hide from predators as long as it stays still."
+      },
+      {
+        "letter": "B",
+        "text": "attracts birds toward it."
+      },
+      {
+        "letter": "C",
+        "text": "is brighter than the surrounding leaves."
+      },
+      {
+        "letter": "D",
+        "text": "makes it fly faster than other moths."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Birds miss the motionless moth and spot it only when it moves, so the pattern conceals it while still. A follows.",
+    "whyWrong": {
+      "B": "The pattern makes birds miss it, not approach it.",
+      "C": "Looking like dead leaves means blending in, not standing out.",
+      "D": "Flight speed is never mentioned."
+    }
+  },
+  {
+    "id": "inferences-t1-10",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "text": "The following text is from a school newsletter.\n\nAfter the science club began meeting in the well-lit, spacious new lab, membership doubled within a semester. Several new members mentioned that they had walked past the club's old, cramped basement room for years without ever going in. This suggests that the club's earlier location ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "had discouraged some students from joining."
+      },
+      {
+        "letter": "B",
+        "text": "was more popular than the new lab."
+      },
+      {
+        "letter": "C",
+        "text": "was too far from the school to reach."
+      },
+      {
+        "letter": "D",
+        "text": "had better equipment than the new lab."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Members who avoided the cramped basement joined once the club moved, so the old room had kept some away. A follows.",
+    "whyWrong": {
+      "B": "Membership doubled after the move, so the new lab was more popular.",
+      "C": "Students walked past it for years, so it was not unreachable.",
+      "D": "No comparison of equipment is made."
+    }
+  },
+  {
+    "id": "inferences-t1-11",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "text": "The following text is from an article about plants.\n\nSunflowers turn to face the sun as it moves across the sky, but only while they are young and growing. Once a sunflower matures, its stem stiffens and the flower stays fixed, usually facing east. This suggests that a sunflower's ability to track the sun ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "continues throughout the plant's entire life."
+      },
+      {
+        "letter": "B",
+        "text": "depends on the flexibility of its growing stem."
+      },
+      {
+        "letter": "C",
+        "text": "is strongest at night."
+      },
+      {
+        "letter": "D",
+        "text": "causes the flower to face west when mature."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Tracking happens while the plant is young and its stem can bend, but stops once the stem stiffens, so it depends on stem flexibility. B follows.",
+    "whyWrong": {
+      "A": "Mature sunflowers stop tracking, so it does not last a lifetime.",
+      "C": "Tracking follows the sun, which is not out at night.",
+      "D": "The text says mature flowers usually face east, not west."
+    }
+  },
+  {
+    "id": "inferences-t1-12",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "text": "The following text is from a report on public transit.\n\nWhen the city made its buses free on weekends, weekend ridership rose sharply, but weekday ridership, which still required a fare, stayed about the same. Officials noted that many weekend riders said the free fare was the reason they chose the bus. This suggests that fare cost ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "affects some people's decision to ride the bus."
+      },
+      {
+        "letter": "B",
+        "text": "has no effect on ridership at all."
+      },
+      {
+        "letter": "C",
+        "text": "is the only reason anyone rides the bus."
+      },
+      {
+        "letter": "D",
+        "text": "matters more on weekdays than on weekends."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Removing the weekend fare raised ridership and riders cited the free fare, so cost influences some riders' choices. A follows.",
+    "whyWrong": {
+      "B": "Ridership rose when the fare was dropped, so cost does have an effect.",
+      "C": "'Only reason' overstates it; riders have other reasons too.",
+      "D": "The change occurred on weekends, not weekdays."
+    }
+  },
+  {
+    "id": "inferences-t2-07",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "text": "The following text is from a study of ancient tools.\n\nExcavators found that stone blades at one site were made from a type of rock that occurs only in mountains more than two hundred miles away. The blades were finely worked, and no rough, half-finished pieces or stone-working debris were found nearby. The most reasonable conclusion is that the finished blades ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "were carved from local rock found at the site."
+      },
+      {
+        "letter": "B",
+        "text": "were made elsewhere and brought to the site already finished."
+      },
+      {
+        "letter": "C",
+        "text": "were never actually used as tools."
+      },
+      {
+        "letter": "D",
+        "text": "were the only objects found at the site."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The rock is from far away and there is no local stone-working debris, so the blades were finished elsewhere and carried in. B follows.",
+    "whyWrong": {
+      "A": "The rock occurs only far away, so it is not local.",
+      "C": "Fine working implies use, and nothing says they were unused.",
+      "D": "The text does not claim these were the only objects."
+    }
+  },
+  {
+    "id": "inferences-t2-08",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "text": "The following text is from an article about astronomy.\n\nA distant star dims slightly at regular intervals, always by the same amount and always for the same length of time. Astronomers note that this pattern is exactly what would occur if a planet passed in front of the star during each orbit. No other explanation has matched the precise regularity observed. The most reasonable conclusion is that ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "the star is slowly burning out."
+      },
+      {
+        "letter": "B",
+        "text": "a planet is orbiting the star and periodically passing in front of it."
+      },
+      {
+        "letter": "C",
+        "text": "the star produces no light of its own."
+      },
+      {
+        "letter": "D",
+        "text": "the dimming happens at random."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Regular, identical dimming matches a planet crossing in front each orbit, and no other explanation fits. B follows.",
+    "whyWrong": {
+      "A": "A star burning out would dim steadily, not at repeating intervals.",
+      "C": "The star clearly emits light, since its brightness dips and returns.",
+      "D": "The dimming is described as regular, not random."
+    }
+  },
+  {
+    "id": "inferences-t2-09",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "text": "The following text is from a discussion of language.\n\nLinguists studying two neighboring communities found that although the groups have lived apart for generations, their languages share dozens of unusual words with nearly identical meanings and pronunciations. These words appear in no other language in the region. The most reasonable conclusion is that the two languages ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "developed these shared words entirely by coincidence."
+      },
+      {
+        "letter": "B",
+        "text": "share a common origin or history of contact."
+      },
+      {
+        "letter": "C",
+        "text": "are identical in every respect."
+      },
+      {
+        "letter": "D",
+        "text": "are both dying out."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Dozens of matching, unusual words found nowhere else point to shared origin or contact, not chance. B follows.",
+    "whyWrong": {
+      "A": "So many precise matches make coincidence unreasonable.",
+      "C": "Sharing some words does not make the languages identical.",
+      "D": "Nothing in the text concerns the languages declining."
+    }
+  },
+  {
+    "id": "inferences-t2-10",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "text": "The following text is adapted from a story.\n\nEvery evening, the old dog waited by the front window a full ten minutes before Nadia's car ever appeared in the drive. No sound of the engine reached the house that early, and Nadia's schedule varied by the day. Yet the dog was never wrong. The most reasonable conclusion is that the dog ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "could hear Nadia's car from miles away."
+      },
+      {
+        "letter": "B",
+        "text": "was relying on some cue other than the sound of the engine."
+      },
+      {
+        "letter": "C",
+        "text": "had memorized Nadia's exact daily schedule."
+      },
+      {
+        "letter": "D",
+        "text": "waited by the window all day long."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The dog reacts before any engine sound and despite a changing schedule, so it must use a different cue. B follows.",
+    "whyWrong": {
+      "A": "The text says no engine sound reached the house that early.",
+      "C": "Nadia's schedule varied, so a memorized fixed schedule cannot explain it.",
+      "D": "It waited each evening before her arrival, not all day."
+    }
+  },
+  {
+    "id": "inferences-t2-11",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "text": "The following text is from a report on agriculture.\n\nIn fields where farmers planted a strip of wildflowers along the edges, crops in the center suffered noticeably less insect damage than in fields with no such strips. Researchers found that the flower strips attracted large numbers of insect-eating beetles and wasps. The most reasonable conclusion is that the flower strips reduced crop damage by ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "blocking insects from physically reaching the crops."
+      },
+      {
+        "letter": "B",
+        "text": "supporting predators that helped control crop-damaging insects."
+      },
+      {
+        "letter": "C",
+        "text": "making the crops grow faster."
+      },
+      {
+        "letter": "D",
+        "text": "replacing the crops with wildflowers."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The strips drew insect-eating beetles and wasps, and damage dropped, so they worked by supporting predators of the pests. B follows.",
+    "whyWrong": {
+      "A": "A strip of flowers along the edge would not physically block insects.",
+      "C": "Faster growth is never mentioned as the mechanism.",
+      "D": "The strips lined field edges; the crops remained in the center."
+    }
+  },
+  {
+    "id": "inferences-t2-12",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "text": "The following text is from an art history discussion.\n\nBeneath the surface of the painting, X-ray imaging revealed an earlier composition: a different figure, painted over and then replaced with the scene now visible. The pigments of the hidden layer match those the artist used only in her final decade. The most reasonable conclusion is that the visible painting ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "was painted before the artist's final decade."
+      },
+      {
+        "letter": "B",
+        "text": "was created no earlier than the artist's final decade."
+      },
+      {
+        "letter": "C",
+        "text": "was painted by a different artist entirely."
+      },
+      {
+        "letter": "D",
+        "text": "contains no hidden layers."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The visible scene sits on top of a layer using pigments from the artist's final decade, so it must come from that decade or later. B follows.",
+    "whyWrong": {
+      "A": "The top layer covers final-decade pigments, so it cannot predate them.",
+      "C": "The pigments tie the work to the same artist, not a different one.",
+      "D": "The X-ray revealed a hidden earlier layer, so the claim is false."
+    }
+  },
+  {
+    "id": "inferences-t3-07",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "text": "The following text is from a study of cooperation.\n\nIn an experiment, players could either share a reward or keep it for themselves. When each round was the last one, most players kept the reward. But when players expected to meet the same partners again in future rounds, sharing rose sharply—even though the immediate cost of sharing was identical in both cases. The most reasonable conclusion is that players' willingness to share depended less on the immediate cost than on ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "whether they expected future interactions with the same partners."
+      },
+      {
+        "letter": "B",
+        "text": "the exact size of the reward offered."
+      },
+      {
+        "letter": "C",
+        "text": "how many players took part in the experiment."
+      },
+      {
+        "letter": "D",
+        "text": "whether the players had shared in past experiments."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Sharing rose specifically when future rounds with the same partners were expected, though the cost was unchanged, so expectation of future interaction drove it. A follows.",
+    "whyWrong": {
+      "B": "The text holds the immediate cost identical, isolating the expectation of future rounds.",
+      "C": "Number of players is never linked to the change in sharing.",
+      "D": "Prior experiments are not mentioned as a factor."
+    }
+  },
+  {
+    "id": "inferences-t3-08",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "text": "The following text is from a paper on climate history.\n\nLayers of sediment at the lake bottom alternate between dark, organic-rich bands and pale, mineral bands. In cores from warmer periods elsewhere, the dark bands are thick; in cores from cooler periods, they are thin. In this lake's core, the dark bands grow steadily thinner from bottom to top. The most reasonable conclusion is that, over the time the core represents, the local climate ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "grew steadily warmer."
+      },
+      {
+        "letter": "B",
+        "text": "grew steadily cooler."
+      },
+      {
+        "letter": "C",
+        "text": "stayed exactly the same."
+      },
+      {
+        "letter": "D",
+        "text": "alternated rapidly between warm and cool."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Thin dark bands indicate cooler periods, and the bands thin from bottom (older) to top (newer), so the climate cooled over time. B follows.",
+    "whyWrong": {
+      "A": "Warming would thicken the dark bands upward, the opposite of what is seen.",
+      "C": "The bands change, so the climate did not stay the same.",
+      "D": "A steady thinning indicates a gradual trend, not rapid alternation."
+    }
+  },
+  {
+    "id": "inferences-t3-09",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "text": "The following text is from a discussion of economics.\n\nWhen a bridge toll was introduced on one of two parallel routes into the city, traffic on the tolled bridge fell while traffic on the free bridge rose by almost the same amount. Total traffic entering the city, however, barely changed. The most reasonable conclusion is that the toll mainly ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "reduced the number of people traveling into the city."
+      },
+      {
+        "letter": "B",
+        "text": "shifted drivers from one route to the other rather than reducing overall travel."
+      },
+      {
+        "letter": "C",
+        "text": "increased the total number of cars entering the city."
+      },
+      {
+        "letter": "D",
+        "text": "had no effect on either bridge."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Traffic dropped on the tolled bridge and rose almost equally on the free one, while total traffic held steady, so drivers rerouted rather than stopped traveling. B follows.",
+    "whyWrong": {
+      "A": "Total traffic barely changed, so overall travel was not reduced.",
+      "C": "Total traffic held steady, not increased.",
+      "D": "Each bridge's traffic changed noticeably, so there was an effect."
+    }
+  },
+  {
+    "id": "inferences-t3-10",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "text": "The following text is from a biology study.\n\nA cave-dwelling fish species has no functioning eyes, yet it belongs to a family whose other members, all living in sunlit waters, see well. The cave species still carries the same genes for building eyes, but those genes are switched off early in development. The most reasonable conclusion is that the cave fish's eyelessness ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "shows it never had ancestors with working eyes."
+      },
+      {
+        "letter": "B",
+        "text": "arose from sighted ancestors whose eye-building genes became inactive."
+      },
+      {
+        "letter": "C",
+        "text": "means it is unrelated to the sighted members of its family."
+      },
+      {
+        "letter": "D",
+        "text": "proves the eye genes have been completely lost."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The fish still carries eye genes, now switched off, and its relatives see, so it descends from sighted ancestors whose genes were silenced. B follows.",
+    "whyWrong": {
+      "A": "Retaining eye genes and sighted relatives implies sighted ancestors.",
+      "C": "It belongs to the same family, so it is related to the sighted members.",
+      "D": "The genes are switched off, not lost—they are still present."
+    }
+  },
+  {
+    "id": "inferences-t3-11",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "text": "The following text is from a study of reading habits.\n\nA library found that when it moved popular new releases from a back shelf to a table by the entrance, borrowing of those titles rose sharply. Borrowing of older titles, left in their usual places, did not fall. The total number of items borrowed increased. The most reasonable conclusion is that the new placement ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "drew borrowers away from older titles."
+      },
+      {
+        "letter": "B",
+        "text": "encouraged additional borrowing rather than merely redirecting it."
+      },
+      {
+        "letter": "C",
+        "text": "had no measurable effect on borrowing."
+      },
+      {
+        "letter": "D",
+        "text": "reduced the library's total circulation."
+      }
+    ],
+    "answer": "B",
+    "explanation": "New-release borrowing rose, older-title borrowing held steady, and total borrowing went up, so the placement added borrowing rather than shifting it. B follows.",
+    "whyWrong": {
+      "A": "Older-title borrowing did not fall, so borrowers were not drawn away.",
+      "C": "Borrowing of the moved titles rose sharply, so there was an effect.",
+      "D": "Total borrowing increased, not decreased."
+    }
+  },
+  {
+    "id": "inferences-t3-12",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "text": "The following text is from a discussion of perception.\n\nWhen listeners heard a recording of a spoken sentence with one sound electronically replaced by a cough, they insisted they had heard the missing sound clearly and could not tell which one had been covered. The effect vanished only when the missing sound fell at a word boundary the listeners did not expect. The most reasonable conclusion is that listeners ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "cannot understand speech that contains any background noise."
+      },
+      {
+        "letter": "B",
+        "text": "use their expectations about words to fill in sounds they do not actually hear."
+      },
+      {
+        "letter": "C",
+        "text": "hear every individual sound in a sentence with perfect accuracy."
+      },
+      {
+        "letter": "D",
+        "text": "ignore the meaning of sentences while listening."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Listeners 'heard' a sound that was replaced by a cough, and the effect broke only against their expectations, so they fill in sounds using what they expect. B follows.",
+    "whyWrong": {
+      "A": "They understood the sentence despite the cough, so noise did not block comprehension.",
+      "C": "They failed to notice a missing sound, so perception was not perfectly accurate.",
+      "D": "Relying on word expectations shows they attend to meaning, not ignore it."
+    }
+  },
+  {
+    "id": "central-ideas-t2-13",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "text": "The following text is from an article about rivers.\n\nEngineers once straightened winding rivers to speed drainage and reclaim land. The straightened channels did move water faster—so fast, in fact, that floods downstream grew worse, and the fish that depended on slow bends and shallow pools disappeared. Increasingly, restoration crews are now paid to put the curves back.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Straightening rivers brought unintended harms that are now being reversed."
+      },
+      {
+        "letter": "B",
+        "text": "Rivers should never be altered by people."
+      },
+      {
+        "letter": "C",
+        "text": "Fish prefer fast-moving water."
+      },
+      {
+        "letter": "D",
+        "text": "Straightened rivers drain land more slowly than winding ones."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The text shows straightening caused worse floods and fish loss, leading crews to restore the curves. A captures the harm-and-reversal arc.",
+    "whyWrong": {
+      "B": "The text describes fixing past changes, not banning all alteration.",
+      "C": "The fish depended on slow bends, not fast water.",
+      "D": "Straightened channels drained faster, not slower."
+    }
+  },
+  {
+    "id": "inferences-t2-13",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "text": "The following text is from a report on retail.\n\nA bookstore placed identical tables of discounted books at its front and back. Shoppers cleared the front table by midday, while the back table stayed nearly full. Staff confirmed the two tables held the same titles at the same prices. The most reasonable conclusion is that the books' location ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "affected how quickly they sold."
+      },
+      {
+        "letter": "B",
+        "text": "determined their prices."
+      },
+      {
+        "letter": "C",
+        "text": "changed which titles they were."
+      },
+      {
+        "letter": "D",
+        "text": "had no effect on sales."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Identical books sold faster at the front than the back, so placement shaped how quickly they sold. A follows.",
+    "whyWrong": {
+      "B": "Staff confirmed prices were the same at both tables.",
+      "C": "The titles were identical, so location did not change them.",
+      "D": "The front table cleared while the back stayed full, so location did have an effect."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-13",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "text": "A survey of 400 commuters found that 240 drive alone, 80 carpool, 60 take transit, and 20 bike.\n\nWhich choice most effectively uses the data to support the claim that most commuters drive alone?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Of the 400 commuters, 240—more than half—drive alone."
+      },
+      {
+        "letter": "B",
+        "text": "Eighty commuters carpool."
+      },
+      {
+        "letter": "C",
+        "text": "Twenty commuters bike to work."
+      },
+      {
+        "letter": "D",
+        "text": "The survey included 400 commuters."
+      }
+    ],
+    "answer": "A",
+    "explanation": "'Most' means over half. A shows 240 of 400 drive alone, a clear majority.",
+    "whyWrong": {
+      "B": "The carpool figure does not show driving alone is the majority.",
+      "C": "Bikers are the smallest group, irrelevant to the claim.",
+      "D": "The total sample size does not identify the majority behavior."
+    }
+  },
+  {
+    "id": "evidence-text-t3-13",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "text": "The following text is from a research proposal.\n\nA team hypothesizes that a plant releases a chemical into the soil that stops rival species from sprouting nearby, rather than simply outcompeting them for light and water.\n\nWhich finding, if true, would most strongly support the team's hypothesis?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Rival seeds fail to sprout even in well-lit, well-watered soil taken from around the plant, but sprout normally once that soil is rinsed clean."
+      },
+      {
+        "letter": "B",
+        "text": "The plant grows taller than its rivals."
+      },
+      {
+        "letter": "C",
+        "text": "The plant has deep roots that reach abundant water."
+      },
+      {
+        "letter": "D",
+        "text": "Rival species grow well far from the plant."
+      }
+    ],
+    "answer": "A",
+    "explanation": "A soil-borne chemical predicts that untreated soil suppresses sprouting even with light and water, while rinsing removes the effect. A isolates exactly that, supporting the chemical hypothesis over mere competition.",
+    "whyWrong": {
+      "B": "Greater height points to competition for light, the alternative the team wants to rule out.",
+      "C": "Deep roots suggest competition for water, not a chemical.",
+      "D": "Rivals thriving far away is consistent with either explanation and does not single out a chemical."
+    }
+  },
+  {
+    "id": "central-ideas-t1-bp01",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from an article about penguins.\n\nEmperor penguins survive the Antarctic winter by huddling together in tight groups of thousands. Birds on the cold outer edge slowly shuffle inward, while those in the warm center move out, so that over hours every penguin takes a turn being sheltered. No single bird stays exposed for long.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Emperor penguins share the burden of the cold by constantly rotating positions in their huddle."
+      },
+      {
+        "letter": "B",
+        "text": "Emperor penguins are the largest penguin species."
+      },
+      {
+        "letter": "C",
+        "text": "Antarctica is the coldest place on Earth."
+      },
+      {
+        "letter": "D",
+        "text": "Penguins cannot survive winter alone."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The passage centers on the huddle's rotation so every penguin takes a turn sheltered. A captures that.",
+    "whyWrong": {
+      "B": "Their size is never mentioned.",
+      "C": "Antarctica's temperature is not the focus.",
+      "D": "The text describes the huddle, not a claim about solo survival."
+    }
+  },
+  {
+    "id": "central-ideas-t1-bp02",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from a community newsletter.\n\nWhen the town added a free tool-lending shed to the park, some doubted anyone would use it. A year on, the shed lends out drills, ladders, and mowers almost daily, and neighbors say it has saved them from buying tools they would use only once.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The tool-lending shed, once doubted, has become a well-used community resource."
+      },
+      {
+        "letter": "B",
+        "text": "Everyone in town owns a drill."
+      },
+      {
+        "letter": "C",
+        "text": "The park was too small for a shed."
+      },
+      {
+        "letter": "D",
+        "text": "Mowers are the most borrowed tool."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The text follows the shed from doubt to daily use that saves neighbors money. A states that arc.",
+    "whyWrong": {
+      "B": "The text says neighbors avoid buying tools, not that all own them.",
+      "C": "No space problem is mentioned.",
+      "D": "No single tool is named the most borrowed."
+    }
+  },
+  {
+    "id": "central-ideas-t1-bp03",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is adapted from a short story.\n\nEvery day after school, Sam walked the long way home to pass the shuttered theater. He liked to imagine the marquee lit again, the lobby full. He never told anyone; the daydream felt too fragile to share, as if speaking it aloud might make its unlikeliness real.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Sam quietly cherishes a hopeful daydream he is afraid to expose to doubt."
+      },
+      {
+        "letter": "B",
+        "text": "Sam wants to buy the old theater."
+      },
+      {
+        "letter": "C",
+        "text": "Sam dislikes walking home from school."
+      },
+      {
+        "letter": "D",
+        "text": "The theater is about to reopen."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Sam privately treasures his imagined revival of the theater, unwilling to risk it by speaking it. A captures that.",
+    "whyWrong": {
+      "B": "He imagines the theater lit, not buying it.",
+      "C": "He chooses the long way by the theater; he does not dislike the walk.",
+      "D": "The theater is shuttered; no reopening is stated."
+    }
+  },
+  {
+    "id": "central-ideas-t1-bp04",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from a science article.\n\nSome plants defend themselves without thorns or poison. When caterpillars begin chewing a tomato leaf, the plant releases airborne chemicals that drift to its neighbors. Warned, those plants ramp up their own defenses before the caterpillars ever arrive.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Some plants warn nearby plants of attack by releasing airborne chemical signals."
+      },
+      {
+        "letter": "B",
+        "text": "Caterpillars prefer tomato leaves to all others."
+      },
+      {
+        "letter": "C",
+        "text": "Thorns are the most common plant defense."
+      },
+      {
+        "letter": "D",
+        "text": "Tomato plants cannot be harmed by insects."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The passage centers on plants signaling neighbors chemically so they can prepare defenses. A captures that.",
+    "whyWrong": {
+      "B": "No caterpillar preference is ranked.",
+      "C": "The text is about chemical, not thorn, defenses.",
+      "D": "The caterpillars do chew the leaves, so plants can be harmed."
+    }
+  },
+  {
+    "id": "central-ideas-t1-bp05",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from a profile of an athlete.\n\nBefore every match, tennis player Lena runs through the same short routine: three deep breaths, a glance at the net, a bounce of the ball. She says the ritual does not calm her nerves so much as give them somewhere to go, turning restless energy into focus.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Lena's pre-match ritual channels her nervous energy into focus rather than erasing it."
+      },
+      {
+        "letter": "B",
+        "text": "Lena is the top-ranked tennis player."
+      },
+      {
+        "letter": "C",
+        "text": "Tennis matches always begin with a serve."
+      },
+      {
+        "letter": "D",
+        "text": "Lena never feels nervous before a match."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Lena says the ritual gives her nerves 'somewhere to go,' turning energy into focus. A captures that.",
+    "whyWrong": {
+      "B": "Her ranking is never mentioned.",
+      "C": "The rules of tennis are not the point.",
+      "D": "She has nerves; the ritual channels them."
+    }
+  },
+  {
+    "id": "central-ideas-t2-bp01",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a history of technology.\n\nThe first photographs took so long to expose that anyone who moved simply vanished from the image. Busy streets appeared eerily empty, their crowds blurred into nothing. What looks to us like a record of deserted cities was really a record of how slow the camera was.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Early photos of 'empty' streets reflect the camera's slowness, not truly deserted cities."
+      },
+      {
+        "letter": "B",
+        "text": "Early cities had very few residents."
+      },
+      {
+        "letter": "C",
+        "text": "Photography was invented to record crowds."
+      },
+      {
+        "letter": "D",
+        "text": "Modern cameras are more expensive than early ones."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The text explains that long exposures erased moving people, so 'empty' streets show the camera's limits. A captures that.",
+    "whyWrong": {
+      "B": "The streets were busy; the people were blurred out.",
+      "C": "Photography's purpose is not the point.",
+      "D": "Cost is never discussed."
+    }
+  },
+  {
+    "id": "central-ideas-t2-bp02",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from an article about oceans.\n\nThe deep sea was long assumed to be a lifeless desert, too dark and cold for much to survive. Then submersibles found entire communities clustered around hot vents on the seafloor, thriving on chemical energy instead of sunlight. Life, it turned out, had simply found another way.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The discovery of vent communities overturned the assumption that the deep sea is lifeless."
+      },
+      {
+        "letter": "B",
+        "text": "Sunlight reaches the deepest parts of the ocean."
+      },
+      {
+        "letter": "C",
+        "text": "Submersibles are expensive to build."
+      },
+      {
+        "letter": "D",
+        "text": "Hot vents are found only in shallow water."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The passage overturns the 'lifeless desert' assumption with vent communities living on chemical energy. A captures that.",
+    "whyWrong": {
+      "B": "The vents thrive without sunlight, which does not reach the deep.",
+      "C": "Submersible cost is not discussed.",
+      "D": "The vents are on the seafloor, not in shallow water."
+    }
+  },
+  {
+    "id": "central-ideas-t2-bp03",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from an essay on cities.\n\nA good sidewalk does more than move people from place to place. Where it is wide and shaded, neighbors linger, children play, and vendors set up carts, so the walk itself becomes a kind of public room. The street's life, in other words, is built as much by how people pause as by how they pass.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "A well-designed sidewalk supports public life by inviting people to linger, not just pass through."
+      },
+      {
+        "letter": "B",
+        "text": "Sidewalks should be as narrow as possible."
+      },
+      {
+        "letter": "C",
+        "text": "Street vendors should be banned from sidewalks."
+      },
+      {
+        "letter": "D",
+        "text": "Children play only on quiet streets."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The text argues a good sidewalk becomes a 'public room' where people pause, building street life. A captures that.",
+    "whyWrong": {
+      "B": "It praises wide sidewalks, not narrow ones.",
+      "C": "Vendors are part of the lively sidewalk, not banned.",
+      "D": "No claim limits children's play to quiet streets."
+    }
+  },
+  {
+    "id": "central-ideas-t2-bp04",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a study of animal behavior.\n\nRats will free a trapped companion even when doing so brings no reward and requires learning to open a difficult latch. In experiments, they often free the trapped rat before helping themselves to a pile of chocolate nearby. Such behavior suggests concern for a companion's distress, not merely a drive for food.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Rats' willingness to free a trapped companion suggests they respond to another's distress."
+      },
+      {
+        "letter": "B",
+        "text": "Rats prefer chocolate to all other foods."
+      },
+      {
+        "letter": "C",
+        "text": "Rats cannot learn to open latches."
+      },
+      {
+        "letter": "D",
+        "text": "Trapped rats never escape on their own."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The passage centers on rats freeing companions even over food, suggesting concern for distress. A captures that.",
+    "whyWrong": {
+      "B": "Chocolate is an example, not a ranked preference.",
+      "C": "The rats do learn the latch, contradicting this.",
+      "D": "The point is being freed by others, not solo escape."
+    }
+  },
+  {
+    "id": "central-ideas-t2-bp05",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is adapted from a novel.\n\nThe old fisherman no longer went out for the catch; his nets had rotted and his boat leaked. Still, each dawn he walked to the dock and sat, watching the younger crews set out. He was not mourning the sea, his granddaughter realized, but keeping an appointment with it.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The fisherman's daily visits to the dock express a lasting bond with the sea rather than grief."
+      },
+      {
+        "letter": "B",
+        "text": "The fisherman plans to repair his boat."
+      },
+      {
+        "letter": "C",
+        "text": "The younger crews resent the old fisherman."
+      },
+      {
+        "letter": "D",
+        "text": "The fisherman has forgotten how to fish."
+      }
+    ],
+    "answer": "A",
+    "explanation": "His granddaughter sees his visits as 'keeping an appointment' with the sea—an enduring bond, not mourning. A captures that.",
+    "whyWrong": {
+      "B": "His boat leaks, but no repair plan is mentioned.",
+      "C": "The crews' feelings are not described.",
+      "D": "Nothing suggests he has forgotten how to fish."
+    }
+  },
+  {
+    "id": "central-ideas-t3-bp01",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from an essay on measurement.\n\nWe assume that to measure something is simply to observe it, as if the ruler leaves the world untouched. But choosing what to count quietly shapes what we come to value: a school judged only by test scores will teach to the test, and a forest priced only for timber will be seen as lumber. The measure, over time, remakes the thing measured.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "How we choose to measure something can reshape what we value and how we treat it."
+      },
+      {
+        "letter": "B",
+        "text": "Test scores are the fairest way to judge schools."
+      },
+      {
+        "letter": "C",
+        "text": "Forests should be valued only for their timber."
+      },
+      {
+        "letter": "D",
+        "text": "Measurement is always perfectly objective."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The essay argues that what we measure shapes what we value and how we act, 'remaking the thing measured.' A captures that.",
+    "whyWrong": {
+      "B": "The text warns against judging schools by scores alone.",
+      "C": "The timber example is a warning, not an endorsement.",
+      "D": "The text argues measurement is not neutral, the opposite of D."
+    }
+  },
+  {
+    "id": "central-ideas-t3-bp02",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a work of criticism.\n\nReaders often praise the novel's villain as its most 'realistic' character, and the compliment reveals more than they intend. We call realistic whatever confirms our existing sense of how people behave; the hero's stubborn decency, being rarer, strikes us as contrived. Realism, so used, is less a measure of truth than a mirror of expectation.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Judgments of what is 'realistic' often reflect readers' expectations more than any objective truth."
+      },
+      {
+        "letter": "B",
+        "text": "The novel's villain is poorly written."
+      },
+      {
+        "letter": "C",
+        "text": "Heroes are always more believable than villains."
+      },
+      {
+        "letter": "D",
+        "text": "Realistic fiction is better than fantasy."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The critic argues 'realistic' tracks what confirms readers' expectations, not truth—'a mirror of expectation.' A captures that.",
+    "whyWrong": {
+      "B": "The villain is called realistic; the point is about the label, not the writing.",
+      "C": "The text says decency strikes readers as contrived, not more believable.",
+      "D": "Fantasy is never compared to realism."
+    }
+  },
+  {
+    "id": "central-ideas-t3-bp03",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from an essay on history.\n\nThe surviving letters of the era were written almost entirely by the literate few, and so historians long told the period's story in their voice alone. Yet the silence of the unlettered is itself a kind of evidence: it marks not an absence of lives but an absence of records, and a history that mistakes the one for the other will always mislead.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Gaps in the historical record reflect who could write, not the lives that went unrecorded, and must be read with care."
+      },
+      {
+        "letter": "B",
+        "text": "Only literate people led meaningful lives in the period."
+      },
+      {
+        "letter": "C",
+        "text": "Letters are the least reliable historical source."
+      },
+      {
+        "letter": "D",
+        "text": "Historians should ignore written records entirely."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The essay argues the silence of the unlettered marks missing records, not missing lives, and warns against confusing the two. A captures that.",
+    "whyWrong": {
+      "B": "The text insists the unrecorded had lives too, the opposite of B.",
+      "C": "Letters are not called least reliable; the issue is who wrote them.",
+      "D": "It urges careful reading of records, not ignoring them."
+    }
+  },
+  {
+    "id": "central-ideas-t3-bp04",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from an essay on invention.\n\nWe honor the breakthrough and forget the maintenance, though the second may matter more. A bridge is designed once and repaired for a century; a vaccine is discovered once and distributed a billion times. The dramatic act of creation depends, quietly, on the undramatic labor that keeps a creation working.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The unglamorous work of maintaining inventions is as vital as the celebrated act of creating them."
+      },
+      {
+        "letter": "B",
+        "text": "Bridges are more important than vaccines."
+      },
+      {
+        "letter": "C",
+        "text": "Breakthroughs are the only work that matters."
+      },
+      {
+        "letter": "D",
+        "text": "Maintenance is easier than invention."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The essay argues that maintenance, though undramatic, is as vital as creation. A captures that.",
+    "whyWrong": {
+      "B": "Bridges and vaccines are parallel examples, not ranked.",
+      "C": "The text elevates maintenance alongside breakthroughs, opposing C.",
+      "D": "Ease is never compared."
+    }
+  },
+  {
+    "id": "central-ideas-t3-bp05",
+    "domain": "rw-ii",
+    "skill": "central-ideas",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from an essay on nature writing.\n\nTo name a bird is to risk no longer seeing it. Once the warbler is filed under its label, the eye slides past, satisfied. The finest nature writers work against this ease, using the name only as a doorway and then lingering past it, until the familiar creature grows strange and vivid again.\n\nWhich choice best states the main idea of the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Naming can dull attention, and good nature writing works to restore fresh, close observation."
+      },
+      {
+        "letter": "B",
+        "text": "Birds should not be given names."
+      },
+      {
+        "letter": "C",
+        "text": "Warblers are the hardest birds to identify."
+      },
+      {
+        "letter": "D",
+        "text": "Nature writing should avoid all description."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The essay warns that a name can stop us from truly seeing, and praises writers who look past the label. A captures that.",
+    "whyWrong": {
+      "B": "The text uses names as a 'doorway,' not something to abolish.",
+      "C": "Warbler is an example; no difficulty ranking is made.",
+      "D": "It praises lingering description, not avoiding it."
+    }
+  },
+  {
+    "id": "evidence-text-t1-bp01",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A student claims that a classroom's new standing desks have made students more attentive during lessons.\n\nWhich finding, if true, would most directly support the student's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Teachers observed that students at the standing desks were off-task less often than before the desks were added."
+      },
+      {
+        "letter": "B",
+        "text": "The standing desks are made of oak."
+      },
+      {
+        "letter": "C",
+        "text": "The desks cost more than regular desks."
+      },
+      {
+        "letter": "D",
+        "text": "The classroom was repainted the same week."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim is about attentiveness. Teachers seeing less off-task behavior after the desks directly supports it.",
+    "whyWrong": {
+      "B": "The desks' material does not measure attentiveness.",
+      "C": "Cost is unrelated to whether students are more attentive.",
+      "D": "Repainting is a separate change, not evidence about attention."
+    }
+  },
+  {
+    "id": "evidence-text-t1-bp02",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A gardener claims that watering her plants early in the morning helps them survive hot afternoons better than watering at noon.\n\nWhich finding, if true, would most directly support the gardener's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Plants watered in the morning wilted less on hot afternoons than identical plants watered at noon."
+      },
+      {
+        "letter": "B",
+        "text": "She uses a green watering can."
+      },
+      {
+        "letter": "C",
+        "text": "Mornings are quieter in her garden."
+      },
+      {
+        "letter": "D",
+        "text": "She grows both flowers and vegetables."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Comparing morning-watered plants to noon-watered ones and finding less wilting directly supports the claim.",
+    "whyWrong": {
+      "B": "The watering can's color is irrelevant.",
+      "C": "Quiet mornings do not measure plant survival.",
+      "D": "The variety of plants does not address watering time."
+    }
+  },
+  {
+    "id": "evidence-text-t1-bp03",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A store owner claims that playing slow music in the shop encourages customers to browse longer.\n\nWhich finding, if true, would most directly support the owner's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "On days with slow music, customers spent more time in the shop than on days with fast music."
+      },
+      {
+        "letter": "B",
+        "text": "The shop sells mostly clothing."
+      },
+      {
+        "letter": "C",
+        "text": "The speakers were installed last year."
+      },
+      {
+        "letter": "D",
+        "text": "The owner enjoys slow music."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim is that slow music makes customers browse longer. Longer visits on slow-music days directly support it.",
+    "whyWrong": {
+      "B": "What the shop sells does not measure browsing time.",
+      "C": "When speakers were installed is irrelevant.",
+      "D": "The owner's taste is not evidence about customers."
+    }
+  },
+  {
+    "id": "evidence-text-t1-bp04",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A teacher claims that giving students a short break every twenty minutes helps them remember more of a lesson.\n\nWhich finding, if true, would most directly support the teacher's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Students who took short breaks scored higher on a later quiz than students taught the same lesson without breaks."
+      },
+      {
+        "letter": "B",
+        "text": "The classroom has large windows."
+      },
+      {
+        "letter": "C",
+        "text": "The lesson lasted about an hour."
+      },
+      {
+        "letter": "D",
+        "text": "Students like taking breaks."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim is about remembering more. Higher quiz scores for the break group directly support it.",
+    "whyWrong": {
+      "B": "The windows do not measure memory.",
+      "C": "The lesson's length is not evidence about recall.",
+      "D": "Enjoying breaks is not the same as remembering more."
+    }
+  },
+  {
+    "id": "evidence-text-t1-bp05",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A coach claims that a team's new stretching routine has reduced muscle soreness after games.\n\nWhich finding, if true, would most directly support the coach's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Players reported much less soreness after games once the stretching routine began than in earlier games."
+      },
+      {
+        "letter": "B",
+        "text": "The stretching routine takes fifteen minutes."
+      },
+      {
+        "letter": "C",
+        "text": "The team plays on a grass field."
+      },
+      {
+        "letter": "D",
+        "text": "The players wear matching uniforms."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim is about less soreness. Players reporting less soreness after the routine began directly supports it.",
+    "whyWrong": {
+      "B": "The routine's length is not evidence about soreness.",
+      "C": "The field surface is a separate factor.",
+      "D": "Uniforms are unrelated to muscle soreness."
+    }
+  },
+  {
+    "id": "evidence-text-t1-bp06",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A researcher claims that adding birdhouses to a park has increased the number of songbirds living there.\n\nWhich finding, if true, would most directly support the researcher's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Bird counts in the park rose after the birdhouses were installed and stayed higher through the season."
+      },
+      {
+        "letter": "B",
+        "text": "The birdhouses are painted blue."
+      },
+      {
+        "letter": "C",
+        "text": "The park has a walking path."
+      },
+      {
+        "letter": "D",
+        "text": "Volunteers built the birdhouses."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim is about more songbirds. A rise in bird counts after installing the birdhouses directly supports it.",
+    "whyWrong": {
+      "B": "The paint color does not measure bird numbers.",
+      "C": "The walking path is unrelated to songbird counts.",
+      "D": "Who built the houses does not show more birds live there."
+    }
+  },
+  {
+    "id": "evidence-text-t2-bp01",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a report on urban wildlife.\n\nA researcher argues that a species of city-dwelling fox has shifted to hunting mostly at night to avoid contact with people.\n\nWhich finding, if true, would most strongly support the researcher's argument?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Motion cameras show the foxes are active almost entirely after dark, when streets are quietest, and rest during busy daytime hours."
+      },
+      {
+        "letter": "B",
+        "text": "The foxes have reddish fur."
+      },
+      {
+        "letter": "C",
+        "text": "The city has many parks."
+      },
+      {
+        "letter": "D",
+        "text": "Foxes are related to dogs."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The argument is that the foxes hunt at night to avoid people. Cameras showing they are active when streets are quietest directly supports it.",
+    "whyWrong": {
+      "B": "Fur color does not address hunting time.",
+      "C": "The number of parks does not show a shift to night hunting.",
+      "D": "The foxes' family tree is irrelevant to the claim."
+    }
+  },
+  {
+    "id": "evidence-text-t2-bp02",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a student's report.\n\nThe student argues that an ancient people stored grain to survive irregular harvests rather than for daily use.\n\nWhich finding, if true, would most strongly support the student's argument?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The largest storage pits were sealed and untouched for long stretches, opened only in years when nearby harvests appear to have failed."
+      },
+      {
+        "letter": "B",
+        "text": "The people made pottery in many shapes."
+      },
+      {
+        "letter": "C",
+        "text": "The settlement was near a river."
+      },
+      {
+        "letter": "D",
+        "text": "The grain was a type of barley."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Storing for lean years, not daily use, predicts sealed pits opened only in failed-harvest years. A matches that pattern.",
+    "whyWrong": {
+      "B": "Pottery shapes do not address why grain was stored.",
+      "C": "Being near a river does not show storage was for lean years.",
+      "D": "The type of grain does not reveal the purpose of storage."
+    }
+  },
+  {
+    "id": "evidence-text-t2-bp03",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a review of a study.\n\nA nutritionist claims that a new bread keeps blood sugar steadier after eating than an ordinary white bread with the same calories.\n\nWhich finding, if true, would most strongly support the nutritionist's claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "In a trial, people who ate the new bread had smaller blood-sugar spikes afterward than those given the white bread."
+      },
+      {
+        "letter": "B",
+        "text": "The new bread is sold in more stores."
+      },
+      {
+        "letter": "C",
+        "text": "The new bread has a darker crust."
+      },
+      {
+        "letter": "D",
+        "text": "The new bread is baked in smaller loaves."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim is about steadier blood sugar at equal calories. Smaller blood-sugar spikes after the new bread directly support it.",
+    "whyWrong": {
+      "B": "Where it is sold does not measure blood sugar.",
+      "C": "Crust color does not address blood-sugar response.",
+      "D": "Loaf size is unrelated to the claim."
+    }
+  },
+  {
+    "id": "evidence-text-t2-bp04",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a literary discussion.\n\nA critic argues that a playwright's later plays gave far more lines to women than her early plays did.\n\nWhich finding, if true, would most strongly support the critic's argument?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "A line count shows female characters speak a small fraction of the words in the early plays but roughly half in the later ones."
+      },
+      {
+        "letter": "B",
+        "text": "The later plays were staged in larger theaters."
+      },
+      {
+        "letter": "C",
+        "text": "The playwright wrote in more than one language."
+      },
+      {
+        "letter": "D",
+        "text": "The early plays had more scenes."
+      }
+    ],
+    "answer": "A",
+    "explanation": "A shift toward women's lines should show in the counts. Female characters' share rising from a fraction to about half directly supports it.",
+    "whyWrong": {
+      "B": "Theater size does not measure who speaks.",
+      "C": "The language used does not address line distribution.",
+      "D": "The number of scenes does not show who has the lines."
+    }
+  },
+  {
+    "id": "evidence-text-t2-bp05",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from an environmental report.\n\nScientists claim that restoring a stream's natural bends has slowed its water enough to reduce erosion of the banks downstream.\n\nWhich finding, if true, would most strongly support the scientists' claim?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "After the bends were restored, water speed dropped and the downstream banks lost far less soil than in previous years."
+      },
+      {
+        "letter": "B",
+        "text": "The stream is home to several fish species."
+      },
+      {
+        "letter": "C",
+        "text": "The project was funded by the county."
+      },
+      {
+        "letter": "D",
+        "text": "The stream flows year-round."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim links restored bends to slower water and less erosion. Slower water plus less soil loss downstream directly supports it.",
+    "whyWrong": {
+      "B": "Fish species do not measure erosion.",
+      "C": "Funding source is unrelated to the effect on banks.",
+      "D": "That it flows year-round does not show reduced erosion."
+    }
+  },
+  {
+    "id": "evidence-text-t2-bp06",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a study of learning.\n\nEducators propose that students who explain their reasoning aloud while solving problems understand the material more deeply than those who solve silently.\n\nWhich finding, if true, would most strongly support the educators' proposal?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Students who explained their steps aloud solved unfamiliar problems of the same type better afterward than students who worked silently."
+      },
+      {
+        "letter": "B",
+        "text": "Students who explained aloud finished slightly slower."
+      },
+      {
+        "letter": "C",
+        "text": "The problems were printed on colored paper."
+      },
+      {
+        "letter": "D",
+        "text": "Both groups had the same teacher."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Deeper understanding shows in solving new problems of the same type. The explaining group's better transfer directly supports the proposal.",
+    "whyWrong": {
+      "B": "Working slower does not show deeper understanding.",
+      "C": "Paper color is irrelevant.",
+      "D": "A shared teacher sets up a fair test but does not itself show deeper understanding."
+    }
+  },
+  {
+    "id": "evidence-text-t3-bp01",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a research proposal.\n\nA team hypothesizes that a plant's brightly colored leaves warn insects that it is toxic, rather than attracting them.\n\nWhich finding, if true, would most strongly support the team's hypothesis?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Insects that sampled the bright leaves grew ill and afterward avoided leaves of that color, while dull-leaved plants of the species were eaten freely."
+      },
+      {
+        "letter": "B",
+        "text": "The bright color fades when the leaves dry."
+      },
+      {
+        "letter": "C",
+        "text": "The plant grows taller in full sun."
+      },
+      {
+        "letter": "D",
+        "text": "The plant flowers in early spring."
+      }
+    ],
+    "answer": "A",
+    "explanation": "A warning function predicts insects learn to avoid the color after a toxic experience, while non-warning plants are eaten. A shows exactly that, supporting the hypothesis.",
+    "whyWrong": {
+      "B": "Fading when dry does not address the warning function.",
+      "C": "Growth in sun is unrelated to insect avoidance.",
+      "D": "Flowering time does not bear on the leaf-color claim."
+    }
+  },
+  {
+    "id": "evidence-text-t3-bp02",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a historian's argument.\n\nA historian contends that a port town's wealth came less from the spices it was famous for than from the ships it built and repaired.\n\nWhich finding, if true, would most strongly support the historian's contention?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Town ledgers show income from shipyards dwarfed spice revenue and held steady even in years when the spice trade collapsed."
+      },
+      {
+        "letter": "B",
+        "text": "The town was famous across the region for its spices."
+      },
+      {
+        "letter": "C",
+        "text": "Spice merchants built the largest houses in town."
+      },
+      {
+        "letter": "D",
+        "text": "The town's harbor was unusually deep."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim is that shipbuilding, not spices, drove wealth. Shipyard income dwarfing spice revenue and surviving spice-trade collapses directly supports it.",
+    "whyWrong": {
+      "B": "Fame for spices, if anything, cuts against the claim.",
+      "C": "Grand merchant houses suggest spice wealth, weakening the claim.",
+      "D": "A deep harbor does not identify the source of wealth."
+    }
+  },
+  {
+    "id": "evidence-text-t3-bp03",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a psychology paper.\n\nResearchers suggest that people remember stories better when the events are told out of order, because the effort of reassembling the sequence deepens attention.\n\nWhich result, if observed, would most strongly support the researchers' suggestion?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Participants who read a scrambled version of a story later recalled its events more accurately than those who read the same story in order."
+      },
+      {
+        "letter": "B",
+        "text": "Participants preferred the version told in order."
+      },
+      {
+        "letter": "C",
+        "text": "The scrambled version took longer to read."
+      },
+      {
+        "letter": "D",
+        "text": "Both versions contained the same number of words."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The suggestion is that out-of-order telling improves memory. Better recall for the scrambled version directly supports it.",
+    "whyWrong": {
+      "B": "Preference is not the same as remembering better.",
+      "C": "Longer reading time does not show better memory.",
+      "D": "Equal word count sets up a fair test but does not itself show which was remembered better."
+    }
+  },
+  {
+    "id": "evidence-text-t3-bp04",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a study of migration.\n\nEcologists propose that a fish species times its upstream migration by water temperature rather than by the length of the day.\n\nWhich result, if observed, would most strongly support the ecologists' proposal?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "In a year when the river warmed unusually early, the fish migrated early too, even though day length was unchanged from other years."
+      },
+      {
+        "letter": "B",
+        "text": "The fish travel in large schools."
+      },
+      {
+        "letter": "C",
+        "text": "The fish are silver in color."
+      },
+      {
+        "letter": "D",
+        "text": "The river is fed by mountain snowmelt."
+      }
+    ],
+    "answer": "A",
+    "explanation": "If temperature, not day length, cues migration, an early warm-up should shift timing while day length stays fixed. A shows exactly that, isolating temperature.",
+    "whyWrong": {
+      "B": "Schooling does not distinguish temperature from day length.",
+      "C": "Color is irrelevant to the timing cue.",
+      "D": "The river's water source does not test the cue."
+    }
+  },
+  {
+    "id": "evidence-text-t3-bp05",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from an economics study.\n\nAn economist argues that posting calorie counts on menus changes what people order only when the counts appear right next to the price, where diners are already looking.\n\nWhich finding, if true, would most strongly support the economist's argument?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Orders shifted toward lower-calorie dishes only at restaurants that printed calories beside the price, not at those that listed them in a separate box."
+      },
+      {
+        "letter": "B",
+        "text": "Diners said they support posting calorie counts."
+      },
+      {
+        "letter": "C",
+        "text": "The restaurants with counts were slightly larger."
+      },
+      {
+        "letter": "D",
+        "text": "Calorie counts were printed in the same font as the dish names."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The argument is that placement beside the price is what matters. Orders shifting only where counts sat next to prices directly supports it.",
+    "whyWrong": {
+      "B": "Support for the policy is not the same as changed orders.",
+      "C": "Restaurant size is an unrelated variable.",
+      "D": "The font does not test the placement claim."
+    }
+  },
+  {
+    "id": "evidence-text-t3-bp06",
+    "domain": "rw-ii",
+    "skill": "evidence-text",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a linguistics paper.\n\nA linguist hypothesizes that a community's frequent use of a rare grammatical form comes from contact with a neighboring language, not from within the language itself.\n\nWhich finding, if true, would most strongly support the linguist's hypothesis?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The form appears almost only among speakers who live along the border with the neighboring language and matches a common form in that language."
+      },
+      {
+        "letter": "B",
+        "text": "The community has a long tradition of storytelling."
+      },
+      {
+        "letter": "C",
+        "text": "The language is spoken by tens of thousands of people."
+      },
+      {
+        "letter": "D",
+        "text": "Older speakers use the form as often as younger ones."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Contact-based borrowing predicts the form clusters near the border and mirrors the neighbor's grammar. A shows both, strongly supporting the hypothesis.",
+    "whyWrong": {
+      "B": "A storytelling tradition does not indicate borrowing.",
+      "C": "The number of speakers does not show the form's origin.",
+      "D": "Equal use across ages does not point to contact as the source."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-bp01",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A chart shows a café's daily muffin sales for one week: 30 on Monday, rising steadily to 72 on Sunday.\n\nWhich choice most effectively uses the data to support the claim that muffin sales grew over the week?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Muffin sales rose steadily from 30 on Monday to 72 on Sunday."
+      },
+      {
+        "letter": "B",
+        "text": "The café sold muffins every day."
+      },
+      {
+        "letter": "C",
+        "text": "Sales on Monday were 30."
+      },
+      {
+        "letter": "D",
+        "text": "Sunday is the last day of the week."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim is growth over the week. A gives the steady rise from 30 to 72, directly supporting it.",
+    "whyWrong": {
+      "B": "Selling daily does not show sales grew.",
+      "C": "A single day's figure does not show the trend.",
+      "D": "Which day is last does not address sales growth."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-bp02",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A table lists the heights of four waterfalls: 25 m, 40 m, 63 m, and 110 m.\n\nWhich choice most effectively uses the data to support the claim that the waterfalls vary greatly in height?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "One waterfall is 40 m tall."
+      },
+      {
+        "letter": "B",
+        "text": "The waterfalls range from 25 m for the shortest to 110 m for the tallest."
+      },
+      {
+        "letter": "C",
+        "text": "All four are natural waterfalls."
+      },
+      {
+        "letter": "D",
+        "text": "Three of the waterfalls are over 30 m."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Great variation is shown by the full range. B reports the 25-to-110-m spread, supporting the claim.",
+    "whyWrong": {
+      "A": "One height does not show variation.",
+      "C": "Being natural is not about height differences.",
+      "D": "Counting those over 30 m omits the extremes that show the spread."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-bp03",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A survey of 150 students asked their favorite season: 60 chose summer, 45 fall, 30 winter, and 15 spring.\n\nWhich choice most effectively uses the data to support the claim that summer was the most popular season?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Fifteen students chose spring."
+      },
+      {
+        "letter": "B",
+        "text": "More students chose summer (60) than any other single season."
+      },
+      {
+        "letter": "C",
+        "text": "The survey included 150 students."
+      },
+      {
+        "letter": "D",
+        "text": "Thirty students chose winter."
+      }
+    ],
+    "answer": "B",
+    "explanation": "'Most popular' means the largest group. B shows summer's 60 exceeds every other season. B fits.",
+    "whyWrong": {
+      "A": "Spring is the smallest group, not evidence summer leads.",
+      "C": "The total sample does not identify the most popular season.",
+      "D": "Winter's count does not show summer is most popular."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-bp04",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A graph shows a plant's height each week: 5 cm, 9 cm, 16 cm, and 26 cm over four weeks.\n\nWhich choice most effectively uses the data to support the claim that the plant grew faster as time went on?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The plant was 9 cm tall in week 2."
+      },
+      {
+        "letter": "B",
+        "text": "The weekly increases grew larger, from 4 cm to 7 cm to 10 cm."
+      },
+      {
+        "letter": "C",
+        "text": "The plant was measured for four weeks."
+      },
+      {
+        "letter": "D",
+        "text": "The plant started at 5 cm."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Faster growth over time is shown by the increases getting bigger each week (4, 7, 10 cm). B fits.",
+    "whyWrong": {
+      "A": "One week's height does not show the growth rate changing.",
+      "C": "The length of the study does not show accelerating growth.",
+      "D": "The starting height alone does not show growth speeding up."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-bp05",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A study reports how far four paper airplane designs flew: 4 m, 7 m, 9 m, and 15 m.\n\nWhich choice most effectively uses the data to support the claim that the designs differed widely in distance?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "One design flew 7 m."
+      },
+      {
+        "letter": "B",
+        "text": "All four were made of paper."
+      },
+      {
+        "letter": "C",
+        "text": "Distances ranged from 4 m for the shortest flight to 15 m for the longest."
+      },
+      {
+        "letter": "D",
+        "text": "Two designs flew more than 8 m."
+      }
+    ],
+    "answer": "C",
+    "explanation": "Wide differences are shown by the full range. C reports the 4-to-15-m spread, supporting the claim.",
+    "whyWrong": {
+      "A": "One distance does not show variation.",
+      "B": "Being paper is not about distance differences.",
+      "D": "Counting those over 8 m omits the extremes."
+    }
+  },
+  {
+    "id": "evidence-quant-t1-bp06",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "A club tracked donations over four months: $200, $350, $500, and $650.\n\nWhich choice most effectively uses the data to support the claim that monthly donations increased steadily?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Donations rose each month, from $200 to $650."
+      },
+      {
+        "letter": "B",
+        "text": "The club collected donations for four months."
+      },
+      {
+        "letter": "C",
+        "text": "One month's donations were $350."
+      },
+      {
+        "letter": "D",
+        "text": "The first month raised the least."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Steady increase is shown by donations rising each month. A gives the full rise from $200 to $650.",
+    "whyWrong": {
+      "B": "The number of months does not show an increase.",
+      "C": "A single month's figure does not show the trend.",
+      "D": "A low starting point alone does not prove steady growth."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-bp01",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "A study compared three study methods. Students using flashcards scored 85 on a later test; those rereading notes scored 74; those who did nothing extra scored 70.\n\nWhich choice most effectively uses the data to support the claim that flashcards led to the best test performance?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Students who did nothing extra scored 70."
+      },
+      {
+        "letter": "B",
+        "text": "Flashcard users scored 85, higher than those who reread notes (74) or did nothing extra (70)."
+      },
+      {
+        "letter": "C",
+        "text": "Rereading beat doing nothing extra."
+      },
+      {
+        "letter": "D",
+        "text": "Some students used flashcards."
+      }
+    ],
+    "answer": "B",
+    "explanation": "'Best performance' requires comparing flashcards to both other methods. B shows 85 exceeds 74 and 70. B fits.",
+    "whyWrong": {
+      "A": "The do-nothing score alone does not show flashcards were best.",
+      "C": "Rereading beating nothing does not show flashcards led.",
+      "D": "That some used flashcards does not identify the top method."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-bp02",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "A report notes that a lake's water clarity fell from 6 m visible depth in 2012 to 2 m in 2016, then rose to 5 m by 2020 after runoff controls began in 2016.\n\nWhich choice most effectively uses the data to support the claim that the runoff controls helped clarity recover?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Clarity was 6 m in 2012."
+      },
+      {
+        "letter": "B",
+        "text": "Clarity fell between 2012 and 2016."
+      },
+      {
+        "letter": "C",
+        "text": "After the controls began in 2016, clarity rose from 2 m to 5 m by 2020."
+      },
+      {
+        "letter": "D",
+        "text": "Clarity never returned to its 2012 level."
+      }
+    ],
+    "answer": "C",
+    "explanation": "Recovery after the controls is shown by the rise following 2016. C reports the climb from 2 m to 5 m once controls began.",
+    "whyWrong": {
+      "A": "The 2012 figure predates the controls.",
+      "B": "The earlier decline occurred before the controls.",
+      "D": "Falling short of 2012 does not show the recovery the controls produced."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-bp03",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "A survey found that 20% of readers finished the guide in under an hour, 50% in one to two hours, 25% in three to four hours, and 5% took longer.\n\nWhich choice most effectively uses the data to support the claim that most readers finished within two hours?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Five percent took longer than four hours."
+      },
+      {
+        "letter": "B",
+        "text": "Combined, 70% finished within two hours (20% under an hour plus 50% in one to two hours)."
+      },
+      {
+        "letter": "C",
+        "text": "Twenty-five percent took three to four hours."
+      },
+      {
+        "letter": "D",
+        "text": "Half finished in one to two hours."
+      }
+    ],
+    "answer": "B",
+    "explanation": "'Most' means over half. B adds the two fastest groups (20% + 50% = 70%) to show a majority finished within two hours.",
+    "whyWrong": {
+      "A": "The slowest group works against the claim.",
+      "C": "That group took longer than two hours.",
+      "D": "50% alone is not a majority; the under-an-hour group must be added."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-bp04",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "A town measured noise near a school before and after a speed limit was lowered. Average noise fell from 68 decibels to 59, while a comparison street with no change stayed near 67.\n\nWhich choice most effectively uses the data to support the claim that the lower speed limit reduced noise near the school?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The comparison street measured about 67 decibels."
+      },
+      {
+        "letter": "B",
+        "text": "Noise near the school fell from 68 to 59 decibels, while the comparison street without a change stayed near 67."
+      },
+      {
+        "letter": "C",
+        "text": "Noise was measured on both streets."
+      },
+      {
+        "letter": "D",
+        "text": "The speed limit was lowered to reduce noise."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The strongest support pairs the drop where the limit changed (68 to 59) with the unchanged comparison street (67). B does this.",
+    "whyWrong": {
+      "A": "The comparison street alone does not show the school street improved.",
+      "C": "That both were measured is method, not evidence of the effect.",
+      "D": "Stating the goal is not data showing it was met."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-bp05",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "A bookstore found that after it began hosting weekly author readings, average Saturday visitors rose from 90 to 140, while its branch with no readings held steady near 88.\n\nWhich choice most effectively uses the data to support the claim that the readings drew more visitors?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "The branch without readings averaged about 88 visitors."
+      },
+      {
+        "letter": "B",
+        "text": "Saturday visitors rose from 90 to 140 at the branch with readings, while the branch without them stayed near 88."
+      },
+      {
+        "letter": "C",
+        "text": "Both branches sell the same books."
+      },
+      {
+        "letter": "D",
+        "text": "The readings were held weekly."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim credits the readings for more visitors. B contrasts the rise where readings were held (90 to 140) with the flat branch (88).",
+    "whyWrong": {
+      "A": "The unchanged branch alone does not show the readings helped.",
+      "C": "Shared inventory is background, not evidence of the effect.",
+      "D": "How often readings were held does not measure their effect."
+    }
+  },
+  {
+    "id": "evidence-quant-t2-bp06",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "A test compared how well three fabrics blocked sunlight. Fabric A blocked 95% of light, Fabric B 92%, and Fabric C only 60%.\n\nWhich choice most effectively uses the data to support the claim that only Fabric C let a large amount of light through?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Fabric B blocked 92% of light."
+      },
+      {
+        "letter": "B",
+        "text": "Fabrics A and B blocked most light (95% and 92%), but Fabric C blocked only 60%, letting far more through."
+      },
+      {
+        "letter": "C",
+        "text": "Fabric A blocked the most light."
+      },
+      {
+        "letter": "D",
+        "text": "Three fabrics were tested."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is that only Fabric C let much light through. B shows A and B were close and high while C was far lower.",
+    "whyWrong": {
+      "A": "Fabric B's figure alone does not single out C.",
+      "C": "A blocking the most ignores that B was nearly as high and C stood out.",
+      "D": "The number of fabrics is not evidence about C."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-bp01",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "A study measured a battery's life at four charging speeds. Slow charging gave 1,200 cycles, medium 1,150, fast 900, and very fast 600.\n\nWhich choice most effectively uses the data to support the claim that faster charging shortens battery life, with the sharpest drop at the highest speeds?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Battery life fell as charging sped up, from 1,200 cycles at slow to 600 at very fast, dropping most steeply between fast (900) and very fast (600)."
+      },
+      {
+        "letter": "B",
+        "text": "Slow charging gave the most cycles."
+      },
+      {
+        "letter": "C",
+        "text": "Medium charging gave 1,150 cycles."
+      },
+      {
+        "letter": "D",
+        "text": "Four charging speeds were tested."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim describes a decline that is steepest at high speeds. A traces the fall from 1,200 to 600 and names the sharpest drop at the top speeds.",
+    "whyWrong": {
+      "B": "The maximum alone does not show the steepening drop.",
+      "C": "A single midpoint does not show the pattern.",
+      "D": "The number of speeds does not describe the trend."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-bp02",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "Two tutoring programs were compared. On basic problems, Program X scored 90 and Program Y 88—nearly equal. On advanced problems, Program X scored 78 while Program Y scored 54.\n\nWhich choice most effectively uses the data to support the claim that Program X's advantage shows mainly on harder problems?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Program X scored 90 on basic problems."
+      },
+      {
+        "letter": "B",
+        "text": "The programs scored nearly the same on basic problems (90 vs. 88) but Program X far outscored Program Y on advanced ones (78 vs. 54)."
+      },
+      {
+        "letter": "C",
+        "text": "Both programs scored above 50 on advanced problems."
+      },
+      {
+        "letter": "D",
+        "text": "Program Y scored 88 on basic problems."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is that X's edge appears on harder problems. B contrasts the near-tie on basics with X's large lead on advanced problems.",
+    "whyWrong": {
+      "A": "One basic score does not reveal where the advantage lies.",
+      "C": "Both clearing 50 ignores the gap that shows the advantage.",
+      "D": "Y's basic score alone does not address the difficulty pattern."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-bp03",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "A survey found that 65% of employees said they would use a new gym if the company built one, but at a similar company that did build one, only 30% of employees actually used it.\n\nWhich choice most effectively uses the data to support the claim that stated intentions can overstate actual use?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Sixty-five percent of employees said they would use a gym."
+      },
+      {
+        "letter": "B",
+        "text": "Although 65% said they would use a gym, only 30% at a comparable company actually did—a gap showing intentions exceeded use."
+      },
+      {
+        "letter": "C",
+        "text": "One company built a gym."
+      },
+      {
+        "letter": "D",
+        "text": "Thirty percent of employees used the gym."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Overstating is shown by the gap between the 65% who intended and the 30% who used. B pairs both figures to reveal that gap.",
+    "whyWrong": {
+      "A": "The intention figure alone gives no basis for comparison.",
+      "C": "That a gym was built is context, not the revealing contrast.",
+      "D": "The usage figure alone, without the 65%, does not show overstatement."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-bp04",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "A clinic compared two reminder methods. Patients who got phone-call reminders showed up 88% of the time; those who got no reminder showed up 62%. The two groups were similar in age and distance from the clinic.\n\nWhich choice most effectively uses the data to support the claim that phone-call reminders improved attendance?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Patients who received phone-call reminders showed up 88% of the time, compared with 62% among the otherwise-similar group that got none."
+      },
+      {
+        "letter": "B",
+        "text": "Most patients in both groups showed up."
+      },
+      {
+        "letter": "C",
+        "text": "The clinic used phone-call reminders for one group."
+      },
+      {
+        "letter": "D",
+        "text": "Both groups were similar in age and distance."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The reminders' effect is shown by comparing the similar groups: 88% with reminders versus 62% without. A gives that contrast.",
+    "whyWrong": {
+      "B": "Saying most showed up blurs the difference the reminders made.",
+      "C": "Describing the method is not the same as showing its effect.",
+      "D": "Group similarity supports a fair comparison but does not itself show the reminders helped."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-bp05",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "A study found that a shaded bus shelter kept waiting riders cooler: on hot days, riders under the new shelter reported a comfort score of 8 out of 10, while riders at a similar unshaded stop reported 4.\n\nWhich choice most effectively uses the data to support the claim that the shelter improved rider comfort on hot days?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "On hot days, riders under the shelter reported a comfort score of 8, versus 4 at a similar unshaded stop."
+      },
+      {
+        "letter": "B",
+        "text": "Both stops served the same bus route."
+      },
+      {
+        "letter": "C",
+        "text": "The shelter provided shade."
+      },
+      {
+        "letter": "D",
+        "text": "Comfort was rated out of 10."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The claim credits the shelter with better comfort. A contrasts the sheltered riders' score of 8 with the unshaded 4 on the same hot days.",
+    "whyWrong": {
+      "B": "A shared route sets up the comparison but is not the evidence.",
+      "C": "That the shelter gave shade does not by itself show improved comfort.",
+      "D": "The rating scale is method, not the comparative result."
+    }
+  },
+  {
+    "id": "evidence-quant-t3-bp06",
+    "domain": "rw-ii",
+    "skill": "evidence-quant",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "A workshop tested a new tool over four weeks. Time to finish a task fell from 40 minutes to 22, while the number of finished tasks per day rose from 12 to 20.\n\nWhich choice most effectively uses the data to support the claim that the tool made work both faster and more productive?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "Tasks finished per day reached 20 in the final week."
+      },
+      {
+        "letter": "B",
+        "text": "As time per task fell from 40 to 22 minutes, daily finished tasks rose from 12 to 20."
+      },
+      {
+        "letter": "C",
+        "text": "The task took 40 minutes at the start."
+      },
+      {
+        "letter": "D",
+        "text": "The tool was tested over four weeks."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The claim is faster and more productive. B shows time per task falling while daily output rose, covering both parts.",
+    "whyWrong": {
+      "A": "Final output alone does not show the speed gain.",
+      "C": "The starting time alone does not show both trends.",
+      "D": "The test's length is not evidence about speed or output."
+    }
+  },
+  {
+    "id": "inferences-t1-bp01",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from an article about birds.\n\nThe Arctic tern nests near the North Pole in summer but spends the other half of the year near the South Pole. To make this journey twice a year, it flies farther annually than almost any other animal. This suggests that the Arctic tern ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "rarely leaves the area where it was born."
+      },
+      {
+        "letter": "B",
+        "text": "is capable of traveling extremely long distances."
+      },
+      {
+        "letter": "C",
+        "text": "cannot survive in cold climates."
+      },
+      {
+        "letter": "D",
+        "text": "never migrates at all."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Flying between the poles twice a year, farther than nearly any animal, shows the tern can travel enormous distances. B follows.",
+    "whyWrong": {
+      "A": "The text describes vast migrations, not staying put.",
+      "C": "It nests near both poles, so it handles cold well.",
+      "D": "Its pole-to-pole journeys are migration."
+    }
+  },
+  {
+    "id": "inferences-t1-bp02",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from a report on a school.\n\nAfter the cafeteria began offering a free piece of fruit with every lunch, the amount of fruit students ate at lunch rose sharply, while the school made no other changes to the menu. This suggests that the free fruit ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "encouraged students to eat more fruit."
+      },
+      {
+        "letter": "B",
+        "text": "made students eat less overall."
+      },
+      {
+        "letter": "C",
+        "text": "was rarely taken by students."
+      },
+      {
+        "letter": "D",
+        "text": "replaced the main lunch dishes."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Fruit eaten rose after it was offered free, with nothing else changed, so the free fruit boosted fruit eating. A follows.",
+    "whyWrong": {
+      "B": "Eating more fruit does not indicate eating less overall.",
+      "C": "Fruit eaten rose sharply, so it was taken often.",
+      "D": "The fruit was added to lunch, not a replacement for main dishes."
+    }
+  },
+  {
+    "id": "inferences-t1-bp03",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from a nature guide.\n\nThe walking stick insect is shaped and colored so much like a twig that predators searching a branch often crawl right past it. Only when it moves does a bird tend to notice it. This suggests that the insect's twig-like appearance ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "helps it avoid predators when it stays still."
+      },
+      {
+        "letter": "B",
+        "text": "draws predators toward it."
+      },
+      {
+        "letter": "C",
+        "text": "lets it fly faster than birds."
+      },
+      {
+        "letter": "D",
+        "text": "makes it glow at night."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Predators pass the still insect and notice it only when it moves, so looking like a twig hides it while motionless. A follows.",
+    "whyWrong": {
+      "B": "The appearance makes predators miss it, not approach.",
+      "C": "Flight speed is never mentioned.",
+      "D": "Nothing about glowing appears in the text."
+    }
+  },
+  {
+    "id": "inferences-t1-bp04",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from a company report.\n\nWhen the software company added a simple tutorial that new users saw the first time they opened the app, the share of users who gave up within the first day dropped by half. This suggests that many users who once quit early ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "had struggled to figure out how to use the app."
+      },
+      {
+        "letter": "B",
+        "text": "disliked the app's color scheme."
+      },
+      {
+        "letter": "C",
+        "text": "had never actually opened the app."
+      },
+      {
+        "letter": "D",
+        "text": "were satisfied with the app from the start."
+      }
+    ],
+    "answer": "A",
+    "explanation": "A first-time tutorial halved early quitting, so many early quitters had trouble learning the app. A follows.",
+    "whyWrong": {
+      "B": "The tutorial addresses use, not colors, so color is unsupported.",
+      "C": "They opened the app and quit within a day.",
+      "D": "Satisfied users would not have quit early."
+    }
+  },
+  {
+    "id": "inferences-t1-bp05",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from an article about deserts.\n\nThe saguaro cactus has pleated sides that expand like an accordion. After a rare desert rain, the cactus swells noticeably as it takes in water, then slowly shrinks over the following weeks. This suggests that the pleated shape allows the saguaro to ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "store water it can use during dry periods."
+      },
+      {
+        "letter": "B",
+        "text": "attract rain to the desert."
+      },
+      {
+        "letter": "C",
+        "text": "grow taller than any other plant."
+      },
+      {
+        "letter": "D",
+        "text": "survive without any water at all."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The cactus swells with water after rain and shrinks over weeks, so the pleats let it store water for dry times. A follows.",
+    "whyWrong": {
+      "B": "A plant's shape does not cause rain.",
+      "C": "Height compared to other plants is not discussed.",
+      "D": "It takes in water, so it does need water."
+    }
+  },
+  {
+    "id": "inferences-t1-bp06",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 1,
+    "source": "blueprint-generated",
+    "text": "The following text is from a town report.\n\nAfter the library moved its children's section from a back corner to a bright space near the front entrance, weekly checkouts of children's books more than doubled, though the collection itself did not change. This suggests that the section's earlier location ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "had made the children's books easy to overlook."
+      },
+      {
+        "letter": "B",
+        "text": "contained better books than the new one."
+      },
+      {
+        "letter": "C",
+        "text": "was closed to the public."
+      },
+      {
+        "letter": "D",
+        "text": "was more popular than the new location."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Checkouts doubled after the move with the same collection, so the old back-corner spot had made the books easy to miss. A follows.",
+    "whyWrong": {
+      "B": "The collection did not change, so book quality is the same.",
+      "C": "Books were checked out before, so it was open.",
+      "D": "The new location doubled checkouts, so it was more popular."
+    }
+  },
+  {
+    "id": "inferences-t2-bp01",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a study of ancient pottery.\n\nJars found at a coastal site were made from a clay that occurs only in a mountain region far inland. The jars still held traces of a wine produced only in that same inland region. The most reasonable conclusion is that the coastal community ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "produced its own wine and jars locally."
+      },
+      {
+        "letter": "B",
+        "text": "obtained both the jars and their contents from the inland region."
+      },
+      {
+        "letter": "C",
+        "text": "had no contact with inland communities."
+      },
+      {
+        "letter": "D",
+        "text": "used the jars only for storing water."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The clay and the wine both come only from inland, so the coastal community got the filled jars from there. B follows.",
+    "whyWrong": {
+      "A": "The clay and wine are inland-only, so they were not made locally.",
+      "C": "The inland goods show contact, not isolation.",
+      "D": "The jars held wine, not water."
+    }
+  },
+  {
+    "id": "inferences-t2-bp02",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from an ecology study.\n\nOn an island with no natural predators, a species of bird lost the ability to fly over many generations, developing heavier bodies and smaller wings. On nearby islands where predators were present, related birds kept their strong flight. The most reasonable conclusion is that the ability to fly ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "is unrelated to the presence of predators."
+      },
+      {
+        "letter": "B",
+        "text": "tends to be maintained where it helps birds escape predators."
+      },
+      {
+        "letter": "C",
+        "text": "was never present in any of these birds."
+      },
+      {
+        "letter": "D",
+        "text": "makes birds heavier over time."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Flight was lost where no predators existed but kept where predators did, so flight is maintained where it aids escape. B follows.",
+    "whyWrong": {
+      "A": "The pattern ties flight to predators, so they are related.",
+      "C": "The predator islands' birds fly, so flight was present.",
+      "D": "The flightless birds grew heavier, not the flying ones."
+    }
+  },
+  {
+    "id": "inferences-t2-bp03",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from an article about astronomy.\n\nA faint, distant object gives off no visible light of its own, yet the stars behind it appear bent and smeared as their light passes nearby. Astronomers know that only a large concentration of mass can bend light this way. The most reasonable conclusion is that the object ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "contains a large amount of mass despite emitting no light."
+      },
+      {
+        "letter": "B",
+        "text": "is a nearby, ordinary star."
+      },
+      {
+        "letter": "C",
+        "text": "does not affect the light around it."
+      },
+      {
+        "letter": "D",
+        "text": "is smaller than a single planet."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Only large mass bends light as observed, and the object does bend starlight, so it holds much mass despite giving off no light. A follows.",
+    "whyWrong": {
+      "B": "It emits no light and is distant, unlike a nearby star.",
+      "C": "It clearly bends the light behind it.",
+      "D": "Bending light requires large mass, not a tiny object."
+    }
+  },
+  {
+    "id": "inferences-t2-bp04",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is adapted from a story.\n\nMr. Alvarez claimed he had not touched the piano in thirty years. Yet when the visiting musician played a wrong note, his fingers twitched toward the keys, and he murmured the correct one without looking. The most reasonable conclusion is that Mr. Alvarez ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "had never learned to play the piano."
+      },
+      {
+        "letter": "B",
+        "text": "retained far more of his old skill than he let on."
+      },
+      {
+        "letter": "C",
+        "text": "could not hear the music being played."
+      },
+      {
+        "letter": "D",
+        "text": "disliked the visiting musician."
+      }
+    ],
+    "answer": "B",
+    "explanation": "His fingers reach for the keys and he names the right note without looking, so he kept more skill than he admitted. B follows.",
+    "whyWrong": {
+      "A": "His instant correction shows he had learned to play.",
+      "C": "He heard the wrong note and corrected it.",
+      "D": "Nothing shows dislike of the musician."
+    }
+  },
+  {
+    "id": "inferences-t2-bp05",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from a report on farming.\n\nIn fields where a farmer left the stalks and roots of the previous crop in the soil, the ground held moisture longer and needed less watering than in fields cleared down to bare earth. Researchers found the leftover plant matter formed a spongy layer near the surface. The most reasonable conclusion is that the leftover plant matter reduced watering needs by ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "helping the soil hold on to moisture."
+      },
+      {
+        "letter": "B",
+        "text": "making the crops grow taller."
+      },
+      {
+        "letter": "C",
+        "text": "attracting more rainfall to the field."
+      },
+      {
+        "letter": "D",
+        "text": "replacing the soil entirely."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The spongy layer of leftover matter kept the ground moist longer, so it cut watering by holding moisture. A follows.",
+    "whyWrong": {
+      "B": "Taller crops are not mentioned as the mechanism.",
+      "C": "Leftover matter does not draw rainfall.",
+      "D": "The matter sat in the soil; it did not replace it."
+    }
+  },
+  {
+    "id": "inferences-t2-bp06",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 2,
+    "source": "blueprint-generated",
+    "text": "The following text is from an art history discussion.\n\nA painting long attributed to a famous master was found to contain a synthetic blue pigment that was not manufactured until decades after the master's death. No records show the painting being altered later. The most reasonable conclusion is that the painting ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "was painted by the master exactly as claimed."
+      },
+      {
+        "letter": "B",
+        "text": "could not have been painted by the master in his lifetime."
+      },
+      {
+        "letter": "C",
+        "text": "contains no blue pigment at all."
+      },
+      {
+        "letter": "D",
+        "text": "was painted before the master was born."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The blue pigment postdates the master's death and the work was not later altered, so he could not have painted it. B follows.",
+    "whyWrong": {
+      "A": "The late pigment rules out the master's authorship.",
+      "C": "The blue pigment is what dates the work, so it is present.",
+      "D": "A pigment made after his death cannot place the work before his birth."
+    }
+  },
+  {
+    "id": "inferences-t3-bp01",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a study of decision-making.\n\nShoppers were shown the same coat at the same price in two stores. In the first, the coat was the cheapest on the rack; in the second, it was the most expensive. Shoppers rated the coat as higher quality in the second store, though the coat and price were identical. The most reasonable conclusion is that shoppers' judgments of quality were shaped less by the coat itself than by ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "how its price compared with the other items around it."
+      },
+      {
+        "letter": "B",
+        "text": "the actual materials the coat was made from."
+      },
+      {
+        "letter": "C",
+        "text": "the exact price printed on its tag."
+      },
+      {
+        "letter": "D",
+        "text": "the number of coats each store carried."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The identical coat was judged better where it was the priciest on the rack, so the surrounding prices, not the coat, shaped the judgment. A follows.",
+    "whyWrong": {
+      "B": "The coat and its materials were identical in both stores.",
+      "C": "The price was the same in both stores.",
+      "D": "The number of coats is never linked to the ratings."
+    }
+  },
+  {
+    "id": "inferences-t3-bp02",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a paper on ecology.\n\nAfter a wildfire, a hillside cleared of its usual shrubs was quickly covered by a plant whose seeds only sprout after being exposed to intense heat. These seeds had lain dormant in the soil for years. The most reasonable conclusion is that, for this plant, occasional fire ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "is fatal to the entire species."
+      },
+      {
+        "letter": "B",
+        "text": "is part of how it reproduces and spreads."
+      },
+      {
+        "letter": "C",
+        "text": "has no effect on its seeds."
+      },
+      {
+        "letter": "D",
+        "text": "prevents its seeds from ever sprouting."
+      }
+    ],
+    "answer": "B",
+    "explanation": "The seeds sprout only after intense heat and then cover the hillside, so fire is part of how the plant reproduces. B follows.",
+    "whyWrong": {
+      "A": "Fire triggers its spread, so it is not fatal to the species.",
+      "C": "Heat is exactly what makes the seeds sprout.",
+      "D": "Fire causes sprouting rather than preventing it."
+    }
+  },
+  {
+    "id": "inferences-t3-bp03",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a study of language learning.\n\nInfants can hear the difference between speech sounds from every language at birth. By their first birthday, they distinguish the sounds of their own language easily but struggle to tell apart sounds their language never uses. The most reasonable conclusion is that, over the first year, exposure to a particular language ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "sharpens the sound distinctions a child hears while dulling unused ones."
+      },
+      {
+        "letter": "B",
+        "text": "has no effect on how infants hear speech."
+      },
+      {
+        "letter": "C",
+        "text": "lets infants hear every possible sound equally well."
+      },
+      {
+        "letter": "D",
+        "text": "prevents infants from hearing any speech sounds."
+      }
+    ],
+    "answer": "A",
+    "explanation": "Infants start able to hear all contrasts but, after a year of exposure, keep their language's contrasts and lose others, so exposure tunes their hearing. A follows.",
+    "whyWrong": {
+      "B": "The change over the year shows exposure does have an effect.",
+      "C": "By one year they struggle with unused sounds, so not all are equal.",
+      "D": "They clearly hear their own language's sounds."
+    }
+  },
+  {
+    "id": "inferences-t3-bp04",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from an economics study.\n\nA city offered the same job training to two neighborhoods. In one, most graduates found work within months; in the other, few did. The programs were identical, but the first neighborhood sat beside a growing industrial park, while the second was miles from any employers hiring such skills. The most reasonable conclusion is that the training's success depended heavily on ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "the quality of the training program itself."
+      },
+      {
+        "letter": "B",
+        "text": "whether nearby employers were hiring those skills."
+      },
+      {
+        "letter": "C",
+        "text": "the number of people who enrolled."
+      },
+      {
+        "letter": "D",
+        "text": "the length of each training session."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Identical training succeeded next to hiring employers but not far from them, so nearby demand drove the difference. B follows.",
+    "whyWrong": {
+      "A": "The programs were identical, so program quality was not the difference.",
+      "C": "Enrollment numbers are never linked to the outcome.",
+      "D": "Session length is not mentioned as a factor."
+    }
+  },
+  {
+    "id": "inferences-t3-bp05",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a study of perception.\n\nWhen a short film was shown with tense background music, viewers described a character's blank expression as fearful. When the same footage was shown with calm music, viewers called the very same expression peaceful. The most reasonable conclusion is that the viewers' reading of the expression depended partly on ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "the music that accompanied the footage."
+      },
+      {
+        "letter": "B",
+        "text": "the actor's actual facial movements."
+      },
+      {
+        "letter": "C",
+        "text": "the length of the film."
+      },
+      {
+        "letter": "D",
+        "text": "the color of the character's clothing."
+      }
+    ],
+    "answer": "A",
+    "explanation": "The identical blank expression was read as fearful or peaceful depending on the music, so the music shaped the reading. A follows.",
+    "whyWrong": {
+      "B": "The footage and expression were the same in both showings.",
+      "C": "Film length is never linked to the viewers' readings.",
+      "D": "Clothing color is not mentioned."
+    }
+  },
+  {
+    "id": "inferences-t3-bp06",
+    "domain": "rw-ii",
+    "skill": "inferences",
+    "tier": 3,
+    "source": "blueprint-generated",
+    "text": "The following text is from a history paper.\n\nA medieval town's records show that in years when a certain saint's festival fell during harvest, far less grain was recorded as stored for winter. The festival drew workers away from the fields for several days at the busiest time. The most reasonable conclusion is that the timing of the festival ______\n\nWhich choice most logically completes the text?",
+    "choices": [
+      {
+        "letter": "A",
+        "text": "had no effect on the town's food supply."
+      },
+      {
+        "letter": "B",
+        "text": "could reduce the harvest when it coincided with it."
+      },
+      {
+        "letter": "C",
+        "text": "always increased the amount of grain stored."
+      },
+      {
+        "letter": "D",
+        "text": "determined which crops the town planted."
+      }
+    ],
+    "answer": "B",
+    "explanation": "Less grain was stored in years when the festival pulled workers from the fields during harvest, so its timing could cut the harvest. B follows.",
+    "whyWrong": {
+      "A": "The lower storage shows it did affect the food supply.",
+      "C": "Storage fell, not rose, in those years.",
+      "D": "The text concerns labor timing, not crop choice."
+    }
+  },
 ];

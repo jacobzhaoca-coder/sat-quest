@@ -1454,7 +1454,7 @@ route('resources', () => {
   ]));
 
   body.push(el('div', { class: 'card note-card' }, [el('h2', { text: 'About the real SAT' }),
-    el('p', { text: 'The digital SAT has two sections — Reading & Writing and Math — delivered in adaptive modules, taking about 2 hours and 14 minutes plus a break. Scores range from 400 to 1600. See SAT_REALISM_AUDIT.md in this project for how SAT Quest aligns to the official structure.' }),
+    el('p', { text: 'The digital SAT has two sections — Reading & Writing and Math — delivered in adaptive modules, taking about 2 hours and 14 minutes plus a break. Scores range from 400 to 1600. SAT Quest mirrors that section structure and per-question pacing, but its practice questions are original and its scores are unofficial estimates.' }),
   ]));
   return screen('Official Resources', 'Straight from the source', body, { back: { route: 'profile' } });
 });
