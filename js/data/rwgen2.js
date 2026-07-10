@@ -460,4 +460,9 @@
     return finalize({ skill: 'cross-text', text: `${it.t1}\n\n${it.t2}\n\n${it.q}`, choices, answer, whyWrong,
       explanation: `Text 2 engages Text 1 by qualifying or complicating it. ${correctExp(it.c)}` }, 3);
   };
+
+  // Expose the comprehension banks (mutable references) so rwgen3.js can extend
+  // them with more original scenarios without touching the generators.
+  const G = (typeof window !== 'undefined') ? window : (typeof globalThis !== 'undefined' ? globalThis : this);
+  if (G.rwgenBanks) Object.assign(G.rwgenBanks, { STRUCTURE, EVIDENCE, INFER, CENTRAL, QUANT, CROSS });
 })();

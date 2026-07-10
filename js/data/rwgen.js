@@ -897,6 +897,9 @@
   G.rwgenFinalize = finalize;
   G.rwgenBuildChoices = buildChoices;
   G.rwgenHelpers = { ri, pick, shuffle, cap, lower1 };
+  // Expose the raw scenario banks (mutable references) so rwgen3.js can extend
+  // them with more original scenarios without touching the generators.
+  G.rwgenBanks = { TRANS, WORDS, BOUND, FORM, SYNTH };
   G.genTransition = genTransition;
   G.genWordsContext = genWordsContext;
   G.genBoundaries = genBoundaries;
