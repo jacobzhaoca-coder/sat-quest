@@ -41,22 +41,31 @@ function buildExamModule(kind, hard) {
     // spread across all R&W skills, sampling authored questions without repeats
     let pool = [];
     for (const s of skills) pool = pool.concat(rwQuestionsFor(s, hard ? 3 : 2));
-    // de-dup by text as we draw
-    const bag = pool.slice();
+    if (typeof rwGeneratedFor === 'function' && typeof rwHasGenerator === 'function') {
+      for (const s of skills) if (rwHasGenerator(s)) pool = pool.concat(rwGeneratedFor(s, 6));
+    }
+    // Draw without repeats, preferring items not yet seen this runthrough.
+    const bag = (typeof shuffleQuestions === 'function') ? shuffleQuestions(pool) : pool.slice();
+    const seen = (typeof _rtSeen === 'function') ? _rtSeen : () => false;
     const used = new Set();
     while (out.length < n) {
-      if (bag.length === 0) { bag.push(...pool); }
-      const i = Math.floor(Math.random() * bag.length);
-      const item = bag.splice(i, 1)[0];
+      if (bag.length === 0) { bag.push(...(typeof shuffleQuestions === 'function' ? shuffleQuestions(pool) : pool)); }
+      let idx = bag.findIndex(it => !used.has(it.text) && !seen(it));
+      if (idx === -1) idx = bag.findIndex(it => !used.has(it.text));
+      if (idx === -1) idx = Math.floor(Math.random() * bag.length);
+      const item = bag.splice(idx, 1)[0];
       if (used.has(item.text) && used.size < pool.length) continue;
       used.add(item.text); out.push(item);
     }
   } else {
     const skills = Object.keys(SKILLS).filter(s => SKILLS[s].section === 'math');
+    const seen = (typeof _rtSeen === 'function') ? _rtSeen : () => false;
     for (let i = 0; i < n; i++) {
       const skill = skills[Math.floor(Math.random() * skills.length)];
       const tier = hard ? (Math.random() < 0.6 ? 3 : 2) : (Math.random() < 0.5 ? 2 : 1);
-      out.push(mixedMathQuestion(skill, tier));
+      let mq = mixedMathQuestion(skill, tier);
+      for (let a = 0; a < 8 && seen(mq); a++) mq = mixedMathQuestion(skill, tier);
+      out.push(mq);
     }
   }
   return shuffleQuestions(out);
@@ -75,8 +84,10 @@ function startExam(style) {
 function newModuleState(kind, hard) {
   const meta = MODULE_META[kind];
   const cfg = EXAM_CONFIG[meta.section];
+  const questions = buildExamModule(kind, hard);
+  if (typeof _noteRun === 'function') _noteRun(questions); // Simulation Gate = fresh practice
   return {
-    kind, questions: buildExamModule(kind, hard),
+    kind, questions,
     responses: {}, flags: {}, idx: 0, submitted: false,
     timeLeft: cfg.count * cfg.perQ + timeBonusSeconds() * cfg.count,
     total: cfg.count,
@@ -119,6 +130,7 @@ function submitModule() {
   m.questions.forEach((q, i) => {
     const ok = gradeExamQuestion(q, m.responses[i]);
     recordAnswer(q.skill, ok, 0);
+    if (m.responses[i] !== undefined && typeof recordQuestionHistory === 'function') recordQuestionHistory(q, ok);
     if (!ok && m.responses[i] !== undefined) {
       // log to mistake log
       STATE.mistakes.unshift({ id: 'm' + Date.now() + i, category: null, reflected: false,

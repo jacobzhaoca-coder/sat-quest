@@ -2,6 +2,11 @@
    daily challenge tower from the two question sources (procedural math +
    authored R&W). */
 
+/* Guarded bridges to the runthrough anti-repeat layer in state.js (kept
+   optional so quiz.js can be unit-tested without the full state module). */
+const _rtSeen = (q) => (typeof runthroughHasSeen === 'function') ? runthroughHasSeen(q) : false;
+const _noteRun = (qs) => { if (typeof noteSeenInRunthrough === 'function') noteSeenInRunthrough(qs); };
+
 /* A math question that may be multiple-choice, a grid-in (student-produced
    response), or a visual (SVG) question — mixing the three the way the real
    SAT Math section mixes MC and student-produced response. */
@@ -25,21 +30,31 @@ function makeQuestion(skillId, tier, opts = {}) {
   const exclude = opts.exclude || new Set();
   if (section === 'math') {
     // Generated math: random parameters can occasionally collide — retry a few
-    // times rather than serve the identical question twice in one quiz.
+    // times rather than serve the identical question twice in one quiz, and
+    // (unless this is a review) prefer a signature not yet seen this runthrough.
     let q = mixedMathQuestion(skillId, tier, opts);
-    for (let a = 0; a < 6 && exclude.has(q.text); a++) q = mixedMathQuestion(skillId, tier, opts);
+    for (let a = 0; a < 10 && (exclude.has(q.text) || (!opts.review && _rtSeen(q))); a++) {
+      q = mixedMathQuestion(skillId, tier, opts);
+    }
     return q;
   }
   // Authored R&W: prefer this skill at this tier, then widen (same skill other
   // tiers, then same region) before ever repeating a text within one quiz.
+  // Passes: runthrough-unseen → not-recent → anything.
   const region = SKILLS[skillId] ? SKILLS[skillId].region : null;
   const layers = rwLevelLayers([skillId], tier, region);
   const flat = layers.flat();
   if (flat.length === 0) return generateMathQuestion('linear-eq', tier); // safety net
   const recent = recentRWSet();
-  for (const pass of ['fresh', 'any']) {
+  const passes = opts.review ? ['any'] : ['unseen', 'fresh', 'any'];
+  for (const pass of passes) {
     for (const layer of layers) {
-      const candidates = layer.filter(q => !exclude.has(q.text) && (pass === 'any' || !recent.has(q.text)));
+      const candidates = layer.filter(q => {
+        if (exclude.has(q.text)) return false;
+        if (pass === 'unseen' && (_rtSeen(q) || recent.has(q.text))) return false;
+        if (pass === 'fresh' && recent.has(q.text)) return false;
+        return true;
+      });
       if (candidates.length) {
         const q = candidates[Math.floor(Math.random() * candidates.length)];
         noteServedRW([q]);
@@ -83,6 +98,14 @@ function rwLevelLayers(skills, tier, regionId) {
   const layers = [[], [], []];
   const add = (q, layer) => { if (!seen.has(q.text)) { seen.add(q.text); layers[layer].push(q); } };
   for (const s of skills) for (const q of rwQuestionsFor(s, tier)) add(q, q.difficulty === TIER_LABEL[tier] ? 0 : 1);
+  // Procedurally generated R&W (transitions, words-in-context) deepens the pool
+  // for the skills that support it. Added to the widen layer so authored items
+  // at the level's tier stay the first choice.
+  if (typeof rwGeneratedFor === 'function') {
+    for (const s of skills) if (typeof rwHasGenerator === 'function' && rwHasGenerator(s)) {
+      for (const q of rwGeneratedFor(s, 8)) add(q, 1);
+    }
+  }
   for (const s of skills) for (const t of [1, 2, 3]) {
     if (t === tier) continue;
     for (const q of rwQuestionsFor(s, t)) add(q, 1);
@@ -98,11 +121,12 @@ function drawFromLayers(layers, n) {
   const recent = recentRWSet();
   const out = [];
   const chosen = new Set();
-  for (const pass of ['fresh', 'any']) {
+  for (const pass of ['unseen', 'fresh', 'any']) {
     for (const layer of layers) {
       for (const q of shuffleQuestions(layer)) {
         if (out.length >= n) break;
         if (chosen.has(q.text)) continue;
+        if (pass === 'unseen' && (_rtSeen(q) || recent.has(q.text))) continue;
         if (pass === 'fresh' && recent.has(q.text)) continue;
         chosen.add(q.text);
         out.push(q);
@@ -136,6 +160,7 @@ function buildLevelQuiz(levelId) {
     questions = drawFromLayers(rwLevelLayers(skills, lv.tier, lv.region), n);
     noteServedRW(questions);
   }
+  _noteRun(questions); // fresh practice: remember these for the runthrough
   debugQuizReport('level ' + levelId, questions);
   return questions;
 }
@@ -190,6 +215,7 @@ function buildBossQuiz(bossId) {
     questions.push(q);
   }
   const out = shuffleQuestions(questions);
+  _noteRun(out); // bosses are fresh practice too
   debugQuizReport('boss ' + bossId, out);
   return out;
 }
@@ -200,21 +226,51 @@ function shuffleQuestions(qs) {
   return a;
 }
 
-/* Review dungeon: pull questions from a set of (usually weak) skills. */
+/* Review Dungeon — spaced repetition. Prefers SPECIFIC questions the player is
+   due to review (exact missed R&W items re-served by id, ranked most-urgent
+   first), then fills the rest with weak-skill practice biased toward skills
+   that have due items. Every question carries a `reviewReason` label so the UI
+   can explain why it appeared. Review deliberately repeats, so — unlike fresh
+   practice — it does NOT mark items seen for the runthrough. */
 function buildReviewQuiz(skillIds, count = 6, tier = null) {
-  const questions = [];
-  const skills = skillIds.length ? skillIds : Object.keys(SKILLS);
-  const used = new Set();
-  for (let i = 0; i < count; i++) {
-    const skill = skills[i % skills.length];
-    const t = tier || pick2(2, 3);
-    const q = makeQuestion(skill, t, { exclude: used });
-    used.add(q.text);
-    questions.push(q);
+  const out = [];
+  const usedText = new Set();
+  const due = (typeof dueReviewQuestions === 'function') ? dueReviewQuestions(60) : [];
+
+  // 1) Exact missed authored R&W items, re-served by id, most urgent first.
+  const authoredCap = Math.max(1, Math.round(count * 0.6));
+  for (const d of due) {
+    if (out.length >= authoredCap) break;
+    if (!d.isAuthored || typeof rwById !== 'function') continue;
+    const q = rwById(d.key);
+    if (!q || usedText.has(q.text)) continue;
+    q.reviewReason = d.reason; q.reviewTag = 'missed';
+    usedText.add(q.text); out.push(q);
   }
-  const out = shuffleQuestions(questions);
-  debugQuizReport('review', out);
-  return out;
+
+  // 2) Fill with weak-skill practice, biased toward skills that have due items
+  //    (this is how due MATH shows up — a fresh instance in the same skill).
+  const dueSkills = [...new Set(due.map(d => d.skill).filter(Boolean))];
+  const base = (skillIds && skillIds.length) ? skillIds : Object.keys(SKILLS);
+  const fillSkills = [...new Set([...dueSkills, ...base])].filter(s => SKILLS[s]);
+  let gi = 0, guard = 0;
+  while (out.length < count && guard++ < count * 12 && fillSkills.length) {
+    const skill = fillSkills[gi++ % fillSkills.length];
+    const t = tier || pick2(2, 3);
+    const q = makeQuestion(skill, t, { exclude: usedText, review: true });
+    if (usedText.has(q.text)) continue;
+    usedText.add(q.text);
+    if (!q.reviewReason) {
+      const acc = (typeof skillAccuracy === 'function') ? skillAccuracy(skill) : null;
+      if (dueSkills.includes(skill)) { q.reviewReason = 'Due because you missed this skill recently'; q.reviewTag = 'due-skill'; }
+      else if (acc !== null && acc < 0.7) { q.reviewReason = `Weak skill: ${SKILLS[skill].name}`; q.reviewTag = 'weak'; }
+      else { q.reviewReason = 'Mastery check'; q.reviewTag = 'check'; }
+    }
+    out.push(q);
+  }
+  const result = shuffleQuestions(out);
+  debugQuizReport('review', result);
+  return result;
 }
 function pick2(a, b) { return Math.random() < 0.5 ? a : b; }
 
@@ -231,7 +287,8 @@ function buildTowerQuestion(floor) {
   for (let attempt = 0; attempt < 6; attempt++) {
     const skill = skills[Math.floor(Math.random() * skills.length)];
     q = makeQuestion(skill, tier);
-    if (q.difficulty === wantLabel) return q;
+    if (q.difficulty === wantLabel) { _noteRun(q); return q; }
   }
+  _noteRun(q); // tower floors are fresh practice
   return q;
 }

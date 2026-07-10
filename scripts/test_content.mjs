@@ -10,9 +10,9 @@ import { fileURLToPath } from 'node:url';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ctx = { console, Math, window: undefined, STATE: { recentRW: [] } };
 vm.createContext(ctx);
-const files = ['js/data/worlds.js', 'js/data/tips.js', 'js/data/mathgen.js', 'js/data/gridgen.js', 'js/data/mathviz.js', 'js/data/mathgen2.js',
+const files = ['js/data/worlds.js', 'js/data/tips.js', 'js/data/mathgen.js', 'js/data/gridgen.js', 'js/data/mathviz.js', 'js/data/mathgen2.js', 'js/data/mathgen3.js',
   'js/data/rw/information-ideas.js', 'js/data/rw/craft-structure.js', 'js/data/rw/expression-ideas.js',
-  'js/data/rw/conventions.js', 'js/data/rw/index.js', 'js/quiz.js'];
+  'js/data/rw/conventions.js', 'js/data/rw/index.js', 'js/data/rwgen.js', 'js/quiz.js'];
 for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 const run = (c) => vm.runInContext(c, ctx);
 
@@ -173,6 +173,34 @@ const grading = run(`(function(){
   return tests;
 })()`);
 for (const [label, ok] of grading) check('grid grading: ' + label, ok);
+
+// Procedural R&W generator (transitions + words-in-context): valid, distinct,
+// exactly one correct answer, tagged, and a large variant space.
+console.log('\nProcedural R&W generator (rwgen.js)');
+const rw = run(`(function(){
+  if (typeof RW_GENERATORS === 'undefined') return { present:false };
+  const skills = Object.keys(RW_GENERATORS);
+  const sigs = new Set(); let invalid = 0, tested = 0;
+  for (const s of skills) for (let i=0;i<2000;i++){
+    const q = rwGeneratedFor(s, 1)[0]; tested++;
+    const letters = q.choices.map(c=>c.letter);
+    const texts = q.choices.map(c=>c.text.trim().toLowerCase());
+    const okItem = q && q.choices.length===4 && new Set(letters).size===4 && new Set(texts).size===4
+      && letters.includes(q.answer) && q.explanation && Object.keys(q.whyWrong||{}).length===3
+      && !Object.keys(q.whyWrong).includes(q.answer)
+      && q.origin==='generated' && q.source==='blueprint-generated' && q.variantId
+      && !/undefined|NaN/.test(q.text) && q.skill;
+    if (!okItem) invalid++;
+    sigs.add(q.variantId);
+  }
+  return { present:true, skills, tested, invalid, variants: sigs.size };
+})()`);
+if (!rw.present) check('R&W generator present', false, 'RW_GENERATORS missing');
+else {
+  console.log(`  R&W generator skills: ${rw.skills.join(', ')} — ${rw.tested} sampled, ${rw.variants} distinct variants`);
+  check('every generated R&W item is valid (4 unique choices, keyed, explained, one correct)', rw.invalid === 0, `${rw.invalid} invalid`);
+  check('R&W generator produces a large distinct variant space (>= 1000)', rw.variants >= 1000, `${rw.variants}`);
+}
 
 console.log(`\n${fail === 0 ? '✅ ALL CONTENT CHECKS PASSED' : '❌ ' + fail + ' CHECK(S) FAILED'} (${pass} passed)`);
 process.exit(fail === 0 ? 0 : 1);

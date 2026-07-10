@@ -538,6 +538,14 @@ function questionCard(q, session, onNext, opts = {}) {
     el('span', { class: 'origin-tag', text: isGrid ? 'Student-Produced Response · Original' : (q.origin === 'generated' ? 'Original · generated' : 'Original · authored') }),
   ]));
 
+  // Review Dungeon: explain why this specific question was surfaced.
+  if (q.reviewReason) {
+    const icon = q.reviewTag === 'missed' ? '🎯' : q.reviewTag === 'due-skill' ? '⏰' : q.reviewTag === 'weak' ? '📉' : '✅';
+    card.appendChild(el('div', { class: 'review-reason review-' + (q.reviewTag || 'check') }, [
+      el('span', { text: icon }), el('span', { text: q.reviewReason }),
+    ]));
+  }
+
   // optional live timer (study mode), extended by the Time Control upgrade
   let liveTimer = null, startTime = Date.now();
   const target = (q.timeTarget || 60) + timeBonusSeconds();
@@ -660,8 +668,34 @@ function feedbackBlock(q, chosen, correct, onNext, opts, session) {
     const last = session.answers[session.answers.length - 1];
     if (last.mistakeId) block.appendChild(reflectionPrompt(last.mistakeId));
   }
+  block.appendChild(flagControl(q));
   block.appendChild(el('button', { class: 'btn btn-primary btn-block', text: opts.nextLabel || 'Next →', onclick: onNext }));
   return block;
+}
+
+/* Small, non-intrusive quality-feedback control shown after answering. Collapsed
+   by default so it never distracts; opening it reveals the flag reasons. Stores
+   locally only — nothing is sent anywhere. */
+function flagControl(q) {
+  const already = typeof isFlagged === 'function' && isFlagged(q);
+  const det = el('details', { class: 'flag-control' + (already ? ' flagged' : '') });
+  det.appendChild(el('summary', { class: 'flag-summary', text: already ? '🚩 Flagged — tap to change' : '🚩 Flag this question' }));
+  const reasons = (typeof FLAG_REASONS !== 'undefined') ? FLAG_REASONS
+    : ['Confusing wording', 'Answer seems wrong', 'Explanation unclear', 'Too easy', 'Too hard', 'Not SAT-like', 'Typo/formatting issue', 'Other'];
+  const wrap = el('div', { class: 'flag-reasons' });
+  reasons.forEach(r => {
+    wrap.appendChild(el('button', { class: 'flag-chip', text: r, onclick: (e) => {
+      if (typeof flagQuestion === 'function') flagQuestion(q, r);
+      wrap.querySelectorAll('.flag-chip').forEach(b => b.classList.remove('picked'));
+      e.currentTarget.classList.add('picked');
+      det.querySelector('.flag-summary').textContent = '🚩 Flagged — tap to change';
+      det.classList.add('flagged');
+      Sound.play('click');
+      toast('Flagged for quality review. View flags in Profile → Flagged questions.', '🚩');
+    } }));
+  });
+  det.appendChild(wrap);
+  return det;
 }
 
 function reflectionPrompt(mistakeId) {
@@ -682,6 +716,7 @@ function reflectionPrompt(mistakeId) {
 
 function handleAnswer(q, chosen, correct, session, elapsedMs) {
   recordAnswer(q.skill, correct, elapsedMs);
+  if (typeof recordQuestionHistory === 'function') recordQuestionHistory(q, correct);
   session.correct += correct ? 1 : 0;
   const rec = { q, chosen, correct, elapsedMs, mistakeId: null };
   if (correct) {
@@ -992,7 +1027,7 @@ route('review', () => {
   const s = SESSION;
   const q = s.questions[s.idx];
   const body = [];
-  body.push(el('div', { class: 'dungeon-banner' }, [el('span', { text: '🔁' }), el('span', { text: 'Review Dungeon — spaced practice of your weak skills' })]));
+  body.push(el('div', { class: 'dungeon-banner' }, [el('span', { text: '🔁' }), el('span', { text: 'Review Dungeon — missed questions first, then weak skills. Each question shows why it appeared.' })]));
   body.push(el('div', { class: 'q-progress' }, [progressBar(s.idx / s.questions.length, 'q-bar'), el('span', { class: 'q-count', text: `${s.idx + 1} / ${s.questions.length}` })]));
   body.push(questionCard(q, s, () => { Sound.play('click'); s.idx += 1; if (s.idx >= s.questions.length) finishReview(s); else render(); }, { showTimer: STATE.settings.mode === 'study' }));
   return screen('Review Dungeon', 'Spaced review', body, { back: { route: 'skills' } });
@@ -1339,16 +1374,50 @@ route('profile', () => {
   badgeCard.appendChild(bg);
   body.push(badgeCard);
 
+  body.push(questionHistoryCard());
+
+  const flagCount = (typeof flaggedQuestions === 'function') ? flaggedQuestions().length : 0;
   body.push(el('div', { class: 'link-list' }, [
     linkRow('⚡', 'Upgrade Hub', `${STATE.skillPoints || 0} Skill Points to spend`, () => navigate('upgrades')),
+    linkRow('🔁', 'Review Dungeon', 'Spaced review of missed & weak questions', () => startReview('due')),
+    linkRow('🚩', 'Flagged questions', flagCount ? `${flagCount} flagged for quality review` : 'Report confusing or wrong questions', () => navigate('flags')),
     linkRow('🧪', 'Practice test', 'Full-length Digital SAT simulation', () => navigate('exam', { style: 'sim' })),
     linkRow('📈', 'Weekly report', 'Accuracy, time, and activity', () => navigate('weekly')),
     linkRow('🌳', 'Skill tree', 'Your weakness map', () => navigate('skills')),
-    linkRow('⚙️', 'Settings', 'Modes, sound, goal, backup', () => navigate('settings')),
+    linkRow('⚙️', 'Settings', 'Modes, sound, goal, runthrough, backup', () => navigate('settings')),
     linkRow('📚', 'Official resources', 'College Board, Bluebook, Khan Academy', () => navigate('resources')),
   ]));
   return screen(p.name, 'Player profile', body);
 });
+
+/* Compact question-history / mastery summary. Derives counts from qhistory. */
+function questionHistoryCard() {
+  const h = (typeof historySummary === 'function') ? historySummary() : { total: 0 };
+  const card = el('section', { class: 'card' }, [
+    el('h2', { text: '📊 Question History' }),
+    el('p', { class: 'muted', text: h.total ? `${h.total} distinct questions tracked across this and past runthroughs.` : 'Answer some questions and your per-question mastery will show here.' }),
+  ]);
+  if (h.total) {
+    const rows = [
+      ['✅', 'Mastered', h.mastered, 'mastered'],
+      ['📈', 'Improving', h.improving, 'improving'],
+      ['🎯', 'Missed', h.missed, 'missed'],
+      ['⏰', 'Due for review', h['due-for-review'], 'due'],
+      ['👁️', 'Seen', h.seen, 'seen'],
+    ];
+    const grid = el('div', { class: 'mastery-breakdown' });
+    for (const [ic, label, n, cls] of rows) {
+      grid.appendChild(el('div', { class: 'mb-row mb-' + cls }, [
+        el('span', { class: 'mb-ico', text: ic }),
+        el('span', { class: 'mb-label', text: label }),
+        el('span', { class: 'mb-count', text: String(n || 0) }),
+      ]));
+    }
+    card.appendChild(grid);
+    card.appendChild(el('p', { class: 'muted small', text: `Sources: ${h.authored} authored · ${h.generated} generated. The Review Dungeon pulls from missed & due items first.` }));
+  }
+  return card;
+}
 function linkRow(icon, title, sub, onclick) {
   return el('button', { class: 'link-row', onclick }, [
     el('span', { class: 'link-icon', text: icon }),
@@ -1356,6 +1425,48 @@ function linkRow(icon, title, sub, onclick) {
     el('span', { class: 'rec-arrow', text: '›' }),
   ]);
 }
+
+/* ================================================================
+   FLAGGED QUESTIONS (quality control — local only)
+   ================================================================ */
+route('flags', () => {
+  const flags = (typeof flaggedQuestions === 'function') ? flaggedQuestions() : [];
+  const body = [];
+  body.push(el('section', { class: 'card' }, [
+    el('h2', { text: '🚩 Flagged questions' }),
+    el('p', { class: 'muted', text: 'Questions you flagged for quality review. Stored on this device only — nothing is sent anywhere. Flags are included in your backup export.' }),
+  ]));
+  if (!flags.length) {
+    body.push(el('section', { class: 'card empty-state' }, [
+      el('div', { class: 'empty-emblem', text: '🚩' }),
+      el('p', { text: 'No flags yet. While playing, open “Flag this question” under any answer to report confusing wording, a wrong answer, an unclear explanation, and so on.' }),
+      el('button', { class: 'btn btn-primary', text: 'Back to profile', onclick: () => navigate('profile') }),
+    ]));
+    return screen('Flagged', 'Quality control', body, { back: { route: 'profile' } });
+  }
+  const list = el('section', { class: 'card flag-list' });
+  flags.forEach(f => {
+    const skillName = SKILLS[f.skill] ? SKILLS[f.skill].name : (f.skill || 'Unknown skill');
+    const when = new Date(f.when);
+    const row = el('div', { class: 'flag-item' }, [
+      el('div', { class: 'flag-item-head' }, [
+        el('span', { class: 'pill flag-reason-pill', text: f.reason }),
+        el('span', { class: 'pill subtle', text: skillName }),
+        el('span', { class: 'pill subtle', text: f.source === 'generated' ? 'generated' : 'authored' }),
+      ]),
+      el('p', { class: 'flag-preview', text: (f.preview || '(no preview)') + '…' }),
+      f.note ? el('p', { class: 'flag-note', text: '“' + f.note + '”' }) : null,
+      el('div', { class: 'flag-item-foot' }, [
+        el('span', { class: 'muted small', text: `${when.getMonth() + 1}/${when.getDate()} · ${f.type} · id ${shorten(String(f.key || '—'), 22)}` }),
+        el('button', { class: 'btn btn-ghost tiny', text: 'Remove', onclick: () => { unflagKey(f.key); Sound.play('click'); render(); } }),
+      ]),
+    ]);
+    list.appendChild(row);
+  });
+  body.push(list);
+  body.push(el('button', { class: 'btn btn-ghost btn-block', text: 'Clear all flags', onclick: () => { if (confirm('Remove all flags? This cannot be undone.')) { STATE.flags = []; saveState(); Sound.play('click'); render(); } } }));
+  return screen('Flagged', `${flags.length} flagged`, body, { back: { route: 'profile' } });
+});
 
 /* ================================================================
    SETTINGS
@@ -1375,6 +1486,8 @@ route('settings', () => {
     toggleRow('Sound effects', STATE.settings.sound, v => { STATE.settings.sound = v; saveState(); if (v) Sound.play('correct'); }),
     toggleRow('Reduce motion', STATE.settings.reducedMotion, v => { STATE.settings.reducedMotion = v; saveState(); }),
   ]));
+
+  body.push(runthroughCard());
 
   const goalCard2 = el('section', { class: 'card' }, [el('h2', { text: 'Quest goal' })]);
   const scoreIn = el('input', { class: 'text-input', type: 'number', min: '400', max: '1600', placeholder: 'Target score', value: p.goalScore || '' });
@@ -1409,6 +1522,36 @@ route('settings', () => {
   body.push(el('p', { class: 'origin-note center', text: 'SAT Quest · All questions are original SAT-style practice, not official College Board content. “SAT” is a trademark of the College Board, which does not endorse this app.' }));
   return screen('Settings', 'Tune your quest', body, { back: { route: 'profile' } });
 });
+/* Runthrough status + control. A runthrough is one campaign session; while it
+   runs, fresh practice (levels, bosses, Daily Tower, Simulation Gate) avoids
+   serving questions you've already seen this run. */
+function runthroughCard() {
+  ensureRunthrough();
+  const rt = STATE.runthrough;
+  const seenIds = (rt.seenIds || []).length, seenSigs = (rt.seenSigs || []).length;
+  const started = new Date(rt.startedAt || Date.now());
+  const card = el('section', { class: 'card' }, [
+    el('h2', { text: '🧭 Runthrough' }),
+    el('p', { class: 'muted', text: 'Fresh practice prioritizes questions you have not seen yet this runthrough. The Review Dungeon is the exception — it intentionally resurfaces missed questions.' }),
+    el('div', { class: 'stat-grid tight' }, [
+      statChip('👁️', 'R&W seen', seenIds),
+      statChip('🔢', 'Math seen', seenSigs),
+      statChip('📅', 'Started', `${started.getMonth() + 1}/${started.getDate()}`),
+    ]),
+    el('button', { class: 'btn btn-ghost btn-block', text: '🔄 Start New Runthrough', onclick: startNewRunthroughFlow }),
+    el('p', { class: 'muted small', text: 'Starting a new runthrough resets only which questions count as “seen,” so fresh practice can serve them again. Your XP, levels, badges, mistakes, question history, and flags are kept.' }),
+  ]);
+  return card;
+}
+
+function startNewRunthroughFlow() {
+  if (!confirm('Start a new runthrough?\n\nThis resets only which questions are marked "seen" this run, so fresh practice can serve them again.\n\nKEPT: XP, levels, badges, mistakes, question history, flags, and all progress.')) return;
+  startNewRunthrough(false);
+  Sound.play('unlock');
+  toast('New runthrough started — seen-tracking reset. Progress kept.', '🧭');
+  render();
+}
+
 function toggleRow(label, value, onChange) {
   const input = el('input', { type: 'checkbox', class: 'toggle-input' });
   input.checked = value;

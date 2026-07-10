@@ -22,6 +22,11 @@ const DEFAULT_STATE = () => ({
   bossesDefeated: {},      // bossId -> true
   skillStats: {},          // skillId -> { correct, seen, timeMs, lastPracticed }
   mistakes: [],            // { id, question, chosen, correct, skill, category, reflected, when }
+  // ---- v3 anti-repeat + question history + flagging ----
+  runthrough: null,        // { id, startedAt, seenIds:[], seenSigs:[], served }
+  qhistory: {},            // qKey -> { s:seen, c:correct, w:wrong, last:ts, lr:0|1, str:streak, sk:skill, dm:domain, src:'authored'|'generated' }
+  flags: [],               // { key, reason, note, source, type, domain, skill, when }
+  recentRW: [],            // rolling window of recently-served authored R&W texts (soft anti-repeat)
   streak: { count: 0, lastActiveDay: null, best: 0 },
   badges: {},              // badgeId -> earnedTimestamp
   daily: { day: null, quests: [] },
@@ -44,6 +49,10 @@ function loadState() {
     if (!STATE.upgrades.mastery) STATE.upgrades.mastery = {};
     if (typeof STATE.skillPoints !== 'number') STATE.skillPoints = 0;
     if (!STATE.dailyLog) STATE.dailyLog = {};
+    if (!STATE.qhistory || typeof STATE.qhistory !== 'object') STATE.qhistory = {};
+    if (!Array.isArray(STATE.flags)) STATE.flags = [];
+    if (!Array.isArray(STATE.recentRW)) STATE.recentRW = [];
+    ensureRunthrough();
   } catch (e) {
     console.warn('Save was corrupted; starting fresh.', e);
     STATE = DEFAULT_STATE();
@@ -205,6 +214,184 @@ function mistakeCategoryCounts() {
   for (const m of STATE.mistakes) if (m.category) counts[m.category] = (counts[m.category] || 0) + 1;
   return counts;
 }
+
+/* ================================================================
+   Runthrough anti-repeat + per-question history + spaced review
+   ----------------------------------------------------------------
+   A "runthrough" is one campaign session across levels, bosses, the
+   Daily Tower and the Simulation Gate. Within it we avoid serving the
+   exact same question twice (by R&W item id or generated math
+   signature) until the relevant pool is genuinely exhausted. History
+   is kept per question so the Review Dungeon can resurface specific
+   missed items and space them out as they are re-mastered.
+   ================================================================ */
+
+/* Universal identity for any question: authored R&W items carry a stable
+   `id`; generated math instances carry a `variantId`/`sig`. */
+function qKey(q) {
+  if (!q) return null;
+  if (q.id) return q.id;
+  if (q.variantId) return q.variantId;
+  if (q.sig) return q.sig;
+  return null;
+}
+function qIsGenerated(q) { return !q.id && !!(q.variantId || q.sig); }
+
+/* ---- Runthrough ---- */
+const RUNTHROUGH_SEEN_CAP = 4000; // plenty for a long campaign; keeps storage bounded
+function ensureRunthrough() {
+  if (!STATE) return;
+  if (!STATE.runthrough || !STATE.runthrough.id) {
+    STATE.runthrough = { id: 'rt-' + Date.now(), startedAt: Date.now(), seenIds: [], seenSigs: [], served: 0 };
+  }
+  if (!Array.isArray(STATE.runthrough.seenIds)) STATE.runthrough.seenIds = [];
+  if (!Array.isArray(STATE.runthrough.seenSigs)) STATE.runthrough.seenSigs = [];
+  return STATE.runthrough;
+}
+
+// Start a fresh runthrough. Always resets seen-tracking; only wipes XP/progress
+// when the caller explicitly asks for a full reset (the UI warns first).
+function startNewRunthrough(fullReset = false) {
+  if (fullReset) { resetSave(); return STATE; }
+  STATE.runthrough = { id: 'rt-' + Date.now(), startedAt: Date.now(), seenIds: [], seenSigs: [], served: 0 };
+  saveState();
+  return STATE.runthrough;
+}
+
+function runthroughHasSeen(q) {
+  const rt = ensureRunthrough();
+  const key = qKey(q);
+  if (!key) return false;
+  return qIsGenerated(q) ? rt.seenSigs.includes(key) : rt.seenIds.includes(key);
+}
+
+// Record questions as served this runthrough (fresh-practice modes only —
+// the Review Dungeon intentionally repeats and must not mark items seen).
+function noteSeenInRunthrough(qs) {
+  const rt = ensureRunthrough();
+  for (const q of (Array.isArray(qs) ? qs : [qs])) {
+    const key = qKey(q);
+    if (!key) continue;
+    const bucket = qIsGenerated(q) ? rt.seenSigs : rt.seenIds;
+    if (!bucket.includes(key)) { bucket.push(key); rt.served++; }
+    if (bucket.length > RUNTHROUGH_SEEN_CAP) bucket.splice(0, bucket.length - RUNTHROUGH_SEEN_CAP);
+  }
+}
+
+/* ---- Per-question history & mastery ---- */
+const HISTORY_CAP = 3000;         // cap tracked questions to keep localStorage small
+const REVIEW_INTERVAL_DAYS = [1, 3, 7, 16, 35]; // spacing by post-miss correct streak
+
+function recordQuestionHistory(q, correct) {
+  const key = qKey(q);
+  if (!key) return;
+  if (!STATE.qhistory) STATE.qhistory = {};
+  const h = STATE.qhistory[key] || { s: 0, c: 0, w: 0, last: 0, lr: 1, str: 0 };
+  h.s += 1;
+  if (correct) { h.c += 1; h.str = (h.lr === 1 || h.s === 1) ? (h.str || 0) + 1 : 1; h.lr = 1; }
+  else { h.w += 1; h.str = 0; h.lr = 0; }
+  h.last = Date.now();
+  h.sk = q.skill || h.sk;
+  h.dm = (typeof SKILLS !== 'undefined' && SKILLS[q.skill]) ? SKILLS[q.skill].region : h.dm;
+  h.src = qIsGenerated(q) ? 'generated' : 'authored';
+  STATE.qhistory[key] = h;
+  pruneHistory();
+}
+
+// Keep only the most valuable rows if the map grows large: never drop items
+// that are still due/missed; among the rest drop the oldest-touched first.
+function pruneHistory() {
+  const keys = Object.keys(STATE.qhistory);
+  if (keys.length <= HISTORY_CAP) return;
+  const removable = keys.filter(k => !reviewDue(STATE.qhistory[k]))
+    .sort((a, b) => (STATE.qhistory[a].last || 0) - (STATE.qhistory[b].last || 0));
+  let excess = keys.length - HISTORY_CAP;
+  for (const k of removable) { if (excess-- <= 0) break; delete STATE.qhistory[k]; }
+}
+
+// Is a tracked question currently due for spaced review?
+function reviewDue(h, now = Date.now()) {
+  if (!h) return false;
+  if (h.lr === 0) return true;          // last attempt wrong → due until re-mastered
+  if ((h.w || 0) === 0) return false;   // never missed → not a review item
+  const days = REVIEW_INTERVAL_DAYS[Math.min(h.str || 0, REVIEW_INTERVAL_DAYS.length - 1)];
+  return (now - (h.last || 0)) >= days * DAY_MS;
+}
+
+// One of: unseen | seen | improving | missed | due-for-review | mastered
+//   missed         = the most recent attempt was wrong (needs work now)
+//   due-for-review = previously missed, since answered right, but the spaced
+//                    interval has elapsed so it is time to re-check
+function masteryOf(key) {
+  const h = STATE.qhistory && STATE.qhistory[key];
+  if (!h) return 'unseen';
+  const acc = h.s ? h.c / h.s : 0;
+  if (h.s >= 3 && acc >= 0.85 && h.lr === 1 && (h.str || 0) >= 2) return 'mastered';
+  if (h.lr === 0) return 'missed';
+  if (reviewDue(h)) return 'due-for-review';
+  if ((h.w || 0) > 0 && (h.c || 0) > 0) return 'improving';
+  return 'seen';
+}
+
+function historySummary() {
+  const out = { total: 0, unseen: 0, seen: 0, improving: 0, missed: 0, 'due-for-review': 0, mastered: 0, authored: 0, generated: 0 };
+  for (const key of Object.keys(STATE.qhistory || {})) {
+    out.total++;
+    out[masteryOf(key)]++;
+    out[STATE.qhistory[key].src === 'generated' ? 'generated' : 'authored']++;
+  }
+  return out;
+}
+
+// Specific questions due for review, most urgent first. Exact misses (last
+// result wrong) rank above spaced re-checks. Returns metadata + a human reason;
+// R&W items also carry the id so the Review Dungeon can re-serve them exactly.
+function dueReviewQuestions(limit = 20) {
+  const now = Date.now();
+  const rows = [];
+  for (const key of Object.keys(STATE.qhistory || {})) {
+    const h = STATE.qhistory[key];
+    if (!reviewDue(h, now)) continue;
+    const exactMiss = h.lr === 0;
+    rows.push({
+      key, skill: h.sk, domain: h.dm, source: h.src,
+      isAuthored: h.src !== 'generated',
+      priority: exactMiss ? 2 : 1,
+      overdueMs: now - (h.last || 0),
+      reason: exactMiss ? 'Due because you missed this exact question'
+                        : 'Spaced review — you have missed this before',
+    });
+  }
+  rows.sort((a, b) => (b.priority - a.priority) || (b.overdueMs - a.overdueMs));
+  return rows.slice(0, limit);
+}
+
+/* ---- Question flagging (quality feedback, local only) ---- */
+const FLAG_REASONS = ['Confusing wording', 'Answer seems wrong', 'Explanation unclear', 'Too easy', 'Too hard', 'Not SAT-like', 'Typo/formatting issue', 'Other'];
+
+function flagQuestion(q, reason, note = '') {
+  if (!Array.isArray(STATE.flags)) STATE.flags = [];
+  const key = qKey(q);
+  const entry = {
+    key, reason, note: (note || '').slice(0, 300),
+    source: qIsGenerated(q) ? 'generated' : 'authored',
+    type: q.type === 'grid' ? 'grid-in' : (q.visual ? 'visual' : 'multiple-choice'),
+    domain: (typeof SKILLS !== 'undefined' && SKILLS[q.skill]) ? SKILLS[q.skill].region : null,
+    skill: q.skill || null,
+    preview: (q.text || '').replace(/\s+/g, ' ').trim().slice(0, 120),
+    when: Date.now(),
+  };
+  // De-dupe: replace an existing flag for the same key+reason rather than pile up.
+  const i = STATE.flags.findIndex(f => f.key === key && f.reason === reason);
+  if (i !== -1) STATE.flags.splice(i, 1);
+  STATE.flags.unshift(entry);
+  if (STATE.flags.length > 300) STATE.flags.length = 300;
+  saveState();
+  return entry;
+}
+function isFlagged(q) { const key = qKey(q); return !!(STATE.flags || []).find(f => f.key === key); }
+function flaggedQuestions() { return (STATE.flags || []).slice(); }
+function unflagKey(key) { STATE.flags = (STATE.flags || []).filter(f => f.key !== key); saveState(); }
 
 /* ---- Streaks ---- */
 function markActiveToday() {
@@ -402,6 +589,10 @@ function importSave(json) {
     STATE[k] = Object.assign(d[k], STATE[k] || {});
   }
   if (!STATE.dailyLog) STATE.dailyLog = {};
+  if (!STATE.qhistory || typeof STATE.qhistory !== 'object') STATE.qhistory = {};
+  if (!Array.isArray(STATE.flags)) STATE.flags = [];
+  if (!Array.isArray(STATE.recentRW)) STATE.recentRW = [];
+  ensureRunthrough();
   refreshDaily();
   saveState();
   return STATE;

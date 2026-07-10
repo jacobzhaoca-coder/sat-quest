@@ -27,6 +27,21 @@ function rwQuestionsFor(skillId, tier) {
   }));
 }
 
+/* Fast id -> item lookup, dressed with the same runtime fields rwQuestionsFor
+   adds, so the Review Dungeon can re-serve a specific missed item by id. */
+let _RW_BY_ID = null;
+function rwById(id) {
+  if (!_RW_BY_ID) { _RW_BY_ID = {}; for (const q of RW_BANK) _RW_BY_ID[q.id] = q; }
+  const q = _RW_BY_ID[id];
+  if (!q) return null;
+  return {
+    ...q, origin: 'authored',
+    difficulty: TIER_LABEL[q.tier] || 'Medium',
+    timeTarget: (TIME_TARGETS.rw[q.tier] || 60),
+    tip: (typeof SKILL_TIPS !== 'undefined' && SKILL_TIPS[q.skill]) ? SKILL_TIPS[q.skill][0] : (typeof generalTip === 'function' ? generalTip() : ''),
+  };
+}
+
 /* Coverage summary — handy for tests and future authoring. */
 function rwBankStats() {
   const bySkill = {}, byTier = { 1: 0, 2: 0, 3: 0 }, byDomain = {};

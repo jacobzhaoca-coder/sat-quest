@@ -777,3 +777,48 @@ body.has-fab #app { padding-bottom: calc(var(--nav-h) + 84px); }
 }
 #upgrade-fab:active { transform: scale(0.94); }
 #upgrade-fab:hover { box-shadow: 0 8px 26px rgba(246, 168, 33, 0.6); }
+
+/* ---------------- v3: flagging, review reasons, mastery, runthrough ---------------- */
+.stat-grid.tight { gap: 8px; margin: 10px 0; }
+
+/* Flag-question control (collapsed by default; non-intrusive) */
+.flag-control { margin: 10px 0 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--ink-700); }
+.flag-control[open] { border-color: rgba(255,107,122,.4); }
+.flag-control.flagged { border-color: rgba(255,107,122,.55); }
+.flag-summary { list-style: none; cursor: pointer; padding: 9px 12px; font-size: .82rem; color: var(--text-dim); font-weight: 600; }
+.flag-summary::-webkit-details-marker { display: none; }
+.flag-control.flagged .flag-summary { color: var(--ember); }
+.flag-reasons { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px; }
+.flag-chip { background: var(--ink-600); border: 1px solid var(--line); border-radius: 999px; color: var(--text-dim); padding: 6px 11px; font-size: .78rem; cursor: pointer; }
+.flag-chip:hover { border-color: var(--ember); color: var(--text); }
+.flag-chip.picked { background: rgba(255,107,122,.18); border-color: var(--ember); color: var(--ember); }
+
+/* Review Dungeon per-question reason banner */
+.review-reason { display: flex; align-items: center; gap: 8px; font-size: .8rem; padding: 8px 11px; border-radius: 9px; margin: 4px 0 10px; border: 1px solid var(--line); background: var(--ink-700); color: var(--text-dim); }
+.review-reason span:first-child { font-size: 1rem; }
+.review-reason.review-missed { border-color: rgba(255,107,122,.45); background: rgba(255,107,122,.1); color: #ffc0c7; }
+.review-reason.review-due-skill { border-color: rgba(232,192,106,.45); background: rgba(232,192,106,.1); color: var(--gold-bright); }
+.review-reason.review-weak { border-color: rgba(167,139,250,.45); background: rgba(167,139,250,.1); color: var(--purple); }
+.review-reason.review-check { border-color: rgba(69,224,168,.4); background: rgba(69,224,168,.08); color: var(--teal); }
+
+/* Question-history / mastery breakdown */
+.mastery-breakdown { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.mb-row { display: flex; align-items: center; gap: 10px; background: var(--ink-700); border: 1px solid var(--line); border-radius: 9px; padding: 9px 12px; }
+.mb-ico { font-size: 1.05rem; }
+.mb-label { flex: 1; font-size: .86rem; color: var(--text-dim); }
+.mb-count { font-weight: 800; font-family: var(--font-display); font-size: 1.05rem; }
+.mb-mastered .mb-count { color: var(--teal); }
+.mb-improving .mb-count { color: var(--purple); }
+.mb-missed .mb-count { color: var(--ember); }
+.mb-due .mb-count { color: var(--gold-bright); }
+.muted.small { font-size: .76rem; }
+
+/* Flagged-questions list */
+.flag-list { display: flex; flex-direction: column; gap: 10px; }
+.flag-item { border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--ink-700); }
+.flag-item-head { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.flag-reason-pill { color: var(--ember); border-color: rgba(255,107,122,.5); }
+.flag-preview { font-size: .85rem; color: var(--text); margin: 0 0 6px; line-height: 1.4; }
+.flag-note { font-size: .82rem; color: var(--text-dim); font-style: italic; margin: 0 0 6px; }
+.flag-item-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.btn.tiny { padding: 5px 10px; font-size: .76rem; }
