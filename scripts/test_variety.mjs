@@ -18,10 +18,10 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ctx = { console, Math, window: undefined, STATE: { recentRW: [] } };
 vm.createContext(ctx);
 for (const f of ['js/data/worlds.js', 'js/data/tips.js', 'js/data/mathgen.js',
-  'js/data/gridgen.js', 'js/data/mathviz.js', 'js/data/mathgen2.js', 'js/data/mathgen3.js',
+  'js/data/gridgen.js', 'js/data/mathviz.js', 'js/data/mathgen2.js', 'js/data/mathgen3.js', 'js/data/mathgen4.js',
   'js/data/rw/information-ideas.js', 'js/data/rw/craft-structure.js',
   'js/data/rw/expression-ideas.js', 'js/data/rw/conventions.js',
-  'js/data/rw/index.js', 'js/data/rwgen.js', 'js/quiz.js', 'js/exam.js']) {
+  'js/data/rw/index.js', 'js/data/rwgen.js', 'js/data/rwgen2.js', 'js/quiz.js', 'js/exam.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const run = (code) => vm.runInContext(code, ctx);

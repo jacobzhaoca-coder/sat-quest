@@ -25,9 +25,9 @@ const ctx = { console, Math, Date, JSON, Object, Array, String, Number, isNaN, p
 vm.createContext(ctx);
 for (const f of [
   'js/data/worlds.js', 'js/data/tips.js', 'js/data/mathgen.js', 'js/data/gridgen.js',
-  'js/data/mathviz.js', 'js/data/mathgen2.js', 'js/data/mathgen3.js',
+  'js/data/mathviz.js', 'js/data/mathgen2.js', 'js/data/mathgen3.js', 'js/data/mathgen4.js',
   'js/data/rw/information-ideas.js', 'js/data/rw/craft-structure.js', 'js/data/rw/expression-ideas.js',
-  'js/data/rw/conventions.js', 'js/data/rw/index.js', 'js/data/rwgen.js',
+  'js/data/rw/conventions.js', 'js/data/rw/index.js', 'js/data/rwgen.js', 'js/data/rwgen2.js',
   'js/state.js', 'js/upgrades.js', 'js/quiz.js', 'js/exam.js',
 ]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
@@ -181,6 +181,60 @@ check('backup export includes flags, history, and runthrough', flags.exportHasFl
 console.log('\n10) No server calls: state module references no network APIs');
 const stateSrc = fs.readFileSync(path.join(root, 'js/state.js'), 'utf8');
 check('state.js makes no fetch/XHR/WebSocket calls', !/\bfetch\s*\(|XMLHttpRequest|WebSocket|navigator\.sendBeacon/.test(stateSrc));
+
+console.log('\n11) Long runthrough simulation (≈ weeks of daily use) avoids exact repeats');
+// Simulate a long daily-use campaign: replay levels, bosses, tower floors, and a
+// Simulation Gate, all within ONE runthrough, and confirm no exact question id /
+// signature repeats until a relevant pool is genuinely exhausted.
+const longRun = run(`(function(){
+  startNewRunthrough(false);
+  const keys = [];
+  const rwLevels = allLevels().filter(l => l.section !== 'math').map(l => l.id);
+  const mathLevels = allLevels().filter(l => l.section === 'math').map(l => l.id);
+  // ~three weeks at ~40 questions/day: replay a rotating set of levels many times
+  for (let day = 0; day < 21; day++) {
+    for (let k = 0; k < 4; k++) {
+      const rw = rwLevels[(day * 4 + k) % rwLevels.length];
+      const ma = mathLevels[(day * 4 + k) % mathLevels.length];
+      for (const q of buildLevelQuiz(rw)) keys.push(q.id || q.variantId);
+      for (const q of buildLevelQuiz(ma)) keys.push(q.variantId || q.sig);
+    }
+    for (let f = 1; f <= 5; f++) { const q = buildTowerQuestion(f); keys.push(q.id || q.variantId || q.sig); }
+  }
+  // Two bosses and one Simulation Gate R&W module for good measure.
+  for (const b of allBosses().slice(0, 2)) for (const q of buildBossQuiz(b.id)) keys.push(q.id || q.variantId);
+  const rwMod = buildExamModule('rw1', false); for (const q of rwMod) keys.push(q.id || q.variantId);
+  const distinct = new Set(keys);
+  // Break down by source.
+  const rwIds = keys.filter(k => typeof k === 'string' && !/#/.test(k) && !/^rwgen/.test(k));
+  const genSigs = keys.filter(k => typeof k === 'string' && /#/.test(k));
+  return { total: keys.length, distinct: distinct.size, repeats: keys.length - distinct.size,
+    rwIds: rwIds.length, distinctRwIds: new Set(rwIds).size, genSigs: genSigs.length, distinctGenSigs: new Set(genSigs).size,
+    seenR: STATE.runthrough.seenIds.length, seenS: STATE.runthrough.seenSigs.length };
+})()`);
+console.log(`   served ${longRun.total} questions (${longRun.rwIds} authored R&W ids, ${longRun.genSigs} generated signatures)`);
+check(`long runthrough served ${longRun.total} questions with ${longRun.repeats} exact repeats (target 0)`,
+  longRun.repeats === 0, `${longRun.repeats} repeats`);
+check('runthrough seen-tracking scaled with the long session', longRun.seenR > 100 && longRun.seenS > 100,
+  `seenR=${longRun.seenR}, seenS=${longRun.seenS}`);
+
+console.log('\n12) Review Dungeon repeats are intentional (due/missed), not accidental');
+const reviewIntent = run(`(function(){
+  STATE.qhistory = {};
+  // Seed three specific missed authored R&W items.
+  const missed = RW_BANK.slice(0, 3).map(it => it.id);
+  for (const it of RW_BANK.slice(0, 3)) recordQuestionHistory({ id: it.id, skill: it.skill }, false);
+  startNewRunthrough(false);
+  const quiz = buildReviewQuiz([], 6);
+  const servedMissed = quiz.filter(q => missed.includes(q.id));
+  return {
+    reservedMissedCount: servedMissed.length,
+    allLabeled: quiz.every(q => q.reviewReason),
+    missedLabeled: servedMissed.every(q => /missed/i.test(q.reviewReason)),
+  };
+})()`);
+check('Review Dungeon re-serves seeded missed items (intentional repeat)', reviewIntent.reservedMissedCount >= 1);
+check('every review item is labeled with a reason, and missed items say so', reviewIntent.allLabeled && reviewIntent.missedLabeled);
 
 console.log(`\n${fail === 0 ? '✅ ALL SYSTEMS CHECKS PASSED' : '❌ ' + fail + ' CHECK(S) FAILED'} (${pass} passed)`);
 process.exit(fail === 0 ? 0 : 1);

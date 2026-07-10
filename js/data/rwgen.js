@@ -1,210 +1,905 @@
-/* SAT Quest — ORIGINAL procedural Reading & Writing generators.
-   Loaded AFTER the authored R&W bank and mathgen.js (for qSignature). These
-   cover the two most rule-deterministic R&W skills — Transitions and Words in
-   Context — where a correct answer can be guaranteed by construction, so the
-   generator produces genuine, high-variety SAT-style items rather than filler.
+/* SAT Quest — ORIGINAL procedural Reading & Writing generators (framework +
+   the five most reliably generatable skills). rwgen2.js adds the comprehension
+   skills. Loaded AFTER the authored R&W bank and mathgen.js (for qSignature).
 
-   Each item is assembled from a hand-written scenario bank (real sentences on
-   varied topics) plus a controlled word set, so every generated item has ONE
-   unambiguous correct answer and plausible distractors. Items are tagged
-   origin:'generated', source:'blueprint-generated', and carry a stable content
-   signature so the runthrough anti-repeat and question-history systems track
-   them exactly like generated math.
+   Every item is assembled from a hand-written scenario bank (real sentences on
+   varied topics) plus controlled answer sets, so each has ONE unambiguous
+   correct answer, plausible distractors, and a complete, teaching explanation.
+   Items are tagged origin:'generated', source:'blueprint-generated', and carry
+   a stable content signature so runthrough anti-repeat and question history
+   track them exactly like generated math.
 
-   These are ORIGINAL: no official passage, sentence, answer choice, or
-   explanation is copied or paraphrased. Depends on globals: qSignature (mathgen),
-   SKILLS, TIER_LABEL, TIME_TARGETS. */
+   ORIGINAL: no official passage, sentence, answer choice, explanation, or
+   recognizable scenario is copied or paraphrased. Depends on globals:
+   qSignature (mathgen), SKILLS, TIER_LABEL, TIME_TARGETS. Freshness comes from
+   the number of distinct SCENARIOS, so the banks below are large and varied. */
 
 (function () {
   'use strict';
+  const G = (typeof window !== 'undefined') ? window : (typeof globalThis !== 'undefined' ? globalThis : this);
 
   function ri(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
   function shuffle(a) { const x = a.slice(); for (let i = x.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [x[i], x[j]] = [x[j], x[i]]; } return x; }
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function lower1(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
+
+  // Difficulty tiering by skill (used so tower/exam escalation stays honest).
+  const SKILL_TIER = { transitions: 2, 'words-context': 2, boundaries: 2, 'form-sense': 2, synthesis: 2,
+    structure: 2, 'evidence-text': 2, inferences: 3, 'central-ideas': 2, 'evidence-quant': 2, 'cross-text': 3 };
+
+  // Wrap a finished question with generated metadata + a stable signature.
+  function finalize(q, tier) {
+    const sig = (typeof qSignature === 'function') ? qSignature(q) : String((q.text || '').length) + '-' + q.answer;
+    const t = tier || SKILL_TIER[q.skill] || 2;
+    return {
+      ...q, origin: 'generated', source: 'blueprint-generated',
+      typeId: 'rwgen-' + q.skill, sig, variantId: 'rwgen-' + q.skill + '#' + sig,
+      difficulty: (typeof TIER_LABEL !== 'undefined' ? (TIER_LABEL[t] || 'Medium') : 'Medium'),
+      timeTarget: (typeof TIME_TARGETS !== 'undefined' && TIME_TARGETS.rw) ? (TIME_TARGETS.rw[t] || 60) : 60,
+      tip: (typeof SKILL_TIPS !== 'undefined' && SKILL_TIPS[q.skill]) ? SKILL_TIPS[q.skill][0] : '',
+    };
+  }
+
+  // Build shuffled choices from a correct string + tagged distractors.
+  // distractors: [{ text, why }]. Returns { choices, answer, whyWrong }.
+  function buildChoices(correct, distractors) {
+    const opts = shuffle([{ text: correct, correct: true }, ...distractors]);
+    const letters = ['A', 'B', 'C', 'D'];
+    const whyWrong = {}; let answer = 'A';
+    const choices = opts.map((o, i) => {
+      if (o.correct) answer = letters[i]; else whyWrong[letters[i]] = o.why;
+      return { letter: letters[i], text: o.text };
+    });
+    return { choices, answer, whyWrong };
+  }
 
   /* ===================== TRANSITIONS ===================== */
-  // Transition words grouped by the logical relationship they signal.
   const REL_WORDS = {
-    contrast:   ['However', 'Nevertheless', 'In contrast', 'On the other hand', 'Even so', 'Conversely'],
-    addition:   ['Moreover', 'In addition', 'Furthermore', 'Additionally', 'What is more'],
-    cause:      ['Therefore', 'Consequently', 'As a result', 'Thus', 'For this reason'],
+    contrast:   ['However', 'Nevertheless', 'In contrast', 'On the other hand', 'Even so', 'Conversely', 'Still'],
+    addition:   ['Moreover', 'In addition', 'Furthermore', 'Additionally', 'What is more', 'Also'],
+    cause:      ['Therefore', 'Consequently', 'As a result', 'Thus', 'For this reason', 'Hence'],
     example:    ['For example', 'For instance', 'To illustrate', 'In particular'],
-    sequence:   ['Subsequently', 'Later', 'Afterward', 'Eventually'],
-    emphasis:   ['Indeed', 'In fact', 'Notably'],
+    sequence:   ['Subsequently', 'Later', 'Afterward', 'Eventually', 'Then'],
+    emphasis:   ['Indeed', 'In fact', 'Notably', 'Above all'],
     similarity: ['Similarly', 'Likewise', 'In the same way'],
-    concession: ['Admittedly', 'Granted', 'To be sure'],
+    concession: ['Admittedly', 'Granted', 'To be sure', 'Of course'],
   };
-  const REL_LABEL = {
-    contrast: 'a contrast', addition: 'an addition of a related point', cause: 'a cause-and-effect result',
-    example: 'an example', sequence: 'a step later in time', emphasis: 'an emphasis or intensification',
-    similarity: 'a comparison', concession: 'a concession',
-  };
+  const REL_LABEL = { contrast: 'a contrast', addition: 'an added, related point', cause: 'a cause-and-effect result', example: 'a specific example', sequence: 'a later step in time', emphasis: 'an emphasis', similarity: 'a comparison', concession: 'a concession' };
   const REL_DOES = {
-    contrast: 'reverses or qualifies the idea in the first sentence',
-    addition: 'adds a further, related point in the same direction',
-    cause: 'states a result that follows from the first sentence',
-    example: 'gives a specific instance of the first sentence',
-    sequence: 'reports what happened next in time',
-    emphasis: 'restates the point more forcefully',
-    similarity: 'draws a parallel with the first sentence',
-    concession: 'grants a limited point before the main claim',
+    contrast: 'reverses or qualifies the first sentence', addition: 'adds a further point in the same direction',
+    cause: 'states a result that follows from the first sentence', example: 'gives a specific instance of the first sentence',
+    sequence: 'reports what happened next', emphasis: 'restates the point more forcefully',
+    similarity: 'draws a parallel with the first sentence', concession: 'grants a limited point',
   };
-
-  // Scenario bank: each has two sentences and the relationship between them.
-  // The blank begins the second sentence. Written so the relationship is clear.
   const TRANS = [
-    { a: 'The new bridge was designed to cut the cross-town commute in half.', b: 'many drivers found their trips barely faster, because traffic simply shifted to the connecting roads.', rel: 'contrast' },
-    { a: 'Solar panels have become far cheaper to manufacture over the past decade.', b: 'the cost of installing and connecting them to the grid has fallen more slowly.', rel: 'contrast' },
-    { a: 'The orchestra rehearsed the difficult passage dozens of times.', b: 'the conductor asked them to play it once more before the concert.', rel: 'addition' },
-    { a: 'The museum extended its evening hours to attract more visitors.', b: 'it lowered the price of admission on weekdays.', rel: 'addition' },
-    { a: 'Heavy rain fell across the valley for three straight days.', b: 'the river rose above its banks and flooded the low-lying farms.', rel: 'cause' },
-    { a: 'The company automated its most repetitive tasks.', b: 'employees were able to spend more time on creative work.', rel: 'cause' },
-    { a: 'Some desert plants survive long droughts by storing water in their stems.', b: 'the saguaro cactus can hold hundreds of liters after a single rainfall.', rel: 'example' },
-    { a: 'Certain birds change their diet as the seasons shift.', b: 'the cedar waxwing eats insects in summer but switches to berries in winter.', rel: 'example' },
-    { a: 'The researchers first collected soil samples from each plot.', b: 'they measured the nitrogen content of every sample in the lab.', rel: 'sequence' },
-    { a: 'The city council approved the park design in the spring.', b: 'construction crews broke ground at the site that autumn.', rel: 'sequence' },
-    { a: 'The author revised her manuscript several times before submitting it.', b: 'she rewrote the entire opening chapter twice.', rel: 'emphasis' },
-    { a: 'The coral reef showed signs of stress during the warm summer.', b: 'more than half of its colonies had lost their color by September.', rel: 'emphasis' },
-    { a: 'A well-designed survey uses clear, neutral wording to avoid bias.', b: 'a careful experiment isolates a single variable to test a cause.', rel: 'similarity' },
-    { a: 'Bees communicate the location of flowers through a looping dance.', b: 'ants lay chemical trails that guide their nestmates to food.', rel: 'similarity' },
-    { a: 'The proposed policy would reduce the town’s energy costs over time.', b: 'the upfront investment it requires is considerable.', rel: 'concession' },
-    { a: 'The novel’s plot is undeniably clever and tightly constructed.', b: 'its characters can feel more like puzzle pieces than people.', rel: 'concession' },
-    { a: 'The factory installed sensors to monitor the temperature of each machine.', b: 'engineers could spot an overheating part before it failed.', rel: 'cause' },
-    { a: 'Many early telescopes distorted the images they produced.', b: 'astronomers still used them to map craters on the Moon.', rel: 'contrast' },
-    { a: 'The trail climbs steadily for the first two miles.', b: 'it levels off along a ridge with a wide view of the valley.', rel: 'sequence' },
-    { a: 'The chef wanted every dish to highlight local produce.', b: 'she visited the farmers’ market before planning each week’s menu.', rel: 'cause' },
-    { a: 'Recycling programs work best when the rules are simple.', b: 'residents are far more likely to sort waste correctly when the categories are clear.', rel: 'cause' },
-    { a: 'The startup’s first product sold well in a handful of stores.', b: 'national retailers were reluctant to stock an unproven brand.', rel: 'contrast' },
-    { a: 'Volunteers cleared the invasive weeds from the wetland in March.', b: 'they planted native grasses along the water’s edge.', rel: 'sequence' },
-    { a: 'Reading aloud can help writers catch awkward sentences.', b: 'it exposes rhythms and repetitions the eye tends to skip.', rel: 'cause' },
-    { a: 'The spacecraft’s cameras captured detailed images of the moon’s surface.', b: 'its instruments measured the faint magnetic field around it.', rel: 'addition' },
-    { a: 'Historians long assumed the settlement had been abandoned suddenly.', b: 'recent excavations suggest it was emptied gradually over many years.', rel: 'contrast' },
-    { a: 'The tutoring program improved students’ test scores.', b: 'it noticeably increased their confidence in class discussions.', rel: 'addition' },
-    { a: 'Some fungi form partnerships with the roots of trees.', b: 'certain species trade minerals from the soil for sugars from the tree.', rel: 'example' },
-    { a: 'The committee gathered feedback from residents for months.', b: 'it published a revised plan that reflected their concerns.', rel: 'sequence' },
-    { a: 'Electric buses are quieter and cleaner than diesel ones.', b: 'their limited range still makes them impractical on the longest routes.', rel: 'concession' },
-    { a: 'The photographer waited hours for the light to soften.', b: 'the final image glowed with a warmth the midday sun could not provide.', rel: 'cause' },
-    { a: 'Careful editors check every quotation against its source.', b: 'meticulous fact-checkers verify each figure before publication.', rel: 'similarity' },
+    { a: 'The new bridge was designed to halve the cross-town commute.', b: 'many drivers found their trips barely faster, as traffic shifted to the connecting roads.', rel: 'contrast' },
+    { a: 'Solar panels have grown far cheaper to manufacture.', b: 'the cost of installing and wiring them to the grid has fallen more slowly.', rel: 'contrast' },
+    { a: 'The orchestra had rehearsed the passage dozens of times.', b: 'the conductor asked for one more run-through before the concert.', rel: 'addition' },
+    { a: 'The museum extended its evening hours to draw more visitors.', b: 'it lowered weekday admission prices.', rel: 'addition' },
+    { a: 'Heavy rain fell across the valley for three days.', b: 'the river rose above its banks and flooded the farms.', rel: 'cause' },
+    { a: 'The firm automated its most repetitive tasks.', b: 'employees spent more of their day on creative work.', rel: 'cause' },
+    { a: 'Some desert plants store water in their thick stems.', b: 'the saguaro can hold hundreds of liters after one rainfall.', rel: 'example' },
+    { a: 'Certain birds change their diet with the seasons.', b: 'the cedar waxwing eats insects in summer and berries in winter.', rel: 'example' },
+    { a: 'The team first collected soil from each plot.', b: 'they measured the nitrogen in every sample.', rel: 'sequence' },
+    { a: 'The council approved the park design in spring.', b: 'crews broke ground at the site that autumn.', rel: 'sequence' },
+    { a: 'The author revised her manuscript repeatedly.', b: 'she rewrote the opening chapter twice.', rel: 'emphasis' },
+    { a: 'The reef showed signs of stress all summer.', b: 'more than half its colonies had bleached by September.', rel: 'emphasis' },
+    { a: 'A good survey uses neutral wording to avoid bias.', b: 'a careful experiment isolates one variable to test a cause.', rel: 'similarity' },
+    { a: 'Bees signal the location of flowers with a looping dance.', b: 'ants lay scent trails that guide nestmates to food.', rel: 'similarity' },
+    { a: 'The policy would lower the town’s energy costs over time.', b: 'the upfront investment it requires is steep.', rel: 'concession' },
+    { a: 'The novel’s plot is undeniably clever.', b: 'its characters can feel more like puzzle pieces than people.', rel: 'concession' },
+    { a: 'The factory added sensors to each machine.', b: 'engineers could catch an overheating part before it failed.', rel: 'cause' },
+    { a: 'Early telescopes distorted the images they produced.', b: 'astronomers still used them to map lunar craters.', rel: 'contrast' },
+    { a: 'The trail climbs steadily for the first two miles.', b: 'it levels off along a ridge with a wide view.', rel: 'sequence' },
+    { a: 'The chef wanted each dish to showcase local produce.', b: 'she visited the farmers’ market before planning the menu.', rel: 'cause' },
+    { a: 'Recycling programs work best when the rules are simple.', b: 'residents sort waste correctly far more often when categories are clear.', rel: 'cause' },
+    { a: 'The startup’s first product sold well in a few shops.', b: 'national chains hesitated to stock an unproven brand.', rel: 'contrast' },
+    { a: 'Volunteers cleared the invasive weeds in March.', b: 'they planted native grasses along the water’s edge.', rel: 'sequence' },
+    { a: 'Reading a draft aloud helps writers catch clumsy lines.', b: 'it exposes rhythms the eye tends to skim past.', rel: 'cause' },
+    { a: 'The probe’s cameras mapped the moon’s surface in detail.', b: 'its instruments measured the faint magnetic field around it.', rel: 'addition' },
+    { a: 'Historians long assumed the settlement emptied suddenly.', b: 'recent digs suggest it was abandoned gradually.', rel: 'contrast' },
+    { a: 'The tutoring program raised students’ test scores.', b: 'it visibly boosted their confidence in discussions.', rel: 'addition' },
+    { a: 'Some fungi partner with the roots of trees.', b: 'certain species trade soil minerals for the tree’s sugars.', rel: 'example' },
+    { a: 'The committee gathered residents’ feedback for months.', b: 'it published a revised plan reflecting their concerns.', rel: 'sequence' },
+    { a: 'Electric buses run quieter and cleaner than diesel ones.', b: 'their limited range still rules them out on the longest routes.', rel: 'concession' },
+    { a: 'The photographer waited hours for the light to soften.', b: 'the final frame glowed with a warmth midday could not give.', rel: 'cause' },
+    { a: 'Careful editors check each quotation against its source.', b: 'diligent fact-checkers verify every figure before print.', rel: 'similarity' },
+    { a: 'The city widened the avenue to ease congestion.', b: 'commute times fell only during the first few months.', rel: 'contrast' },
+    { a: 'The greenhouse kept the seedlings warm through winter.', b: 'it protected them from the late frost in March.', rel: 'addition' },
+    { a: 'The glacier has retreated a mile in fifty years.', b: 'the valley below now floods each spring from the melt.', rel: 'cause' },
+    { a: 'Many songbirds navigate using the stars.', b: 'the indigo bunting orients itself by the night sky during migration.', rel: 'example' },
+    { a: 'The lab confirmed the compound in the first trial.', b: 'it repeated the test twice to rule out any fluke.', rel: 'sequence' },
+    { a: 'The essay’s argument is tightly organized.', b: 'its evidence, however, comes from a single study.', rel: 'concession' },
+    { a: 'The archive digitized thousands of fragile letters.', b: 'scholars could now read them without handling the originals.', rel: 'cause' },
+    { a: 'A telescope gathers light to reveal faint objects.', b: 'a microscope bends light to reveal tiny ones.', rel: 'similarity' },
+    { a: 'The bakery introduced a rye loaf last spring.', b: 'it added a sourdough to the shelves by summer.', rel: 'addition' },
+    { a: 'The dam generates power for the whole region.', b: 'it has also disrupted the fish that once swam upstream.', rel: 'concession' },
+    { a: 'The coach studied hours of game footage.', b: 'she rebuilt the team’s defense around what she found.', rel: 'cause' },
+    { a: 'Wind turbines were installed along the ridge in June.', b: 'the first electricity reached the grid that November.', rel: 'sequence' },
+    { a: 'The map looked complete at first glance.', b: 'it omitted several roads built in the last decade.', rel: 'contrast' },
+    { a: 'The vaccine trained the immune system to recognize the virus.', b: 'exposed volunteers fought off the infection quickly.', rel: 'cause' },
+    { a: 'The poet favored short, plain words.', b: 'the essayist, too, avoided ornate phrasing.', rel: 'similarity' },
+    { a: 'The store cut its prices to clear old stock.', b: 'sales rose sharply within a week.', rel: 'cause' },
+    { a: 'The species was thought extinct for a century.', b: 'a small population turned up on a remote island.', rel: 'contrast' },
+    { a: 'The engineers tested the prototype in the lab.', b: 'they drove it across rough terrain to confirm the results.', rel: 'sequence' },
+    { a: 'The report’s data are thorough.', b: 'its conclusions reach beyond what the numbers can show.', rel: 'concession' },
+    { a: 'Coral polyps build reefs over thousands of years.', b: 'the Great Barrier Reef took roughly eight thousand years to form.', rel: 'example' },
+    { a: 'The library added quiet study rooms.', b: 'it extended its weekend hours as well.', rel: 'addition' },
+    { a: 'The river was too shallow for large boats.', b: 'engineers dredged a channel to let ships pass.', rel: 'cause' },
+    { a: 'The painting seemed abstract from across the room.', b: 'up close, tiny recognizable figures emerged.', rel: 'contrast' },
+    { a: 'The clinic opened a second location downtown.', b: 'patient wait times fell almost immediately.', rel: 'cause' },
+    { a: 'Migratory whales fast for months at their breeding grounds.', b: 'the gray whale can travel thousands of miles without feeding.', rel: 'example' },
+    { a: 'The debate team practiced rebuttals every evening.', b: 'they rehearsed their opening speeches on weekends.', rel: 'addition' },
+    { a: 'The soil in the plot was poor and rocky.', b: 'the farmers added compost for three seasons before planting.', rel: 'sequence' },
+    { a: 'The theory elegantly explained the old data.', b: 'it failed to predict the newest observations.', rel: 'contrast' },
+    { a: 'The city planted shade trees along every block.', b: 'summer temperatures downtown dropped by several degrees.', rel: 'cause' },
+    { a: 'A dictionary records how words are used.', b: 'a style guide, likewise, describes accepted conventions.', rel: 'similarity' },
+    { a: 'The startup’s app was praised for its clean design.', b: 'it drew criticism for draining phone batteries.', rel: 'concession' },
+    { a: 'The archaeologists mapped the site with drones.', b: 'they began careful excavation the following season.', rel: 'sequence' },
+    { a: 'The medicine eased the symptoms within hours.', b: 'it did nothing to address the underlying infection.', rel: 'contrast' },
+    { a: 'The apprentice learned to sharpen every blade by hand.', b: 'she memorized the grain of each kind of wood.', rel: 'addition' },
+    { a: 'The dam released water ahead of the spring melt.', b: 'the reservoir had room to absorb the flood.', rel: 'cause' },
+    { a: 'Some octopuses can reshape their bodies to hide.', b: 'the mimic octopus can imitate the shape of a flatfish.', rel: 'example' },
+    { a: 'The crew sealed the hull in the morning.', b: 'they tested it in the harbor that afternoon.', rel: 'sequence' },
+    { a: 'The findings were striking on their own.', b: 'a second lab reproduced them exactly.', rel: 'emphasis' },
+    { a: 'A good teacher adjusts the pace to the class.', b: 'a skilled editor adjusts the tone to the reader.', rel: 'similarity' },
+    { a: 'The plan would cut waste across the whole system.', b: 'it would require retraining nearly every worker.', rel: 'concession' },
+    { a: 'The town installed streetlights along the river path.', b: 'evening foot traffic there rose sharply.', rel: 'cause' },
+    { a: 'The manuscript was praised for its wit.', b: 'it was faulted for its tangled structure.', rel: 'contrast' },
+    { a: 'The museum cataloged its fossils by region.', b: 'it later sorted them by geological age as well.', rel: 'addition' },
+    { a: 'The soil test revealed a lack of nitrogen.', b: 'the farmer rotated in beans to enrich the field.', rel: 'cause' },
+    { a: 'Some plants defend themselves with chemicals.', b: 'the milkweed fills its leaves with a bitter toxin.', rel: 'example' },
+    { a: 'The engineers modeled the tower on a computer first.', b: 'they built a scale version to test in a wind tunnel.', rel: 'sequence' },
+    { a: 'The essay is carefully argued.', b: 'it is, above all, a pleasure to read.', rel: 'emphasis' },
+    { a: 'A microscope reveals the structure of a cell.', b: 'an X-ray, similarly, reveals the structure of a bone.', rel: 'similarity' },
+    { a: 'The subsidy made the crop cheaper to grow.', b: 'it also encouraged farmers to abandon other plants.', rel: 'concession' },
+    { a: 'The bakery started grinding its own flour.', b: 'the bread developed a noticeably richer flavor.', rel: 'cause' },
+    { a: 'The satellite was designed to last five years.', b: 'it was still returning data two decades later.', rel: 'contrast' },
+    { a: 'The city repaved the main road in April.', b: 'it repainted the bike lanes by June.', rel: 'sequence' },
+    { a: 'The theory accounts for the planet’s orbit.', b: 'it explains the timing of its seasons as well.', rel: 'addition' },
+    { a: 'The lake absorbed runoff from the fields.', b: 'algae bloomed across its surface by midsummer.', rel: 'cause' },
+    { a: 'Certain insects survive winter by producing antifreeze.', b: 'some beetles fill their blood with a sugar that resists ice.', rel: 'example' },
+    { a: 'The choir warmed up for half an hour.', b: 'they took the stage as the lights dimmed.', rel: 'sequence' },
+    { a: 'The device is undeniably powerful.', b: 'it is also, unfortunately, difficult to repair.', rel: 'concession' },
+    { a: 'The novel sold modestly at first.', b: 'word of mouth turned it into a bestseller within a year.', rel: 'contrast' },
+    { a: 'The lab measured the sample’s density.', b: 'it recorded the melting point next.', rel: 'sequence' },
+    { a: 'A dictionary settles disputes about meaning.', b: 'a map, likewise, settles disputes about place.', rel: 'similarity' },
+    { a: 'The park added a pond to collect rainwater.', b: 'frogs and dragonflies arrived within a single season.', rel: 'cause' },
+    { a: 'The report’s prose is clear and direct.', b: 'its charts, in fact, tell the story even faster.', rel: 'emphasis' },
+    { a: 'The company promised faster shipping.', b: 'its warehouses could not keep up with the orders.', rel: 'contrast' },
+    { a: 'The scientists gathered samples for a decade.', b: 'they finally published the full data set last year.', rel: 'sequence' },
+    { a: 'The workshop taught students to frame a photo.', b: 'it also showed them how to develop the film.', rel: 'addition' },
+    { a: 'The reef sat in unusually warm water all summer.', b: 'the coral expelled the algae that gave it color.', rel: 'cause' },
+    { a: 'Many birds reuse the same nest for years.', b: 'the bald eagle can return to a nest for decades.', rel: 'example' },
+    { a: 'The bridge design was elegant on paper.', b: 'it proved far too costly to actually build.', rel: 'contrast' },
+    { a: 'The archive scanned its photographs first.', b: 'it transcribed the handwritten captions afterward.', rel: 'sequence' },
+    { a: 'The clinic offered evening appointments.', b: 'working patients could finally be seen on time.', rel: 'cause' },
+    { a: 'The lecture was densely packed with data.', b: 'it was, remarkably, easy to follow throughout.', rel: 'emphasis' },
+    { a: 'A thermostat keeps a room at a set temperature.', b: 'a governor, in the same way, keeps an engine at a set speed.', rel: 'similarity' },
+    { a: 'The new policy reduced paperwork for teachers.', b: 'it added a new set of digital forms in its place.', rel: 'concession' },
+    { a: 'The volcano released ash for weeks.', b: 'the surrounding fields became strikingly fertile.', rel: 'cause' },
+    { a: 'The team sketched three possible logos.', b: 'they narrowed the choice to one by Friday.', rel: 'sequence' },
+    { a: 'The garden looked bare in early spring.', b: 'by June it overflowed with color.', rel: 'contrast' },
+    { a: 'The app tracked users’ daily steps.', b: 'it began suggesting nearby walking routes too.', rel: 'addition' },
+    { a: 'The vineyard switched to organic methods.', b: 'its yields dipped for two seasons before recovering.', rel: 'contrast' },
+    { a: 'The astronomers logged the star’s brightness nightly.', b: 'they charted its faint wobble as well.', rel: 'addition' },
+    { a: 'The road crew laid the foundation in autumn.', b: 'they paved the surface the following spring.', rel: 'sequence' },
+    { a: 'Warm currents shifted north that year.', b: 'fish that rarely ventured so far appeared off the coast.', rel: 'cause' },
+    { a: 'Many mammals hibernate to survive scarce winters.', b: 'the ground squirrel slows its heart to a few beats a minute.', rel: 'example' },
+    { a: 'The editor trimmed the article by half.', b: 'the argument, if anything, grew sharper.', rel: 'contrast' },
+    { a: 'The choir mastered the first movement.', b: 'they turned to the far harder second one.', rel: 'sequence' },
+    { a: 'A compass points a hiker toward north.', b: 'a sundial, similarly, marks the passing hours.', rel: 'similarity' },
+    { a: 'The grant funded new lab equipment.', b: 'it also paid for two research assistants.', rel: 'addition' },
+    { a: 'The policy promised shorter wait times.', b: 'the clinics were too understaffed to deliver them.', rel: 'contrast' },
+    { a: 'The beekeeper added hives near the orchard.', b: 'the apple harvest grew noticeably that year.', rel: 'cause' },
+    { a: 'The museum restored the fresco inch by inch.', b: 'colors hidden for centuries came back to life.', rel: 'cause' },
+    { a: 'The debate covered trade at length.', b: 'it barely touched on the environment.', rel: 'contrast' },
+    { a: 'Some plants signal danger to their neighbors.', b: 'a bitten acacia releases a gas that warns nearby trees.', rel: 'example' },
+    { a: 'The team gathered data through the summer.', b: 'they spent the winter analyzing it.', rel: 'sequence' },
+    { a: 'The report is meticulously sourced.', b: 'it is, above all, refreshingly readable.', rel: 'emphasis' },
+    { a: 'The city offered free transit on holidays.', b: 'downtown crowds swelled on those days.', rel: 'cause' },
+    { a: 'A good coach studies each player’s habits.', b: 'a wise teacher, likewise, learns how each student thinks.', rel: 'similarity' },
+    { a: 'The bakery’s ovens broke down overnight.', b: 'the staff borrowed a neighbor’s kitchen by dawn.', rel: 'sequence' },
+    { a: 'The design won praise for its beauty.', b: 'it drew complaints for its cost.', rel: 'concession' },
+    { a: 'The river changed course after the flood.', b: 'the old ferry landing now sits far from the water.', rel: 'cause' },
+    { a: 'The lab sequenced the ancient DNA.', b: 'it compared the results with living relatives.', rel: 'sequence' },
+    { a: 'The plan looked promising in theory.', b: 'it collapsed the moment it met the real budget.', rel: 'contrast' },
+    { a: 'The gallery lit each canvas individually.', b: 'it played soft music in every room as well.', rel: 'addition' },
+    { a: 'Certain frogs freeze solid through winter.', b: 'the wood frog can stop its heart for weeks and revive in spring.', rel: 'example' },
+    { a: 'The teacher modeled the problem on the board.', b: 'she asked the class to try one on their own.', rel: 'sequence' },
+    { a: 'The report is exhaustive.', b: 'it is, more importantly, entirely accurate.', rel: 'emphasis' },
+    { a: 'The city buried its power lines.', b: 'outages during storms became far less common.', rel: 'cause' },
+    { a: 'A lock keeps a boat at one water level.', b: 'a staircase of locks, likewise, lifts it over a hill.', rel: 'similarity' },
+    { a: 'The startup promised same-day delivery.', b: 'its couriers could not cover the whole city.', rel: 'contrast' },
+    { a: 'The crew cleared the fallen trees first.', b: 'they repaired the damaged fence afterward.', rel: 'sequence' },
+    { a: 'The medication controlled the pain.', b: 'it also, unfortunately, dulled the patient’s appetite.', rel: 'concession' },
+    { a: 'The soil grew richer each season.', b: 'the farmers had been rotating their crops for years.', rel: 'cause' },
+    { a: 'Many animals store food for lean times.', b: 'the acorn woodpecker drills thousands of holes to hold its stash.', rel: 'example' },
+    { a: 'The museum reopened after the renovation.', b: 'attendance rose to record levels within a month.', rel: 'cause' },
+    { a: 'The essay is short.', b: 'it says more than many books twice its length.', rel: 'contrast' },
+    { a: 'The choir learned the melody by heart.', b: 'they added the harmony line the next week.', rel: 'sequence' },
+    { a: 'A well-kept journal preserves a scientist’s thinking.', b: 'a careful ledger, similarly, preserves a merchant’s.', rel: 'similarity' },
+    { a: 'The council heard the residents’ objections.', b: 'it revised the parking plan accordingly.', rel: 'cause' },
+    { a: 'The trail was clearly marked at the start.', b: 'the signs disappeared entirely past the ridge.', rel: 'contrast' },
+    { a: 'The archive scanned the brittle newspapers.', b: 'it indexed every article by date and topic.', rel: 'addition' },
+    { a: 'The storm stripped the leaves from the trees.', b: 'the orchard produced almost no fruit that year.', rel: 'cause' },
+    { a: 'The novel’s prose is spare and cool.', b: 'its final chapter, notably, blazes with feeling.', rel: 'emphasis' },
+    { a: 'The workshop taught the basics of welding.', b: 'it covered simple metal casting too.', rel: 'addition' },
+    { a: 'The bridge was meant to last a century.', b: 'salt air corroded its cables within thirty years.', rel: 'contrast' },
+    { a: 'The team collected the survey responses.', b: 'they entered the data into the model that night.', rel: 'sequence' },
+    { a: 'Solar panels cut the school’s electric bill.', b: 'the savings paid for two new teachers.', rel: 'cause' },
+    { a: 'The reserve protects a rare orchid.', b: 'the same land shelters an endangered frog.', rel: 'addition' },
+    { a: 'The plan would preserve the old facade.', b: 'it would gut everything behind it.', rel: 'concession' },
+    { a: 'The comet brightened as it neared the sun.', b: 'its tail stretched across half the night sky.', rel: 'cause' },
   ];
-
   function genTransition() {
     const item = pick(TRANS);
-    const rel = item.rel;
-    const correct = pick(REL_WORDS[rel]);
-    // choose three distractor relationships different from the correct one
-    const otherRels = shuffle(Object.keys(REL_WORDS).filter(r => r !== rel)).slice(0, 3);
-    const distractors = otherRels.map(r => ({ word: pick(REL_WORDS[r]), rel: r }));
-    const options = shuffle([{ word: correct, rel, correct: true }, ...distractors]);
-    const letters = ['A', 'B', 'C', 'D'];
-    const whyWrong = {};
-    let answer = 'A';
-    const choices = options.map((o, i) => {
-      if (o.correct) answer = letters[i];
-      else whyWrong[letters[i]] = `“${o.word}” signals ${REL_LABEL[o.rel]}, but the second sentence ${REL_DOES[rel]}, so this transition is illogical here.`;
-      return { letter: letters[i], text: o.word };
+    const correct = pick(REL_WORDS[item.rel]);
+    const otherRels = shuffle(Object.keys(REL_WORDS).filter(r => r !== item.rel)).slice(0, 3);
+    const distractors = otherRels.map(r => {
+      const w = pick(REL_WORDS[r]);
+      return { text: w, why: `“${w}” signals ${REL_LABEL[r]}, but the second sentence ${REL_DOES[item.rel]}, so this transition is illogical here.` };
     });
-    const text = `${item.a} ______ ${item.b}\n\nWhich choice completes the text with the most logical transition?`;
+    const { choices, answer, whyWrong } = buildChoices(correct, distractors);
     return finalize({
       skill: 'transitions',
-      text,
+      text: `${item.a} ______ ${cap(item.b)}\n\nWhich choice completes the text with the most logical transition?`,
       choices, answer, whyWrong,
-      explanation: `The second sentence ${REL_DOES[rel]}. That calls for ${REL_LABEL[rel]}, which “${correct}” correctly signals.`,
+      explanation: `The second sentence ${REL_DOES[item.rel]}, which calls for ${REL_LABEL[item.rel]}. “${correct}” signals that relationship.`,
     });
   }
 
   /* ===================== WORDS IN CONTEXT ===================== */
-  // Each scenario has a blank, the single best word, and three real words that
-  // are the wrong meaning or register for the context. Written so exactly one
-  // choice fits.
+  // Distractor tags → a meaningful elimination explanation.
+  const WHY_WORD = {
+    opp:   (w) => `“${cap(w)}” means roughly the opposite of what the context calls for.`,
+    unrel: (w) => `“${cap(w)}” doesn’t fit the meaning the sentence builds toward.`,
+    weak:  (w) => `“${cap(w)}” is close but too vague or mild to be the precise fit.`,
+    reg:   (w) => `“${cap(w)}” is the wrong kind of word for this context.`,
+    extreme: (w) => `“${cap(w)}” overstates what the sentence actually says.`,
+  };
+  // { s: sentence with ___, a: answer, g: gloss, d: [[word, tag], ...] }
   const WORDS = [
-    { text: 'Because the evidence was so ______, the jury reached a verdict within an hour.', ans: 'conclusive', wrong: [['ambiguous', 'means unclear — the opposite of what a quick verdict implies'], ['tentative', 'means hesitant or provisional, not decisive'], ['ornate', 'describes elaborate decoration, unrelated to evidence']], gloss: 'Evidence that leads to a fast verdict is decisive, or conclusive.' },
-    { text: 'The critic praised the film’s ______ pacing, which never let the tension slacken.', ans: 'relentless', wrong: [['sluggish', 'means slow — the opposite of maintained tension'], ['erratic', 'means inconsistent, which would undercut steady tension'], ['transparent', 'means easy to see through, not a description of pace']], gloss: 'Pacing that never eases is unrelenting, or relentless.' },
-    { text: 'Rather than accept the first offer, the negotiator remained ______ and waited for better terms.', ans: 'steadfast', wrong: [['impulsive', 'means acting without thought, unlike patient waiting'], ['indifferent', 'means uninterested, but the negotiator clearly cared'], ['fragile', 'means easily broken, not a stance in a negotiation']], gloss: 'Someone who holds firm and waits is steadfast.' },
-    { text: 'The scientist’s early results were ______, so she repeated the experiment before drawing conclusions.', ans: 'inconclusive', wrong: [['definitive', 'means final and settled, which would not require repeating'], ['abundant', 'describes quantity, not the reliability of a result'], ['audible', 'refers to sound, irrelevant here']], gloss: 'Results that settle nothing are inconclusive.' },
-    { text: 'The mural’s colors were so ______ that visitors could see it from across the plaza.', ans: 'vivid', wrong: [['muted', 'means subdued — the opposite of eye-catching'], ['brittle', 'describes texture, not color intensity'], ['frugal', 'means thrifty, unrelated to appearance']], gloss: 'Colors bright enough to see from far away are vivid.' },
-    { text: 'His explanation was admirably ______: not a single word was wasted.', ans: 'concise', wrong: [['rambling', 'means long-winded — the opposite of no wasted words'], ['obscure', 'means hard to understand, not brief'], ['generous', 'means giving, not a description of brevity']], gloss: 'Language with no wasted words is concise.' },
-    { text: 'The old treaty had become ______, and both nations agreed it no longer applied.', ans: 'obsolete', wrong: [['binding', 'means still in force — the opposite of no longer applying'], ['pristine', 'means spotless and new, not outdated'], ['lucrative', 'means profitable, unrelated to an outdated treaty']], gloss: 'Something no longer in use is obsolete.' },
-    { text: 'She gave a ______ account of the trip, leaving out no detail her readers might want.', ans: 'thorough', wrong: [['cursory', 'means hasty and superficial — the opposite of leaving out nothing'], ['reluctant', 'means unwilling, not detailed'], ['portable', 'describes what can be carried, irrelevant here']], gloss: 'A complete, detailed account is thorough.' },
-    { text: 'The committee’s support was merely ______; few members truly believed in the plan.', ans: 'nominal', wrong: [['wholehearted', 'means fully committed — the opposite of the sentence'], ['unanimous', 'means agreed by all, which contradicts “few believed”'], ['fragrant', 'refers to smell, unrelated to support']], gloss: 'Support in name only is nominal.' },
-    { text: 'The engineer proposed a ______ solution that solved several problems at once.', ans: 'elegant', wrong: [['clumsy', 'means awkward — the opposite of a neat solution'], ['redundant', 'means unnecessarily repetitive, not efficient'], ['nocturnal', 'means active at night, irrelevant here']], gloss: 'A neat, efficient solution is elegant.' },
-    { text: 'Once a ______ river, it now trickles through the canyon after years of drought.', ans: 'mighty', wrong: [['meager', 'means scanty — the opposite of a once-powerful river'], ['tepid', 'describes lukewarm temperature, not size or force'], ['candid', 'means frank, unrelated to a river']], gloss: 'A powerful river is a mighty one.' },
-    { text: 'The author’s tone is ______, poking gentle fun at the very customs she describes.', ans: 'ironic', wrong: [['earnest', 'means sincere and serious — not poking fun'], ['frantic', 'means panicked, not a description of gentle humor'], ['opaque', 'means unclear, not a tone of humor']], gloss: 'A tone that gently mocks is ironic.' },
-    { text: 'Their first attempt was ______, but with practice the dancers grew precise and smooth.', ans: 'tentative', wrong: [['polished', 'means refined — the opposite of a shaky first try'], ['permanent', 'means lasting, not hesitant'], ['edible', 'refers to food, irrelevant here']], gloss: 'A hesitant, unsure first try is tentative.' },
-    { text: 'The manager’s ______ praise, offered so rarely, meant a great deal to the team.', ans: 'sparing', wrong: [['constant', 'means unceasing — the opposite of rarely offered'], ['hollow', 'means insincere, but the praise clearly mattered'], ['spherical', 'describes a shape, irrelevant here']], gloss: 'Praise given rarely is sparing.' },
-    { text: 'The documentary was ______ in its research, citing hundreds of primary sources.', ans: 'meticulous', wrong: [['careless', 'means sloppy — the opposite of citing hundreds of sources'], ['brief', 'means short, not a measure of care'], ['savory', 'describes taste, irrelevant here']], gloss: 'Extremely careful, detailed work is meticulous.' },
-    { text: 'Far from being ______, the professor welcomed questions that challenged her ideas.', ans: 'defensive', wrong: [['curious', 'means eager to learn, which the sentence actually affirms'], ['generous', 'means giving, not a reaction to challenge'], ['aquatic', 'means living in water, irrelevant here']], gloss: '“Far from being” sets up the opposite of welcoming challenge — that is being defensive.' },
-    { text: 'The bridge’s design is ______, relying on a single graceful arch rather than heavy supports.', ans: 'minimalist', wrong: [['cluttered', 'means crowded with parts — the opposite of a single arch'], ['fraudulent', 'means dishonest, unrelated to design'], ['humid', 'describes moisture, irrelevant here']], gloss: 'A pared-down design relying on little is minimalist.' },
-    { text: 'The report’s conclusions were ______, drawn only after the team ruled out every alternative.', ans: 'warranted', wrong: [['premature', 'means too early — the opposite of ruling out alternatives first'], ['fictional', 'means invented, not justified'], ['portable', 'describes what can be carried, irrelevant here']], gloss: 'Conclusions justified by careful work are warranted.' },
-    { text: 'Although the instructions seemed ______ at first, they became clear once we tried the steps.', ans: 'daunting', wrong: [['trivial', 'means unimportant — the opposite of intimidating'], ['fluent', 'describes smooth speech, not instructions'], ['metallic', 'describes material, irrelevant here']], gloss: 'Instructions that seem intimidating at first are daunting.' },
-    { text: 'The senator was known for ______ remarks that revealed little of her true position.', ans: 'evasive', wrong: [['candid', 'means frank and open — the opposite of revealing little'], ['melodic', 'describes music, not speech content'], ['punctual', 'means on time, unrelated here']], gloss: 'Remarks that dodge and reveal little are evasive.' },
-    { text: 'The volunteers’ ______ effort cleared the entire beach in a single afternoon.', ans: 'concerted', wrong: [['halfhearted', 'means lacking effort — the opposite of clearing a whole beach fast'], ['solitary', 'means alone, but many volunteers worked together'], ['edible', 'refers to food, irrelevant here']], gloss: 'A coordinated group effort is concerted.' },
-    { text: 'His argument, though ______, ultimately rested on a single unproven assumption.', ans: 'persuasive', wrong: [['feeble', 'means weak, but the sentence contrasts strength with a hidden flaw'], ['audible', 'refers to sound, not argument quality'], ['annual', 'means yearly, irrelevant here']], gloss: 'An argument that convinces is persuasive; “though” sets up the hidden flaw.' },
-    { text: 'The garden was left ______ for years, and weeds soon overran the once-tidy beds.', ans: 'untended', wrong: [['pristine', 'means spotless — the opposite of overrun by weeds'], ['fertile', 'describes rich soil, not neglect'], ['vocal', 'means outspoken, irrelevant here']], gloss: 'A garden left uncared-for is untended.' },
+    { s: 'Because the evidence was so ______, the jury reached a verdict within an hour.', a: 'conclusive', g: 'Evidence that settles the matter and leads to a fast verdict is conclusive.', d: [['ambiguous', 'opp'], ['tentative', 'opp'], ['ornate', 'unrel']] },
+    { s: 'The critic praised the film’s ______ pacing, which never let the tension slacken.', a: 'relentless', g: 'Pacing that never eases is relentless.', d: [['sluggish', 'opp'], ['erratic', 'unrel'], ['transparent', 'unrel']] },
+    { s: 'Rather than take the first offer, the negotiator stayed ______ and waited for better terms.', a: 'steadfast', g: 'Someone who holds firm and waits is steadfast.', d: [['impulsive', 'opp'], ['indifferent', 'unrel'], ['fragile', 'unrel']] },
+    { s: 'Her early results were ______, so she repeated the experiment before concluding.', a: 'inconclusive', g: 'Results that settle nothing are inconclusive.', d: [['definitive', 'opp'], ['abundant', 'unrel'], ['audible', 'unrel']] },
+    { s: 'The mural’s colors were so ______ that visitors could see it across the plaza.', a: 'vivid', g: 'Colors bright enough to see from far off are vivid.', d: [['muted', 'opp'], ['brittle', 'unrel'], ['frugal', 'unrel']] },
+    { s: 'His explanation was admirably ______: not a word was wasted.', a: 'concise', g: 'Language with no wasted words is concise.', d: [['rambling', 'opp'], ['obscure', 'unrel'], ['generous', 'unrel']] },
+    { s: 'The treaty had become ______, and both nations agreed it no longer applied.', a: 'obsolete', g: 'Something no longer in force is obsolete.', d: [['binding', 'opp'], ['pristine', 'unrel'], ['lucrative', 'unrel']] },
+    { s: 'She gave a ______ account of the trip, leaving out no detail.', a: 'thorough', g: 'A complete, detailed account is thorough.', d: [['cursory', 'opp'], ['reluctant', 'unrel'], ['portable', 'unrel']] },
+    { s: 'The committee’s support was merely ______; few members truly believed in the plan.', a: 'nominal', g: 'Support in name only is nominal.', d: [['wholehearted', 'opp'], ['unanimous', 'opp'], ['fragrant', 'unrel']] },
+    { s: 'The engineer proposed an ______ solution that fixed several problems at once.', a: 'elegant', g: 'A neat, efficient solution is elegant.', d: [['clumsy', 'opp'], ['redundant', 'unrel'], ['nocturnal', 'unrel']] },
+    { s: 'Once a ______ river, it now trickles through the canyon after years of drought.', a: 'mighty', g: 'A powerful river is a mighty one.', d: [['meager', 'opp'], ['tepid', 'unrel'], ['candid', 'unrel']] },
+    { s: 'The author’s tone is ______, poking gentle fun at the customs she describes.', a: 'ironic', g: 'A tone that gently mocks is ironic.', d: [['earnest', 'opp'], ['frantic', 'unrel'], ['opaque', 'unrel']] },
+    { s: 'Their first attempt was ______, but with practice the dancers grew precise.', a: 'tentative', g: 'A hesitant, unsure first try is tentative.', d: [['polished', 'opp'], ['permanent', 'unrel'], ['edible', 'unrel']] },
+    { s: 'The manager’s ______ praise, offered so rarely, meant a great deal.', a: 'sparing', g: 'Praise given rarely is sparing.', d: [['constant', 'opp'], ['hollow', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The documentary was ______ in its research, citing hundreds of sources.', a: 'meticulous', g: 'Extremely careful, detailed work is meticulous.', d: [['careless', 'opp'], ['brief', 'unrel'], ['savory', 'unrel']] },
+    { s: 'Far from being ______, the professor welcomed questions that challenged her.', a: 'defensive', g: '“Far from being” sets up the opposite of welcoming challenge — being defensive.', d: [['curious', 'opp'], ['generous', 'unrel'], ['aquatic', 'unrel']] },
+    { s: 'The bridge’s design is ______, relying on one graceful arch rather than heavy supports.', a: 'minimalist', g: 'A pared-down design relying on little is minimalist.', d: [['cluttered', 'opp'], ['fraudulent', 'unrel'], ['humid', 'unrel']] },
+    { s: 'The conclusions were ______, drawn only after every alternative was ruled out.', a: 'warranted', g: 'Conclusions justified by careful work are warranted.', d: [['premature', 'opp'], ['fictional', 'unrel'], ['portable', 'unrel']] },
+    { s: 'Although the instructions seemed ______ at first, they became clear once we tried them.', a: 'daunting', g: 'Instructions that seem intimidating at first are daunting.', d: [['trivial', 'opp'], ['fluent', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The senator was known for ______ remarks that revealed little of her position.', a: 'evasive', g: 'Remarks that dodge and reveal little are evasive.', d: [['candid', 'opp'], ['melodic', 'unrel'], ['punctual', 'unrel']] },
+    { s: 'The volunteers’ ______ effort cleared the entire beach in an afternoon.', a: 'concerted', g: 'A coordinated group effort is concerted.', d: [['halfhearted', 'opp'], ['solitary', 'opp'], ['edible', 'unrel']] },
+    { s: 'The garden was left ______ for years, and weeds overran the tidy beds.', a: 'untended', g: 'A garden left uncared-for is untended.', d: [['pristine', 'opp'], ['fertile', 'unrel'], ['vocal', 'unrel']] },
+    { s: 'The scientist remained ______ about the claim until she saw the raw data.', a: 'skeptical', g: 'Doubting until shown proof is being skeptical.', d: [['gullible', 'opp'], ['jubilant', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'His argument was ______, built step by careful step from shared premises.', a: 'rigorous', g: 'A carefully built, exacting argument is rigorous.', d: [['sloppy', 'opp'], ['fleeting', 'unrel'], ['edible', 'unrel']] },
+    { s: 'The new policy had an ______ effect: costs fell even as service improved.', a: 'unexpected', g: 'An effect no one predicted is unexpected.', d: [['inevitable', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The lecture was so ______ that students filled every seat and the aisles.', a: 'compelling', g: 'A talk that draws crowds is compelling.', d: [['tedious', 'opp'], ['damp', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The witness gave a ______ description, precise down to the smallest detail.', a: 'exacting', g: 'A precise, detail-perfect description is exacting.', d: [['vague', 'opp'], ['buoyant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The company’s growth was ______, doubling in size every single year.', a: 'rapid', g: 'Doubling yearly is rapid growth.', d: [['gradual', 'opp'], ['hollow', 'unrel'], ['fragrant', 'unrel']] },
+    { s: 'The critic found the sequel ______, adding nothing the original had not already said.', a: 'derivative', g: 'A work that merely copies its source is derivative.', d: [['original', 'opp'], ['nutritious', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The trail was ______, winding back on itself so often that hikers lost their way.', a: 'circuitous', g: 'A roundabout, winding route is circuitous.', d: [['direct', 'opp'], ['generous', 'unrel'], ['audible', 'unrel']] },
+    { s: 'Her prose is ______, stripping each sentence to its essential words.', a: 'spare', g: 'Writing stripped to essentials is spare.', d: [['lavish', 'opp'], ['humid', 'unrel'], ['punctual', 'unrel']] },
+    { s: 'The scientist’s claims were ______, matching every result she had gathered.', a: 'consistent', g: 'Claims that agree with all the results are consistent.', d: [['contradictory', 'opp'], ['portable', 'unrel'], ['fragrant', 'unrel']] },
+    { s: 'The negotiations were ______, dragging on for months without progress.', a: 'protracted', g: 'Negotiations that drag on are protracted.', d: [['swift', 'opp'], ['edible', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The mentor’s advice was ______, useful in almost any situation.', a: 'versatile', g: 'Advice useful across many situations is versatile.', d: [['narrow', 'opp'], ['damp', 'unrel'], ['nocturnal', 'unrel']] },
+    { s: 'The audience sat in ______ silence, afraid to break the moment.', a: 'reverent', g: 'A respectful, awed silence is reverent.', d: [['rowdy', 'opp'], ['soluble', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The report was ______, glossing over the details that mattered most.', a: 'superficial', g: 'A shallow treatment that skips key detail is superficial.', d: [['profound', 'opp'], ['fragrant', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The explorer kept a ______ record, noting the weather every hour.', a: 'diligent', g: 'A careful, steady record-keeper is diligent.', d: [['negligent', 'opp'], ['buoyant', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The plan was ______, accounting for problems that had not yet arisen.', a: 'foresighted', g: 'Planning for problems in advance is foresighted.', d: [['shortsighted', 'opp'], ['edible', 'unrel'], ['humid', 'unrel']] },
+    { s: 'The two accounts were ______, agreeing on every important point.', a: 'congruent', g: 'Accounts that line up on the key points are congruent.', d: [['conflicting', 'opp'], ['fragrant', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The speaker was ______, pausing so long that the room grew restless.', a: 'halting', g: 'Speech broken by long pauses is halting.', d: [['fluent', 'opp'], ['savory', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The design felt ______, borrowing freely from a dozen older styles.', a: 'eclectic', g: 'Drawing from many varied sources is eclectic.', d: [['uniform', 'opp'], ['damp', 'unrel'], ['punctual', 'unrel']] },
+    { s: 'Her leadership was ______, steady and calm even in a crisis.', a: 'unflappable', g: 'Staying calm under pressure is being unflappable.', d: [['panicky', 'opp'], ['fragrant', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The evidence was ______, pointing clearly to a single explanation.', a: 'unambiguous', g: 'Evidence pointing one clear way is unambiguous.', d: [['murky', 'opp'], ['edible', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The novel’s structure is ______, folding several timelines into one chapter.', a: 'intricate', g: 'A complex, finely interwoven structure is intricate.', d: [['plain', 'opp'], ['humid', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The critic called the performance ______, praising its raw, unforced feeling.', a: 'authentic', g: 'Something genuine and unforced is authentic.', d: [['contrived', 'opp'], ['spherical', 'unrel'], ['soluble', 'unrel']] },
+    { s: 'The instructions were ______, so clear that no one had a single question.', a: 'lucid', g: 'Perfectly clear, easy-to-follow instructions are lucid.', d: [['confusing', 'opp'], ['fragrant', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The negotiator’s manner was ______, smoothing over every disagreement.', a: 'conciliatory', g: 'A manner that soothes conflict is conciliatory.', d: [['combative', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The evidence for the theory remained ______, resting on a single fossil.', a: 'scant', g: 'Evidence that is thin and limited is scant.', d: [['ample', 'opp'], ['fragrant', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The town’s response was ______, mobilizing volunteers within hours of the storm.', a: 'swift', g: 'A fast response is swift.', d: [['sluggish', 'opp'], ['humid', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'His account was ______, matching the facts others had reported.', a: 'credible', g: 'A believable account that fits the facts is credible.', d: [['dubious', 'opp'], ['coastal', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The museum’s collection is ______, spanning five continents and four centuries.', a: 'vast', g: 'A collection this wide-ranging is vast.', d: [['modest', 'opp'], ['fragrant', 'unrel'], ['punctual', 'unrel']] },
+    { s: 'The reforms were ______, reshaping nearly every department at once.', a: 'sweeping', g: 'Reforms that reshape everything are sweeping.', d: [['minor', 'opp'], ['edible', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The poem’s imagery is ______, conjuring a whole landscape in a single line.', a: 'evocative', g: 'Imagery that vividly conjures a scene is evocative.', d: [['flat', 'opp'], ['soluble', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The scientist was ______ in her methods, checking each step twice.', a: 'scrupulous', g: 'Extremely careful and exact is scrupulous.', d: [['reckless', 'opp'], ['fragrant', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The city’s growth had been ______, adding a new district every decade.', a: 'steady', g: 'Consistent, dependable growth is steady.', d: [['erratic', 'opp'], ['humid', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The argument was ______, so full of gaps that no one accepted it.', a: 'flimsy', g: 'A weak, full-of-holes argument is flimsy.', d: [['sound', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The treaty’s language was deliberately ______, leaving room for each side to interpret it favorably.', a: 'vague', g: 'Wording left open to interpretation on purpose is vague.', d: [['precise', 'opp'], ['fragrant', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The scientist was ______ in sharing credit, naming every student who had helped.', a: 'generous', g: 'Freely giving credit is being generous.', d: [['stingy', 'opp'], ['coastal', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The film’s plot was so ______ that viewers could predict the ending in the first ten minutes.', a: 'predictable', g: 'A plot easily guessed ahead is predictable.', d: [['surprising', 'opp'], ['humid', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The mediator’s ______ questions kept the discussion moving without taking sides.', a: 'neutral', g: 'Questions that favor no side are neutral.', d: [['biased', 'opp'], ['soluble', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'Her handwriting was so ______ that the pharmacist could not read the note.', a: 'illegible', g: 'Writing that cannot be read is illegible.', d: [['legible', 'opp'], ['fragrant', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The plan was ______, weighing the cost of every option before deciding.', a: 'deliberate', g: 'Careful, considered decision-making is deliberate.', d: [['hasty', 'opp'], ['edible', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The lecture was ______, covering three centuries of history in one hour.', a: 'wide-ranging', g: 'A talk that spans a lot of ground is wide-ranging.', d: [['narrow', 'opp'], ['humid', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The critic’s praise was ______, admitting only that the book “had a few good pages.”', a: 'grudging', g: 'Praise given reluctantly is grudging.', d: [['effusive', 'opp'], ['soluble', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The instructions were ______, so tangled that even the engineers gave up.', a: 'convoluted', g: 'Overly complicated, twisting instructions are convoluted.', d: [['straightforward', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The evidence was ______, gathered from a dozen independent studies.', a: 'robust', g: 'Strong evidence from many sources is robust.', d: [['weak', 'opp'], ['coastal', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The candidate’s answers were ______, dodging every hard question.', a: 'evasive', g: 'Answers that dodge are evasive.', d: [['forthright', 'opp'], ['humid', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The design was praised as ______, doing much with very few parts.', a: 'economical', g: 'Achieving a lot with little is being economical.', d: [['wasteful', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The witness gave a ______ account, sure of every detail.', a: 'confident', g: 'An account given with certainty is confident.', d: [['hesitant', 'opp'], ['soluble', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The soil was too ______ to hold water, so the seedlings dried out.', a: 'porous', g: 'Soil full of gaps that water drains through is porous.', d: [['dense', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The essay’s claims were ______, supported at every turn by careful citation.', a: 'substantiated', g: 'Claims backed by evidence are substantiated.', d: [['unfounded', 'opp'], ['humid', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The comedian’s timing was ______, landing each joke at the perfect beat.', a: 'impeccable', g: 'Flawless timing is impeccable.', d: [['clumsy', 'opp'], ['coastal', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The report was ______, repeating the same point in three different sections.', a: 'redundant', g: 'Needless repetition is redundant.', d: [['succinct', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The leader stayed ______ in the crisis, calming everyone around her.', a: 'composed', g: 'Staying calm and collected is being composed.', d: [['frantic', 'opp'], ['soluble', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The proposal was ______, so bold that the committee hesitated to approve it.', a: 'ambitious', g: 'A bold, far-reaching proposal is ambitious.', d: [['timid', 'opp'], ['humid', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The two witnesses’ stories were ______, matching down to the smallest detail.', a: 'identical', g: 'Stories that match exactly are identical.', d: [['divergent', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The trail markings were ______, so faint that hikers repeatedly lost the path.', a: 'indistinct', g: 'Markings too faint to make out are indistinct.', d: [['prominent', 'opp'], ['edible', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The professor’s feedback was ______, pointing to the exact line that needed work.', a: 'specific', g: 'Feedback that pinpoints details is specific.', d: [['general', 'opp'], ['humid', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The old engine ran ______, sputtering and stalling at every stop.', a: 'erratically', g: 'Running unevenly and unpredictably is running erratically.', d: [['smoothly', 'opp'], ['coastal', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The author’s influence was ______, felt in nearly every novel that followed.', a: 'pervasive', g: 'Influence felt everywhere is pervasive.', d: [['negligible', 'opp'], ['soluble', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The negotiation reached a ______ point at which neither side would move.', a: 'deadlocked', g: 'A stuck standoff is deadlocked.', d: [['flexible', 'opp'], ['fragrant', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The paint’s color proved ______, fading badly after a single summer.', a: 'unstable', g: 'A color that will not hold is unstable.', d: [['durable', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The coach’s praise felt ______, since she said the same thing to everyone.', a: 'insincere', g: 'Praise that seems not genuine is insincere.', d: [['heartfelt', 'opp'], ['humid', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The city’s response was ______, addressing the flood within hours.', a: 'prompt', g: 'A quick, on-time response is prompt.', d: [['delayed', 'opp'], ['soluble', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The theory is ______, explaining data that three older models could not.', a: 'powerful', g: 'A theory that explains more is powerful.', d: [['limited', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The paperwork was ______, requiring the same signature on nine separate forms.', a: 'burdensome', g: 'Excessively demanding paperwork is burdensome.', d: [['effortless', 'opp'], ['coastal', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The novel’s world felt ______, built with the detail of a real place.', a: 'immersive', g: 'A world so detailed you sink into it is immersive.', d: [['shallow', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'Her reasoning was ______, each conclusion following cleanly from the last.', a: 'logical', g: 'Reasoning that follows step by step is logical.', d: [['muddled', 'opp'], ['humid', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The species is ______, found on only one small island.', a: 'rare', g: 'Something found in very few places is rare.', d: [['widespread', 'opp'], ['soluble', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The bridge’s repairs were ______, patched again and again over the years.', a: 'piecemeal', g: 'Done bit by bit rather than all at once is piecemeal.', d: [['comprehensive', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The mentor’s advice proved ______, useful long after the class ended.', a: 'enduring', g: 'Advice that lasts is enduring.', d: [['fleeting', 'opp'], ['edible', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The data were ______, riddled with gaps and contradictions.', a: 'unreliable', g: 'Data you cannot trust are unreliable.', d: [['trustworthy', 'opp'], ['humid', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The room fell ______ as the speaker approached the podium.', a: 'hushed', g: 'Growing suddenly quiet is falling hushed.', d: [['raucous', 'opp'], ['soluble', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The plan was ______, accounting for nearly every possible setback.', a: 'comprehensive', g: 'A plan covering everything is comprehensive.', d: [['partial', 'opp'], ['coastal', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The critic’s tone grew ______, softening as she found more to admire.', a: 'warmer', g: 'Becoming more favorable is growing warmer.', d: [['harsher', 'opp'], ['fragrant', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The invention was ______, unlike anything the field had seen before.', a: 'novel', g: 'Something genuinely new is novel.', d: [['conventional', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The account was ______, leaving out the one fact that mattered most.', a: 'incomplete', g: 'An account missing key parts is incomplete.', d: [['exhaustive', 'opp'], ['humid', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The audience’s attention was ______, drifting long before the final act.', a: 'waning', g: 'Attention that is fading is waning.', d: [['mounting', 'opp'], ['soluble', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The bridge’s cables were ______, able to bear far more than the load.', a: 'sturdy', g: 'Strong and dependable is sturdy.', d: [['frail', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The professor’s prose was ______, dense with terms only experts knew.', a: 'technical', g: 'Writing full of specialist terms is technical.', d: [['accessible', 'opp'], ['edible', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The scientist’s manner was ______, giving nothing away until the data were complete.', a: 'guarded', g: 'Cautiously withholding is being guarded.', d: [['open', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The critic praised the design as ______, functioning as well as it looked.', a: 'practical', g: 'Useful and functional is practical.', d: [['decorative', 'opp'], ['soluble', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The instructions were ______, omitting the one step that mattered.', a: 'deficient', g: 'Lacking something essential is deficient.', d: [['complete', 'opp'], ['humid', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The performance felt ______, every gesture rehearsed to the second.', a: 'calculated', g: 'Carefully planned for effect is calculated.', d: [['spontaneous', 'opp'], ['metallic', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The town’s support for the plan was ______, growing louder with each meeting.', a: 'mounting', g: 'Steadily increasing support is mounting.', d: [['fading', 'opp'], ['edible', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'Her tone was ______, refusing to soften even under pressure.', a: 'firm', g: 'Unyielding and resolute is firm.', d: [['wavering', 'opp'], ['fragrant', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The theory was ______, ignoring several well-known exceptions.', a: 'incomplete', g: 'Leaving out known cases makes a theory incomplete.', d: [['exhaustive', 'opp'], ['humid', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The garden’s upkeep was ______, tended daily without fail.', a: 'diligent', g: 'Steady, careful upkeep is diligent.', d: [['neglectful', 'opp'], ['soluble', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The proposal met with ______ approval, passing without a single objection.', a: 'unanimous', g: 'Agreed by everyone is unanimous.', d: [['divided', 'opp'], ['fragrant', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The old translation was ______, missing the poem’s music entirely.', a: 'lifeless', g: 'Flat and without spirit is lifeless.', d: [['vibrant', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The manager’s decisions were ______, changing with each passing mood.', a: 'inconsistent', g: 'Not steady or predictable is inconsistent.', d: [['dependable', 'opp'], ['coastal', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The lecture was ______, sparking questions long after it ended.', a: 'stimulating', g: 'Thought-provoking and engaging is stimulating.', d: [['dull', 'opp'], ['humid', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The account was ______, agreeing with the records at every point.', a: 'accurate', g: 'Free of error and matching the facts is accurate.', d: [['mistaken', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The path grew ______, so overgrown that the trail vanished.', a: 'impassable', g: 'Impossible to get through is impassable.', d: [['clear', 'opp'], ['edible', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The scientist’s claims were ______, tested and confirmed many times.', a: 'verified', g: 'Confirmed by testing is verified.', d: [['unproven', 'opp'], ['soluble', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The essay’s structure was ______, each section built on the last.', a: 'coherent', g: 'Clearly connected and logical is coherent.', d: [['disjointed', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The audience response was ______, warm applause filling the hall.', a: 'enthusiastic', g: 'Eager and hearty is enthusiastic.', d: [['lukewarm', 'opp'], ['humid', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The old bridge was ______, unsafe for anything heavier than a bicycle.', a: 'fragile', g: 'Weak and easily damaged is fragile.', d: [['robust', 'opp'], ['edible', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The report’s findings were ______, hedged with so many exceptions as to say little.', a: 'qualified', g: 'Limited by conditions is qualified.', d: [['absolute', 'opp'], ['coastal', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The author’s later style became ______, favoring silence over explanation.', a: 'restrained', g: 'Held back and understated is restrained.', d: [['exuberant', 'opp'], ['fragrant', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The bridge’s new coating proved ______, unchanged after a decade of storms.', a: 'durable', g: 'Long-lasting and hard to damage is durable.', d: [['perishable', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The lecturer’s style was ______, wandering far from the announced topic.', a: 'digressive', g: 'Straying from the point is digressive.', d: [['focused', 'opp'], ['soluble', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The evidence was ______, leaving no room for a second interpretation.', a: 'decisive', g: 'Settling the matter beyond doubt is decisive.', d: [['inconclusive', 'opp'], ['humid', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The mayor’s promises were ______, forgotten the week after the election.', a: 'fleeting', g: 'Short-lived and quickly gone is fleeting.', d: [['lasting', 'opp'], ['metallic', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The new hire was ______, mastering the software in a single afternoon.', a: 'adept', g: 'Highly skilled and quick to learn is adept.', d: [['inept', 'opp'], ['edible', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The critic’s review was ______, tearing into every scene.', a: 'scathing', g: 'Harshly and severely critical is scathing.', d: [['flattering', 'opp'], ['fragrant', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The path forward was ______, with no clear next step in sight.', a: 'uncertain', g: 'Not settled or clear is uncertain.', d: [['obvious', 'opp'], ['humid', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The design’s appeal was ______, admired by nearly everyone who saw it.', a: 'broad', g: 'Wide-reaching and general is broad.', d: [['narrow', 'opp'], ['soluble', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The scientist was ______ about the timeline, refusing to name a date.', a: 'noncommittal', g: 'Unwilling to commit to a definite stance is noncommittal.', d: [['emphatic', 'opp'], ['fragrant', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The old software was ______, unable to open the newer files.', a: 'outdated', g: 'No longer current or usable is outdated.', d: [['cutting-edge', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The volunteers’ energy was ______, still strong at the end of the long day.', a: 'undiminished', g: 'Not lessened at all is undiminished.', d: [['exhausted', 'opp'], ['coastal', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The report’s tone was ______, careful never to alarm its readers.', a: 'measured', g: 'Calm and deliberately controlled is measured.', d: [['alarmist', 'opp'], ['humid', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The trail’s difficulty was ______, gentle at first and brutal near the top.', a: 'uneven', g: 'Varying and inconsistent is uneven.', d: [['uniform', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The professor’s knowledge was ______, spanning half a dozen fields.', a: 'encyclopedic', g: 'Vast and covering everything is encyclopedic.', d: [['limited', 'opp'], ['edible', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The company’s claims were ______, unsupported by any real data.', a: 'baseless', g: 'Without foundation or support is baseless.', d: [['well-founded', 'opp'], ['soluble', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The dancer’s movements were ______, flowing without a single pause.', a: 'fluid', g: 'Smooth and continuous is fluid.', d: [['jerky', 'opp'], ['humid', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The instructions were ______, assuming knowledge the reader lacked.', a: 'inadequate', g: 'Not sufficient for the purpose is inadequate.', d: [['sufficient', 'opp'], ['fragrant', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The negotiator was ______, unwilling to yield even a small point.', a: 'inflexible', g: 'Rigid and unwilling to bend is inflexible.', d: [['accommodating', 'opp'], ['edible', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The findings were ______, confirmed by three separate teams.', a: 'reliable', g: 'Dependable and confirmed is reliable.', d: [['dubious', 'opp'], ['coastal', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The essay’s claims grew ______, reaching well past the evidence.', a: 'overstated', g: 'Exaggerated beyond what is supported is overstated.', d: [['understated', 'opp'], ['fragrant', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The town’s welcome was ______, every door open to the newcomers.', a: 'gracious', g: 'Warm and generous in spirit is gracious.', d: [['hostile', 'opp'], ['humid', 'unrel'], ['metallic', 'unrel']] },
+    { s: 'The plan’s logic was ______, each part supporting the next.', a: 'sound', g: 'Well-reasoned and free of flaws is sound.', d: [['faulty', 'opp'], ['edible', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The museum’s labels were ______, explaining just enough without crowding the art.', a: 'judicious', g: 'Showing good, careful judgment is judicious.', d: [['careless', 'opp'], ['soluble', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The storm’s damage was ______, sparing all but a few roofs.', a: 'minimal', g: 'Very small in extent is minimal.', d: [['extensive', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The witness seemed ______, changing key details with each retelling.', a: 'unreliable', g: 'Not to be depended on is unreliable.', d: [['trustworthy', 'opp'], ['humid', 'unrel'], ['circular', 'unrel']] },
+    { s: 'The music swelled to a ______ finish, filling the whole hall.', a: 'triumphant', g: 'Joyfully victorious is triumphant.', d: [['mournful', 'opp'], ['metallic', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The scientist’s notes were ______, easy for anyone to follow.', a: 'orderly', g: 'Neat and well-organized is orderly.', d: [['chaotic', 'opp'], ['edible', 'unrel'], ['spherical', 'unrel']] },
+    { s: 'The proposal met with ______ resistance, opposed at every turn.', a: 'fierce', g: 'Intense and strong is fierce.', d: [['mild', 'opp'], ['soluble', 'unrel'], ['coastal', 'unrel']] },
+    { s: 'The old map proved ______, matching the coastline exactly.', a: 'reliable', g: 'Dependably correct is reliable.', d: [['misleading', 'opp'], ['fragrant', 'unrel'], ['annual', 'unrel']] },
+    { s: 'The lecture’s pace was ______, too quick for anyone to take notes.', a: 'brisk', g: 'Quick and energetic is brisk.', d: [['leisurely', 'opp'], ['humid', 'unrel'], ['metallic', 'unrel']] },
   ];
-
   function genWordsContext() {
     const item = pick(WORDS);
-    const opts = shuffle([{ word: item.ans, correct: true }, ...item.wrong.map(w => ({ word: w[0], why: w[1] }))]);
-    const letters = ['A', 'B', 'C', 'D'];
-    const whyWrong = {};
-    let answer = 'A';
-    const choices = opts.map((o, i) => {
-      if (o.correct) answer = letters[i];
-      else whyWrong[letters[i]] = `“${cap(o.word)}” ${o.why}.`;
-      return { letter: letters[i], text: o.word };
-    });
-    const text = `${item.text}\n\nWhich choice completes the text with the most logical and precise word or phrase?`;
+    const distractors = item.d.map(([w, tag]) => ({ text: w, why: WHY_WORD[tag](w) }));
+    const { choices, answer, whyWrong } = buildChoices(item.a, distractors);
     return finalize({
       skill: 'words-context',
-      text, choices, answer, whyWrong,
-      explanation: `${item.gloss} “${cap(item.ans)}” is the precise fit.`,
+      text: `${item.s}\n\nWhich choice completes the text with the most logical and precise word?`,
+      choices, answer, whyWrong,
+      explanation: `${item.g} “${cap(item.a)}” is the precise fit.`,
     });
   }
 
-  /* ===================== SHARED FINALIZER ===================== */
-  function finalize(q) {
-    const sig = (typeof qSignature === 'function')
-      ? qSignature(q)
-      : String((q.text || '').length) + '-' + q.answer;
-    const skill = q.skill;
-    return {
-      ...q,
-      origin: 'generated',
-      source: 'blueprint-generated',
-      typeId: 'rwgen-' + skill,
-      sig,
-      variantId: 'rwgen-' + skill + '#' + sig,
-      difficulty: (typeof TIER_LABEL !== 'undefined' ? (TIER_LABEL[2] || 'Medium') : 'Medium'),
-      timeTarget: (typeof TIME_TARGETS !== 'undefined' && TIME_TARGETS.rw) ? (TIME_TARGETS.rw[2] || 60) : 60,
-      tip: (typeof SKILL_TIPS !== 'undefined' && SKILL_TIPS[skill]) ? SKILL_TIPS[skill][0] : '',
-    };
+  /* ===================== BOUNDARIES (punctuation) ===================== */
+  // Each entry is two INDEPENDENT clauses where the second does NOT rename or
+  // explain the first, so the only correct join is a period/semicolon and the
+  // colon option is unambiguously wrong. Choices show the junction words.
+  const BOUND = [
+    ['The museum opened in 1921', 'it soon became the city’s busiest attraction'],
+    ['The storm knocked out power for days', 'crews worked around the clock to restore it'],
+    ['The recipe calls for fresh basil', 'dried basil will work in a pinch'],
+    ['Sea otters wrap themselves in kelp while they sleep', 'the anchor keeps them from drifting away'],
+    ['The novel was rejected by twelve publishers', 'the thirteenth made it a bestseller'],
+    ['Volunteers planted two hundred trees on Saturday', 'they returned to water them all week'],
+    ['The comet will not return for centuries', 'astronomers photographed it for months this year'],
+    ['The bakery sells out of croissants by nine', 'regulars line up well before it opens'],
+    ['The bridge was closed for repairs', 'traffic backed up for miles on the detour'],
+    ['Honeybees communicate through movement', 'a looping dance points the hive toward food'],
+    ['The lecture ran long', 'no one in the packed hall left early'],
+    ['The river floods every spring', 'farmers plant only after the water recedes'],
+    ['The telescope captured thousands of images', 'researchers are still sorting through them'],
+    ['The factory switched to solar power', 'its energy bills dropped by half'],
+    ['The trail is steep near the summit', 'the view from the top rewards the climb'],
+    ['The orchestra tuned for several minutes', 'the audience waited in restless silence'],
+    ['The species was believed extinct', 'a hiker photographed one last spring'],
+    ['The city widened the avenue', 'congestion eased only briefly'],
+    ['The experiment failed the first time', 'the second run produced clear results'],
+    ['The library extended its hours', 'students packed the reading room past midnight'],
+    ['The glacier has retreated for decades', 'the meadow below is expanding each year'],
+    ['The chef changed the menu weekly', 'diners never quite knew what to expect'],
+    ['The satellite lost contact for an hour', 'engineers restored the signal by dawn'],
+    ['The team trailed at halftime', 'they scored twice in the final minutes'],
+    ['The archive digitized its oldest letters', 'scholars can now read them from anywhere'],
+    ['The drought lasted three years', 'the reservoir fell to record lows'],
+    ['The startup began in a garage', 'it now employs hundreds of people'],
+    ['The mural took two summers to finish', 'it covers the entire east wall'],
+    ['The vaccine required cold storage', 'clinics installed special freezers for it'],
+    ['The author writes only at dawn', 'she revises late into the evening'],
+    ['The reef lost half its color', 'divers documented the bleaching each week'],
+    ['The train was delayed by snow', 'passengers waited hours on the platform'],
+    ['The garden attracts dozens of species', 'birdwatchers visit it all summer'],
+    ['The company recalled the product', 'customers returned thousands of units'],
+    ['The volcano had been quiet for years', 'sensors detected new tremors last month'],
+    ['The professor posted the lecture online', 'enrollment in the course doubled'],
+    ['The old clock still keeps perfect time', 'no one has repaired it in a century'],
+    ['The harvest came early this year', 'the market overflowed with produce'],
+    ['The prototype passed every test', 'the team began building a full version'],
+    ['The coastline is eroding steadily', 'the town moved its road inland'],
+    ['The comet appears only once a lifetime', 'thousands gathered on the hills to watch it'],
+    ['The recipe has just four ingredients', 'the timing is what makes it difficult'],
+    ['The printing press arrived in the city in 1470', 'books soon spread far beyond the wealthy few'],
+    ['The marsh filters the town’s runoff', 'few residents realize how much work it does'],
+    ['The violinist practiced six hours a day', 'her hands ached long after the recital'],
+    ['The observatory sits above the clouds', 'its telescopes capture the clearest images in the country'],
+    ['The old mill has stood for two centuries', 'its wheel still turns in the spring current'],
+    ['The vaccine must stay frozen until use', 'clinics in the region lacked reliable power'],
+    ['The author set the novel in a real town', 'she changed the names of every street'],
+    ['The reef supports thousands of species', 'a single degree of warming can devastate it'],
+    ['The bakery bakes only what it can sell', 'nothing is left on the shelves by noon'],
+    ['The glacier calved a huge slab of ice', 'the wave it raised reached the far shore'],
+    ['The committee met for months', 'its final report ran to three hundred pages'],
+    ['The desert blooms briefly after rain', 'photographers travel for miles to see it'],
+    ['The engineer doubted the first results', 'she ran the test three more times'],
+    ['The library waived its late fees', 'returns jumped in the following weeks'],
+    ['The orchard lost half its trees to frost', 'the surviving ones bore fruit that fall'],
+    ['The satellite mapped the ocean floor', 'features no one had charted came into view'],
+    ['The town banned cars from the square', 'cafés spilled out onto the open pavement'],
+    ['The scientist labeled every sample', 'a single mix-up could ruin the whole study'],
+    ['The river once powered a dozen mills', 'only their stone foundations remain today'],
+    ['The choir rehearsed in the empty hall', 'their voices carried up into the rafters'],
+    ['The bridge sways gently in high wind', 'engineers designed it to bend rather than break'],
+    ['The museum acquired the painting in 1930', 'it has hung in the same room ever since'],
+    ['The startup outgrew its first office', 'it moved into a warehouse across town'],
+    ['The trail crosses three streams', 'hikers should expect wet boots by the end'],
+    ['The lecture drew a standing-room crowd', 'the department scheduled a second session'],
+    ['The wind farm powers the whole valley', 'its turbines are visible from every hilltop'],
+    ['The manuscript survived the fire', 'its charred edges are still visible today'],
+    ['The clinic opened a mobile unit', 'it now reaches villages far from the highway'],
+    ['The comet will not return for ages', 'astronomers recorded every detail they could'],
+    ['The garden attracts rare butterflies', 'volunteers plant only native flowers there'],
+    ['The factory recycles its own water', 'it draws almost nothing from the river now'],
+    ['The professor posts her lectures online', 'students from other schools follow along'],
+    ['The old theater reopened last spring', 'its velvet seats had been restored by hand'],
+    ['The storm flooded the lower streets', 'shopkeepers stacked sandbags before dawn'],
+    ['The species was named only recently', 'it had been photographed for years without a label'],
+    ['The town relies on a single well', 'a long drought would leave it with nothing'],
+    ['The runner set a new record', 'the crowd rose to its feet as she crossed the line'],
+    ['The observatory was built on a remote peak', 'city lights would have washed out the faint stars'],
+    ['The novelist wrote in longhand', 'her editor typed each chapter as it arrived'],
+    ['The wetland stores floodwater each spring', 'the town downstream has stayed dry for years'],
+    ['The bakery roasts its own coffee', 'the aroma drifts halfway down the block'],
+    ['The expedition mapped the cave system', 'passages far deeper still remain unexplored'],
+    ['The vaccine reached the village by boat', 'the nearest road ended miles away'],
+    ['The orchestra lost its concert hall to fire', 'it performed in a tent for the entire season'],
+    ['The species migrates thousands of miles', 'a single wrong turn can prove fatal'],
+    ['The archive receives new donations weekly', 'its shelves are nearly full already'],
+    ['The startup began with three employees', 'it now fills two floors of the building'],
+    ['The dam holds back the spring melt', 'the valley below has not flooded in decades'],
+    ['The painter worked only in daylight', 'the colors looked wrong under lamps'],
+    ['The town restored its old theater', 'weekend shows now sell out months ahead'],
+    ['The glacier feeds the river all summer', 'the fields depend on its steady flow'],
+    ['The scientist repeated the trial ten times', 'the result never varied by more than a hair'],
+    ['The library digitized its rarest maps', 'scholars abroad can finally study them'],
+    ['The comet last appeared in 1910', 'few alive today have seen it with their own eyes'],
+    ['The reef recovered after the ban on fishing', 'schools of fish returned within a few years'],
+    ['The bridge carries thousands of cars daily', 'engineers inspect it every single month'],
+    ['The garden was planted for the bees', 'butterflies and hummingbirds arrived as well'],
+    ['The composer wrote the symphony in a month', 'it took the orchestra a year to master it'],
+    ['The trail was rebuilt after the landslide', 'hikers returned to it the following spring'],
+    ['The telescope detected the faint signal', 'engineers spent weeks confirming it was real'],
+    ['The bakery uses a century-old recipe', 'the bread tastes exactly as it did then'],
+    ['The village had no paved roads', 'supplies arrived only by mule for decades'],
+    ['The startup raised money quickly', 'spending it wisely proved far harder'],
+    ['The reef teems with life at dawn', 'by midday most of the fish have hidden'],
+    ['The archive holds a million photographs', 'only a fraction have ever been cataloged'],
+    ['The dam generates power for the city', 'it drowned three villages when it was built'],
+    ['The author kept a strict schedule', 'she wrote a thousand words before breakfast'],
+    ['The clinic serves the entire county', 'its waiting room is never truly empty'],
+    ['The comet passed close to Earth', 'astronomers had waited years for the chance'],
+    ['The bridge sways in strong gusts', 'its engineers insist it is perfectly safe'],
+    ['The museum acquired the sculpture at auction', 'crowds lined up to see it the next day'],
+    ['The forest recovered after the fire', 'young pines now cover the blackened slopes'],
+    ['The factory runs day and night', 'its lights are visible from the highway'],
+    ['The scientist doubted the first reading', 'a second instrument confirmed it hours later'],
+    ['The library sits at the town’s center', 'nearly every resident holds a card there'],
+    ['The glacier feeds two rivers', 'its slow retreat worries the farmers downstream'],
+    ['The orchestra toured for a decade', 'it finally recorded the symphony last year'],
+    ['The garden needs little water', 'its plants are all native to the desert'],
+    ['The startup shipped its first product late', 'customers had already lost interest'],
+    ['The old lighthouse still stands', 'a small museum now occupies its base'],
+    ['The storm knocked out the bridge', 'the ferry became the only way across'],
+    ['The team analyzed years of data', 'a clear pattern emerged only at the end'],
+    ['The vineyard sits on a steep hill', 'every grape there is picked by hand'],
+    ['The city planted a thousand trees', 'the avenues are noticeably cooler now'],
+    ['The manuscript was nearly lost', 'a librarian found it behind a shelf'],
+    ['The theater seats only a hundred', 'its shows sell out within minutes'],
+    ['The river flooded the market square', 'vendors moved their stalls uphill for weeks'],
+  ];
+  const BOUND_WHY = {
+    comma: 'A comma alone cannot join two complete sentences — that creates a comma splice.',
+    fused: 'Two complete sentences run together with no punctuation form a run-on.',
+    colon: 'A colon should follow a clause that introduces or explains what comes next, which isn’t the case here.',
+  };
+  function genBoundaries() {
+    const [c1, c2] = pick(BOUND);
+    const last = c1.split(' ').pop().replace(/[.,;:]$/, '');
+    const first = lower1(c2).split(' ')[0];
+    const useSemicolon = Math.random() < 0.5;
+    const correctText = useSemicolon ? `${last}; ${first}` : `${last}. ${cap(first)}`;
+    const distractors = [
+      { text: `${last}, ${first}`, why: BOUND_WHY.comma },
+      { text: `${last} ${first}`, why: BOUND_WHY.fused },
+      { text: `${last}: ${first}`, why: BOUND_WHY.colon },
+    ];
+    const { choices, answer, whyWrong } = buildChoices(correctText, distractors);
+    return finalize({
+      skill: 'boundaries',
+      text: `${c1} ______ ${lower1(c2)}.\n\nWhich choice completes the text so that it conforms to the conventions of Standard English?`,
+      choices, answer, whyWrong,
+      explanation: `The two parts are each complete sentences, so they need a full stop between them. ${useSemicolon ? 'A semicolon' : 'A period'} correctly separates them; a comma would splice them and no punctuation would run them together.`,
+    });
   }
 
-  const RW_GENERATORS = { 'transitions': genTransition, 'words-context': genWordsContext };
+  /* ===================== FORM, STRUCTURE & SENSE ===================== */
+  // Subject–verb agreement / verb tense. Each entry fixes the correct form; the
+  // distractors are the wrong number, tense, or non-finite form.
+  const WHY_FORM = {
+    agr: 'This verb doesn’t agree in number with the subject.',
+    tense: 'This tense doesn’t match the time frame the sentence establishes.',
+    nonfinite: 'This is a non-finite form and can’t serve as the sentence’s main verb.',
+    plural: 'This treats a singular subject as plural (or vice versa).',
+  };
+  // { s: sentence with ___ , a: correct, d: [[form, tag]] }
+  const FORM = [
+    { s: 'The list of approved vendors ______ posted outside the office each morning.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Neither the manager nor the clerks ______ aware of the schedule change.', a: 'were', d: [['was', 'agr'], ['is', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Each of the paintings in the gallery ______ a small brass label.', a: 'has', d: [['have', 'agr'], ['were having', 'tense'], ['having', 'nonfinite']] },
+    { s: 'The team of researchers ______ its findings at the conference last spring.', a: 'presented', d: [['present', 'tense'], ['presents', 'tense'], ['presenting', 'nonfinite']] },
+    { s: 'By the time the bell rang, the students ______ already turned in their tests.', a: 'had', d: [['have', 'tense'], ['has', 'tense'], ['having', 'nonfinite']] },
+    { s: 'A flock of geese ______ across the gray November sky.', a: 'moves', d: [['move', 'agr'], ['are moving', 'agr'], ['moving', 'nonfinite']] },
+    { s: 'The data from the two trials ______ that the drug is effective.', a: 'suggest', d: [['suggests', 'agr'], ['is suggesting', 'agr'], ['suggesting', 'nonfinite']] },
+    { s: 'Several of the bridges in the region ______ inspected every year.', a: 'are', d: [['is', 'agr'], ['was', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The chef, along with her two assistants, ______ the kitchen before dawn.', a: 'enters', d: [['enter', 'agr'], ['are entering', 'agr'], ['entering', 'nonfinite']] },
+    { s: 'Last year the museum ______ a record number of visitors.', a: 'welcomed', d: [['welcomes', 'tense'], ['welcome', 'tense'], ['welcoming', 'nonfinite']] },
+    { s: 'The number of applicants ______ grown steadily since the program began.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'Mathematics ______ a required subject at the school for over a century.', a: 'has been', d: [['have been', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'When the storm finally passed, the river ______ back within its banks.', a: 'receded', d: [['recedes', 'tense'], ['recede', 'tense'], ['receding', 'nonfinite']] },
+    { s: 'One of the oldest clocks in the country still ______ in the tower.', a: 'chimes', d: [['chime', 'agr'], ['are chiming', 'agr'], ['chiming', 'nonfinite']] },
+    { s: 'The committee ______ its recommendations in a report next month.', a: 'will release', d: [['released', 'tense'], ['releases', 'tense'], ['releasing', 'nonfinite']] },
+    { s: 'Both of the proposals ______ merit, though only one can be funded.', a: 'have', d: [['has', 'agr'], ['is having', 'agr'], ['having', 'nonfinite']] },
+    { s: 'The collection of rare coins ______ kept in a locked case.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Every summer, the volunteers ______ the trails before the hiking season.', a: 'clear', d: [['clears', 'agr'], ['is clearing', 'agr'], ['clearing', 'nonfinite']] },
+    { s: 'The scientist noted that light ______ faster than sound.', a: 'travels', d: [['traveled', 'tense'], ['travel', 'agr'], ['traveling', 'nonfinite']] },
+    { s: 'Neither of the answers ______ correct, the teacher explained.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The orchestra ______ three new works during the coming season.', a: 'will perform', d: [['performed', 'tense'], ['performs', 'tense'], ['performing', 'nonfinite']] },
+    { s: 'A series of lectures ______ scheduled for the fall semester.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The twins, who rarely disagree, ______ on where to eat that night.', a: 'argued', d: [['argues', 'agr'], ['is arguing', 'agr'], ['arguing', 'nonfinite']] },
+    { s: 'The quality of the recordings ______ improved with the new equipment.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'Physics ______ the branch of science that most fascinated her as a child.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The crew ______ the set overnight so filming could resume at dawn.', a: 'rebuilt', d: [['rebuilds', 'tense'], ['rebuild', 'tense'], ['rebuilding', 'nonfinite']] },
+    { s: 'Most of the evidence ______ toward a single conclusion.', a: 'points', d: [['point', 'agr'], ['are pointing', 'agr'], ['pointing', 'nonfinite']] },
+    { s: 'The pair of scissors ______ dull, so she sharpened them.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Since 2010, the town ______ nearly doubled in population.', a: 'has', d: [['have', 'agr'], ['is', 'agr'], ['having', 'nonfinite']] },
+    { s: 'The professor, together with her students, ______ the fossils last week.', a: 'examined', d: [['examines', 'tense'], ['examine', 'agr'], ['examining', 'nonfinite']] },
+    { s: 'Each of the runners ______ given a numbered bib before the race.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The findings, published last month, ______ earlier assumptions.', a: 'challenge', d: [['challenges', 'agr'], ['is challenging', 'agr'], ['challenging', 'nonfinite']] },
+    { s: 'None of the water ______ suitable for drinking after the spill.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The board ______ the budget before the fiscal year ends.', a: 'will approve', d: [['approved', 'tense'], ['approves', 'tense'], ['approving', 'nonfinite']] },
+    { s: 'A variety of birds ______ the feeder throughout the winter.', a: 'visits', d: [['visit', 'agr'], ['are visiting', 'agr'], ['visiting', 'nonfinite']] },
+    { s: 'The engineers ______ the design several times before the launch.', a: 'had revised', d: [['have revised', 'tense'], ['revises', 'tense'], ['revising', 'nonfinite']] },
+    { s: 'The audience ______ on its feet as the final note faded.', a: 'rises', d: [['rise', 'agr'], ['are rising', 'agr'], ['rising', 'nonfinite']] },
+    { s: 'Statistics ______ often misunderstood by people who skip the fine print.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The set of instructions ______ printed on the back of the box.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The archaeologists ______ the site long before the highway was proposed.', a: 'had mapped', d: [['have mapped', 'tense'], ['maps', 'tense'], ['mapping', 'nonfinite']] },
+    { s: 'The bouquet of wildflowers ______ brightening the entryway all week.', a: 'has been', d: [['have been', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Neither the coach nor the players ______ satisfied with the tie.', a: 'were', d: [['was', 'agr'], ['is', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Each of the volunteers ______ a role before the event began.', a: 'was given', d: [['were given', 'agr'], ['are given', 'agr'], ['giving', 'nonfinite']] },
+    { s: 'Long before the guests arrived, the host ______ the table.', a: 'had set', d: [['have set', 'tense'], ['sets', 'tense'], ['setting', 'nonfinite']] },
+    { s: 'A swarm of bees ______ around the old oak every afternoon.', a: 'gathers', d: [['gather', 'agr'], ['are gathering', 'agr'], ['gathering', 'nonfinite']] },
+    { s: 'The evidence from the interviews ______ the earlier theory.', a: 'contradicts', d: [['contradict', 'agr'], ['are contradicting', 'agr'], ['contradicting', 'nonfinite']] },
+    { s: 'Several of the tunnels ______ sealed off decades ago.', a: 'were', d: [['was', 'agr'], ['is', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The director, along with the actors, ______ the set every evening.', a: 'reviews', d: [['review', 'agr'], ['are reviewing', 'agr'], ['reviewing', 'nonfinite']] },
+    { s: 'Last winter the harbor ______ over for the first time in years.', a: 'froze', d: [['freezes', 'tense'], ['freeze', 'tense'], ['freezing', 'nonfinite']] },
+    { s: 'The number of complaints ______ dropped since the redesign.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'Economics ______ been her favorite subject since high school.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'Once the tide went out, the boats ______ gently in the mud.', a: 'settled', d: [['settles', 'tense'], ['settle', 'tense'], ['settling', 'nonfinite']] },
+    { s: 'One of the paintings in the hall still ______ visitors after a century.', a: 'draws', d: [['draw', 'agr'], ['are drawing', 'agr'], ['drawing', 'nonfinite']] },
+    { s: 'The council ______ its decision at next week’s meeting.', a: 'will announce', d: [['announced', 'tense'], ['announces', 'tense'], ['announcing', 'nonfinite']] },
+    { s: 'Both of the routes ______ hazards in winter, the guide warned.', a: 'have', d: [['has', 'agr'], ['is having', 'agr'], ['having', 'nonfinite']] },
+    { s: 'The bundle of letters ______ tied with a faded ribbon.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Every autumn, the rangers ______ the campsites for the season.', a: 'close', d: [['closes', 'agr'], ['is closing', 'agr'], ['closing', 'nonfinite']] },
+    { s: 'The teacher explained that water ______ at a lower temperature at altitude.', a: 'boils', d: [['boiled', 'tense'], ['boil', 'agr'], ['boiling', 'nonfinite']] },
+    { s: 'Neither of the maps ______ the new trail, the ranger noticed.', a: 'shows', d: [['show', 'agr'], ['are showing', 'agr'], ['showing', 'nonfinite']] },
+    { s: 'A collection of essays ______ due out from the press this fall.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The siblings, who seldom agree, ______ instantly about the plan.', a: 'clashed', d: [['clashes', 'agr'], ['is clashing', 'agr'], ['clashing', 'nonfinite']] },
+    { s: 'The clarity of the recordings ______ surprised the engineers.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'The herd of elk ______ down from the ridge as snow fell.', a: 'moves', d: [['move', 'agr'], ['are moving', 'agr'], ['moving', 'nonfinite']] },
+    { s: 'By nightfall the crew ______ the last of the cargo.', a: 'had unloaded', d: [['have unloaded', 'tense'], ['unloads', 'tense'], ['unloading', 'nonfinite']] },
+    { s: 'Most of the funding ______ come from a single donor.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'The pair of gloves ______ missing after the trip.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Since the bridge opened, the commute ______ by twenty minutes.', a: 'has shortened', d: [['have shortened', 'agr'], ['shortens', 'tense'], ['shortening', 'nonfinite']] },
+    { s: 'The curator, together with two interns, ______ the exhibit last month.', a: 'installed', d: [['installs', 'tense'], ['install', 'agr'], ['installing', 'nonfinite']] },
+    { s: 'None of the milk ______ left after breakfast.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The panel ______ its verdict before the deadline passes.', a: 'will deliver', d: [['delivered', 'tense'], ['delivers', 'tense'], ['delivering', 'nonfinite']] },
+    { s: 'A range of colors ______ available in the new collection.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The technicians ______ the machine twice before the demonstration.', a: 'had tested', d: [['have tested', 'tense'], ['tests', 'tense'], ['testing', 'nonfinite']] },
+    { s: 'The crowd ______ to its feet as the runners entered the stadium.', a: 'surges', d: [['surge', 'agr'], ['are surging', 'agr'], ['surging', 'nonfinite']] },
+    { s: 'Mathematics, she often said, ______ a language of its own.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The stack of applications ______ reviewed by two readers each.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The surveyors ______ the boundary long before the dispute arose.', a: 'had marked', d: [['have marked', 'tense'], ['marks', 'tense'], ['marking', 'nonfinite']] },
+    { s: 'One of the clocks in the museum still ______ the hour.', a: 'strikes', d: [['strike', 'agr'], ['are striking', 'agr'], ['striking', 'nonfinite']] },
+    { s: 'A flock of starlings ______ across the field at dusk.', a: 'wheels', d: [['wheel', 'agr'], ['are wheeling', 'agr'], ['wheeling', 'nonfinite']] },
+    { s: 'The board ______ the proposal after the audit is complete.', a: 'will reconsider', d: [['reconsidered', 'tense'], ['reconsiders', 'tense'], ['reconsidering', 'nonfinite']] },
+    { s: 'The array of solar panels ______ enough power for the whole farm.', a: 'generates', d: [['generate', 'agr'], ['are generating', 'agr'], ['generating', 'nonfinite']] },
+    { s: 'Neither the author nor her editors ______ noticed the error.', a: 'had', d: [['has', 'agr'], ['is', 'agr'], ['having', 'nonfinite']] },
+    { s: 'Each of the samples ______ tested twice for accuracy.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'By the time help arrived, the campers ______ already built a fire.', a: 'had', d: [['have', 'tense'], ['has', 'tense'], ['having', 'nonfinite']] },
+    { s: 'A cluster of galaxies ______ millions of light-years across.', a: 'stretches', d: [['stretch', 'agr'], ['are stretching', 'agr'], ['stretching', 'nonfinite']] },
+    { s: 'The results of the survey ______ a clear preference among readers.', a: 'reveal', d: [['reveals', 'agr'], ['is revealing', 'agr'], ['revealing', 'nonfinite']] },
+    { s: 'Several of the murals ______ painted over during the renovation.', a: 'were', d: [['was', 'agr'], ['is', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The captain, along with the crew, ______ the deck before every voyage.', a: 'inspects', d: [['inspect', 'agr'], ['are inspecting', 'agr'], ['inspecting', 'nonfinite']] },
+    { s: 'Two summers ago, the lake ______ so low that boats could not launch.', a: 'fell', d: [['falls', 'tense'], ['fall', 'tense'], ['falling', 'nonfinite']] },
+    { s: 'The number of visitors ______ risen sharply since the trail reopened.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'Politics ______ never far from the dinner conversation in that house.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'After the whistle blew, the players ______ off the field.', a: 'walked', d: [['walks', 'tense'], ['walk', 'tense'], ['walking', 'nonfinite']] },
+    { s: 'One of the engines still ______ a faint rattle at high speed.', a: 'makes', d: [['make', 'agr'], ['are making', 'agr'], ['making', 'nonfinite']] },
+    { s: 'The jury ______ its decision once the testimony ends.', a: 'will render', d: [['rendered', 'tense'], ['renders', 'tense'], ['rendering', 'nonfinite']] },
+    { s: 'Both of the theories ______ support in the recent data.', a: 'find', d: [['finds', 'agr'], ['is finding', 'agr'], ['finding', 'nonfinite']] },
+    { s: 'The set of keys ______ hanging by the door where she left it.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Each spring, the students ______ the riverbank for their science project.', a: 'survey', d: [['surveys', 'agr'], ['is surveying', 'agr'], ['surveying', 'nonfinite']] },
+    { s: 'The guide reminded us that sound ______ faster in water than in air.', a: 'travels', d: [['traveled', 'tense'], ['travel', 'agr'], ['traveling', 'nonfinite']] },
+    { s: 'Neither of the routes ______ marked on the old map.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'A handful of errors ______ enough to sink the whole report.', a: 'were', d: [['was', 'agr'], ['is', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The row of streetlights ______ the whole avenue after dark.', a: 'illuminates', d: [['illuminate', 'agr'], ['are illuminating', 'agr'], ['illuminating', 'nonfinite']] },
+    { s: 'Neither the pilots nor the crew ______ told of the delay.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Each of the recipes ______ a photograph beside it.', a: 'has', d: [['have', 'agr'], ['were having', 'tense'], ['having', 'nonfinite']] },
+    { s: 'By the time the tour ended, the group ______ every gallery.', a: 'had seen', d: [['have seen', 'tense'], ['sees', 'tense'], ['seeing', 'nonfinite']] },
+    { s: 'A pack of wolves ______ the ridge at dusk each evening.', a: 'crosses', d: [['cross', 'agr'], ['are crossing', 'agr'], ['crossing', 'nonfinite']] },
+    { s: 'The results of the audit ______ several errors in the ledger.', a: 'expose', d: [['exposes', 'agr'], ['is exposing', 'agr'], ['exposing', 'nonfinite']] },
+    { s: 'Several of the statues ______ moved to the new wing.', a: 'were', d: [['was', 'agr'], ['is', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The novelist, along with her translators, ______ at the festival each year.', a: 'appears', d: [['appear', 'agr'], ['are appearing', 'agr'], ['appearing', 'nonfinite']] },
+    { s: 'Two winters ago, the pond ______ thick enough to skate on.', a: 'froze', d: [['freezes', 'tense'], ['freeze', 'tense'], ['freezing', 'nonfinite']] },
+    { s: 'The number of species in the reserve ______ grown each year.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'Ethics ______ a required course for every first-year student.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Once the rain stopped, the workers ______ back to the roof.', a: 'climbed', d: [['climbs', 'tense'], ['climb', 'tense'], ['climbing', 'nonfinite']] },
+    { s: 'One of the printers still ______ the occasional blank page.', a: 'produces', d: [['produce', 'agr'], ['are producing', 'agr'], ['producing', 'nonfinite']] },
+    { s: 'The committee ______ its findings once the review is done.', a: 'will publish', d: [['published', 'tense'], ['publishes', 'tense'], ['publishing', 'nonfinite']] },
+    { s: 'Both of the maps ______ the river in the wrong place.', a: 'show', d: [['shows', 'agr'], ['is showing', 'agr'], ['showing', 'nonfinite']] },
+    { s: 'The box of tools ______ left out in the rain overnight.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Every winter, the rangers ______ the shelters for hikers.', a: 'stock', d: [['stocks', 'agr'], ['is stocking', 'agr'], ['stocking', 'nonfinite']] },
+    { s: 'The instructor noted that heat ______ upward through the vents.', a: 'rises', d: [['rose', 'tense'], ['rise', 'agr'], ['rising', 'nonfinite']] },
+    { s: 'Neither of the roads ______ plowed after the storm.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'A stack of contracts ______ waiting for her signature.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The twins, who rarely compete, ______ hard for the same prize.', a: 'trained', d: [['trains', 'agr'], ['is training', 'agr'], ['training', 'nonfinite']] },
+    { s: 'The scope of the changes ______ surprised the whole staff.', a: 'has', d: [['have', 'agr'], ['are', 'agr'], ['having', 'nonfinite']] },
+    { s: 'A colony of ants ______ the fallen fruit within minutes.', a: 'covers', d: [['cover', 'agr'], ['are covering', 'agr'], ['covering', 'nonfinite']] },
+    { s: 'By dawn the bakers ______ the day’s first loaves.', a: 'had shaped', d: [['have shaped', 'tense'], ['shapes', 'tense'], ['shaping', 'nonfinite']] },
+    { s: 'Much of the funding ______ yet to be approved.', a: 'is', d: [['are', 'agr'], ['were', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The pair of binoculars ______ heavier than it looked.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'Since the ban took effect, litter on the beach ______ sharply.', a: 'has fallen', d: [['have fallen', 'agr'], ['falls', 'tense'], ['falling', 'nonfinite']] },
+    { s: 'The director, together with the cast, ______ the theater last night.', a: 'toured', d: [['tours', 'tense'], ['tour', 'agr'], ['touring', 'nonfinite']] },
+    { s: 'None of the paint ______ usable after the long freeze.', a: 'was', d: [['were', 'agr'], ['are', 'agr'], ['being', 'nonfinite']] },
+    { s: 'The panel ______ its ruling as soon as the hearing closes.', a: 'will issue', d: [['issued', 'tense'], ['issues', 'tense'], ['issuing', 'nonfinite']] },
+  ];
+  function genFormSense() {
+    const item = pick(FORM);
+    const distractors = item.d.map(([w, tag]) => ({ text: w, why: WHY_FORM[tag] }));
+    const { choices, answer, whyWrong } = buildChoices(item.a, distractors);
+    return finalize({
+      skill: 'form-sense',
+      text: `${item.s.replace('______', '______')}\n\nWhich choice completes the text so that it conforms to the conventions of Standard English?`,
+      choices, answer, whyWrong,
+      explanation: `“${item.a}” is the form that agrees with the subject and fits the sentence’s time frame.`,
+    });
+  }
 
-  // Produce up to n freshly generated, text-distinct items for a skill.
+  /* ===================== RHETORICAL SYNTHESIS ===================== */
+  // Bullet notes + a goal; choose the sentence that best accomplishes the goal.
+  // Each entry supplies the correct sentence and three that miss the stated goal.
+  const SYNTH = [
+    { topic: 'a study of urban trees', notes: ['Oak trees were planted along Maple Street in 1995.', 'The trees now provide shade to the entire block.', 'Summer sidewalk temperatures there are 5°C lower than on nearby streets.'],
+      goal: 'emphasize the cooling effect of the trees',
+      correct: 'The oaks on Maple Street keep summer sidewalks 5°C cooler than those on nearby streets.',
+      wrongs: [['The oaks on Maple Street were planted in 1995.', 'states a date but says nothing about cooling.'], ['Maple Street has oak trees along its length.', 'describes the trees but not their cooling effect.'], ['Nearby streets do not have many oak trees.', 'focuses on other streets, not the cooling on Maple Street.']] },
+    { topic: 'two composers', notes: ['Composer A wrote mainly for solo piano.', 'Composer B wrote mainly for full orchestra.', 'Both drew heavily on folk melodies.'],
+      goal: 'emphasize a similarity between the two composers',
+      correct: 'Though they wrote for different forces, both composers built their music on folk melodies.',
+      wrongs: [['Composer A wrote for piano, while Composer B wrote for orchestra.', 'stresses a difference, not a similarity.'], ['Composer B preferred the full orchestra.', 'describes only one composer.'], ['The two composers lived in different centuries.', 'introduces a difference unrelated to the notes.']] },
+    { topic: 'a migrating shorebird', notes: ['The red knot flies from the Arctic to South America.', 'The trip covers about 15,000 kilometers.', 'It stops at only a few key feeding sites.'],
+      goal: 'emphasize the length of the journey',
+      correct: 'Each year the red knot travels roughly 15,000 kilometers between the Arctic and South America.',
+      wrongs: [['The red knot stops at only a few feeding sites.', 'highlights the stops, not the distance.'], ['The red knot breeds in the Arctic.', 'notes where it breeds, not how far it flies.'], ['South America is one end of the red knot’s range.', 'gives a location rather than the journey’s length.']] },
+    { topic: 'a new water filter', notes: ['The filter removes 99% of bacteria.', 'It costs about two dollars to make.', 'It needs no electricity to run.'],
+      goal: 'emphasize the filter’s affordability',
+      correct: 'The filter cleans water effectively for only about two dollars to produce.',
+      wrongs: [['The filter removes 99% of bacteria.', 'stresses effectiveness, not cost.'], ['The filter runs without electricity.', 'highlights convenience, not affordability.'], ['The filter is a recent invention.', 'says nothing about its low cost.']] },
+    { topic: 'an old manuscript', notes: ['The manuscript dates to the 1300s.', 'It was hidden in a monastery wall for centuries.', 'Scholars found it during a 2018 renovation.'],
+      goal: 'emphasize how recently the manuscript was discovered',
+      correct: 'Hidden for centuries, the manuscript came to light only during a 2018 renovation.',
+      wrongs: [['The manuscript dates to the 1300s.', 'gives its age, not the date of discovery.'], ['The manuscript was kept in a monastery.', 'notes its location, not when it was found.'], ['The manuscript is written on parchment.', 'describes its material, not its discovery.']] },
+    { topic: 'a coral restoration project', notes: ['Divers attached 4,000 coral fragments to the reef.', 'About 80% of the fragments survived the first year.', 'The reef now shelters more fish than before.'],
+      goal: 'emphasize the project’s success rate',
+      correct: 'Of the 4,000 coral fragments the divers planted, about 80% survived their first year.',
+      wrongs: [['Divers worked on the reef for many months.', 'describes effort, not the survival rate.'], ['The reef shelters more fish than it once did.', 'notes an outcome for fish, not the coral survival rate.'], ['Coral fragments were attached to the reef.', 'describes the method without the success rate.']] },
+    { topic: 'a historic railway', notes: ['The railway opened in 1869.', 'It connected two coasts for the first time.', 'A trip that once took months now took days.'],
+      goal: 'emphasize how the railway shortened travel time',
+      correct: 'The railway cut a cross-country journey from months to a matter of days.',
+      wrongs: [['The railway opened in 1869.', 'gives the opening date, not the change in travel time.'], ['The railway linked two coasts.', 'notes the connection, not the time saved.'], ['The railway was a major engineering feat.', 'praises the feat without mentioning travel time.']] },
+    { topic: 'a species of frog', notes: ['The glass frog has translucent skin.', 'Its internal organs are visible from below.', 'The trait may help it hide from predators.'],
+      goal: 'emphasize the possible purpose of the frog’s transparency',
+      correct: 'The glass frog’s see-through skin may help it avoid the eyes of predators.',
+      wrongs: [['The glass frog has translucent skin.', 'states the trait without its possible purpose.'], ['The glass frog’s organs are visible from below.', 'describes the trait, not why it might help.'], ['The glass frog lives in tropical forests.', 'gives habitat, not the purpose of transparency.']] },
+    { topic: 'a city bike-share program', notes: ['The program added 50 new stations last year.', 'Ridership rose by 40%.', 'Most new riders were first-time cyclists.'],
+      goal: 'emphasize the growth in ridership',
+      correct: 'After the expansion, ridership in the program climbed by 40%.',
+      wrongs: [['The program added 50 stations last year.', 'notes the expansion, not the rise in ridership.'], ['Many new riders had never cycled before.', 'describes who the riders were, not the growth.'], ['The program uses a smartphone app.', 'adds a detail unrelated to ridership growth.']] },
+    { topic: 'an experimental battery', notes: ['The battery charges in five minutes.', 'It holds enough power for a full day.', 'It uses no rare metals.'],
+      goal: 'emphasize how quickly the battery charges',
+      correct: 'The new battery reaches a full charge in just five minutes.',
+      wrongs: [['The battery lasts a full day on one charge.', 'stresses capacity, not charging speed.'], ['The battery avoids rare metals.', 'highlights materials, not speed.'], ['The battery is still being tested.', 'says nothing about how fast it charges.']] },
+    { topic: 'a pair of archaeological sites', notes: ['Site X held pottery but no metal tools.', 'Site Y held metal tools but little pottery.', 'Both were occupied around the same century.'],
+      goal: 'emphasize a difference between the two sites',
+      correct: 'Site X yielded pottery while Site Y yielded metal tools, pointing to different crafts.',
+      wrongs: [['Both sites were occupied in the same century.', 'stresses a similarity, not a difference.'], ['Site X contained a great deal of pottery.', 'describes only one site.'], ['The two sites lie near the same river.', 'adds a shared feature, not a difference.']] },
+    { topic: 'a reforestation effort', notes: ['Workers planted one million saplings.', 'The saplings covered 500 hectares of hillside.', 'The goal is to prevent landslides.'],
+      goal: 'emphasize the scale of the planting',
+      correct: 'The effort put one million saplings across 500 hectares of hillside.',
+      wrongs: [['The saplings are meant to prevent landslides.', 'gives the purpose, not the scale.'], ['Workers planted young trees on the hillside.', 'omits the scale figures entirely.'], ['The hillside had been bare for years.', 'describes the site, not the scale of planting.']] },
+    { topic: 'a jazz musician', notes: ['She recorded her first album at seventeen.', 'She later taught at a music conservatory.', 'Her students now perform worldwide.'],
+      goal: 'emphasize her influence as a teacher',
+      correct: 'The musicians she trained now perform on stages around the world.',
+      wrongs: [['She recorded her first album at seventeen.', 'highlights her own early career, not her teaching.'], ['She taught at a conservatory.', 'notes that she taught without showing her influence.'], ['She began performing as a teenager.', 'describes her performing, not her teaching influence.']] },
+    { topic: 'a desert plant', notes: ['The plant’s roots reach 30 meters down.', 'They tap water far below the surface.', 'This lets the plant survive long droughts.'],
+      goal: 'explain how the plant survives droughts',
+      correct: 'By sending roots 30 meters down to deep water, the plant endures long droughts.',
+      wrongs: [['The plant has very long roots.', 'notes the roots without explaining drought survival.'], ['The plant grows in the desert.', 'gives habitat, not the survival mechanism.'], ['The plant’s roots reach deep underground.', 'describes the roots but not how they aid survival.']] },
+    { topic: 'a public mural project', notes: ['Local teenagers designed the mural.', 'It took three months to paint.', 'It now covers a once-blank underpass.'],
+      goal: 'emphasize the community’s role in the project',
+      correct: 'Designed by local teenagers, the mural turned a blank underpass into neighborhood art.',
+      wrongs: [['The mural took three months to paint.', 'gives the timeline, not the community’s role.'], ['The mural covers an underpass.', 'notes the location, not who made it.'], ['The underpass had been blank for years.', 'describes the site, not community involvement.']] },
+    { topic: 'a study of sleep', notes: ['Volunteers slept two hours less for a week.', 'Their reaction times slowed noticeably.', 'A full night of sleep restored their speed.'],
+      goal: 'emphasize the effect of lost sleep on reaction time',
+      correct: 'After a week of short nights, the volunteers’ reaction times slowed noticeably.',
+      wrongs: [['A full night’s sleep restored the volunteers’ speed.', 'describes recovery, not the effect of lost sleep.'], ['Volunteers slept two hours less each night.', 'states the setup, not the effect on reactions.'], ['The study lasted one week.', 'gives duration, not the effect on reaction time.']] },
+    { topic: 'two rivers', notes: ['River A carries heavy sediment and runs brown.', 'River B runs clear over rock.', 'They meet at the edge of the city.'],
+      goal: 'emphasize the visible contrast where the rivers meet',
+      correct: 'Where the muddy River A joins the clear River B, the two colors run side by side.',
+      wrongs: [['The two rivers meet at the city’s edge.', 'gives the location, not the visible contrast.'], ['River A carries a great deal of sediment.', 'describes only one river.'], ['River B flows over a rocky bed.', 'describes only one river, not the contrast.']] },
+    { topic: 'a wind farm', notes: ['The farm has 60 turbines.', 'It powers about 40,000 homes.', 'It replaced an aging coal plant.'],
+      goal: 'emphasize how many homes the farm powers',
+      correct: 'The farm’s 60 turbines supply electricity to some 40,000 homes.',
+      wrongs: [['The farm replaced an old coal plant.', 'notes what it replaced, not how many homes it powers.'], ['The farm has 60 turbines.', 'counts turbines without the homes figure.'], ['The turbines stand on a windy ridge.', 'describes the site, not the homes powered.']] },
+    { topic: 'a childhood-literacy program', notes: ['The program gives free books to families.', 'Children in it read a year ahead of peers.', 'It now serves 200 towns.'],
+      goal: 'emphasize the program’s effect on reading level',
+      correct: 'Children in the program read about a year ahead of their peers.',
+      wrongs: [['The program serves 200 towns.', 'stresses reach, not reading level.'], ['The program hands out free books.', 'describes the method, not the effect on reading.'], ['The program is popular with families.', 'notes popularity, not reading level.']] },
+    { topic: 'a fossil discovery', notes: ['The fossil is of a winged reptile.', 'It is 150 million years old.', 'It preserves faint outlines of feathers.'],
+      goal: 'emphasize what makes the fossil unusual',
+      correct: 'Remarkably, the 150-million-year-old fossil preserves faint outlines of feathers.',
+      wrongs: [['The fossil is of a winged reptile.', 'identifies the animal without the unusual detail.'], ['The fossil is 150 million years old.', 'gives its age, not what makes it unusual.'], ['The fossil was found by a research team.', 'notes who found it, not its unusual feature.']] },
+    { topic: 'a solar-powered pump', notes: ['The pump lifts water from deep wells.', 'It runs entirely on sunlight.', 'It has cut villages’ fuel costs to nothing.'],
+      goal: 'emphasize the pump’s effect on fuel costs',
+      correct: 'By running on sunlight alone, the pump has erased the villages’ fuel costs.',
+      wrongs: [['The pump draws water from deep wells.', 'describes its function, not the cost effect.'], ['The pump relies on sunlight.', 'notes the power source without the cost effect.'], ['The pump is used in several villages.', 'gives its reach, not the effect on costs.']] },
+    { topic: 'two painters', notes: ['Painter A worked in tiny, precise strokes.', 'Painter B worked in broad, loose strokes.', 'Both painted the same harbor at dawn.'],
+      goal: 'emphasize a difference in the painters’ techniques',
+      correct: 'Painting the same harbor, one artist used tiny precise strokes while the other worked in broad, loose ones.',
+      wrongs: [['Both painters chose the same harbor at dawn.', 'stresses a similarity, not a difference.'], ['Painter A used very fine strokes.', 'describes only one painter.'], ['The two painters admired each other.', 'adds a detail not in the notes.']] },
+    { topic: 'a city composting program', notes: ['The program serves 20,000 households.', 'It has diverted 5,000 tons of waste from landfills.', 'The compost is given free to community gardens.'],
+      goal: 'emphasize how much waste the program has diverted',
+      correct: 'The program has kept 5,000 tons of waste out of landfills.',
+      wrongs: [['The program serves 20,000 households.', 'gives its reach, not the waste diverted.'], ['The compost goes to community gardens.', 'notes where compost goes, not the amount diverted.'], ['The program is run by the city.', 'names the operator, not the diverted amount.']] },
+    { topic: 'a rediscovered composer', notes: ['Her scores sat unplayed for eighty years.', 'A student found them in a library basement.', 'Orchestras now perform them worldwide.'],
+      goal: 'emphasize the current popularity of her music',
+      correct: 'Once forgotten, her scores are now performed by orchestras around the world.',
+      wrongs: [['Her scores went unplayed for eighty years.', 'stresses the long neglect, not current popularity.'], ['A student found the scores in a basement.', 'describes the discovery, not today’s popularity.'], ['The scores were stored in a library.', 'notes where they sat, not their popularity now.']] },
+    { topic: 'a bat species', notes: ['The bat eats thousands of insects each night.', 'Farmers nearby use less pesticide as a result.', 'The bat roosts in a single limestone cave.'],
+      goal: 'emphasize the bat’s benefit to nearby farms',
+      correct: 'By devouring thousands of insects nightly, the bat lets nearby farmers use far less pesticide.',
+      wrongs: [['The bat roosts in a limestone cave.', 'gives its home, not its benefit to farms.'], ['The bat eats thousands of insects a night.', 'states the diet without linking it to the farms.'], ['The bat is active only after dark.', 'notes when it feeds, not the benefit.']] },
+    { topic: 'a historic lighthouse', notes: ['The lighthouse was built in 1848.', 'Its light guided ships for over a century.', 'It was automated in 1970.'],
+      goal: 'emphasize how long the lighthouse guided ships before automation',
+      correct: 'From 1848 until it was automated in 1970, the lighthouse guided ships for more than a century.',
+      wrongs: [['The lighthouse was built in 1848.', 'gives only the start date.'], ['The lighthouse was automated in 1970.', 'gives the end of manual operation, not the span.'], ['The lighthouse still stands today.', 'notes its survival, not its span of service.']] },
+    { topic: 'a river cleanup', notes: ['Crews removed 40 tons of trash from the river.', 'Native fish returned within two years.', 'A riverside trail now draws daily walkers.'],
+      goal: 'emphasize the return of wildlife after the cleanup',
+      correct: 'Within two years of the cleanup, native fish returned to the river.',
+      wrongs: [['Crews pulled 40 tons of trash from the river.', 'describes the effort, not the wildlife’s return.'], ['A riverside trail now draws walkers.', 'notes human use, not the return of wildlife.'], ['The river runs through the city.', 'gives location, not the wildlife result.']] },
+    { topic: 'an ancient road', notes: ['The road stretched 2,000 kilometers.', 'It linked a dozen distant cities.', 'Traders used it for over 500 years.'],
+      goal: 'emphasize how long the road remained in use',
+      correct: 'Traders relied on the road for more than five centuries.',
+      wrongs: [['The road ran some 2,000 kilometers.', 'gives its length, not how long it was used.'], ['The road connected a dozen cities.', 'notes what it linked, not its span of use.'], ['The road crossed rugged terrain.', 'describes the route, not its longevity.']] },
+    { topic: 'a school garden', notes: ['Students grow vegetables in the garden.', 'The harvest supplies the cafeteria.', 'Test scores in science rose after it opened.'],
+      goal: 'emphasize the garden’s effect on science learning',
+      correct: 'Since the garden opened, students’ science scores have risen.',
+      wrongs: [['Students grow vegetables in the garden.', 'describes the activity, not the learning effect.'], ['The harvest goes to the cafeteria.', 'notes where food goes, not the science effect.'], ['The garden is tended by students.', 'names who tends it, not the effect on learning.']] },
+  ];
+  function genSynthesis() {
+    const item = pick(SYNTH);
+    const distractors = item.wrongs.map(([text, why]) => ({ text, why: `This choice ${why}` }));
+    const { choices, answer, whyWrong } = buildChoices(item.correct, distractors);
+    const notes = item.notes.map(n => '• ' + n).join('\n');
+    return finalize({
+      skill: 'synthesis',
+      text: `While researching ${item.topic}, a student took these notes:\n${notes}\n\nThe student wants to ${item.goal}. Which choice most effectively uses relevant information from the notes to accomplish this goal?`,
+      choices, answer, whyWrong,
+      explanation: `The goal is to ${item.goal}. Only this choice draws on the notes to do exactly that; the others report accurate details that don’t serve the stated goal.`,
+    }, 2);
+  }
+
+  /* ===================== REGISTER ===================== */
+  const RW_GENERATORS = {
+    transitions: genTransition,
+    'words-context': genWordsContext,
+    boundaries: genBoundaries,
+    'form-sense': genFormSense,
+    synthesis: genSynthesis,
+  };
+
   function rwGeneratedFor(skill, n) {
     const gen = RW_GENERATORS[skill];
     if (!gen) return [];
-    const out = [];
-    const seen = new Set();
-    let guard = 0;
-    while (out.length < n && guard++ < n * 8) {
-      const q = gen();
-      if (seen.has(q.text)) continue;
-      seen.add(q.text); out.push(q);
-    }
+    const out = [], seen = new Set(); let guard = 0;
+    while (out.length < n && guard++ < n * 10) { const q = gen(); if (seen.has(q.text)) continue; seen.add(q.text); out.push(q); }
     return out;
   }
-
   function rwHasGenerator(skill) { return !!RW_GENERATORS[skill]; }
 
-  // Export to the global scope for quiz.js / exam.js.
-  const g = (typeof window !== 'undefined') ? window : (typeof globalThis !== 'undefined' ? globalThis : this);
-  g.RW_GENERATORS = RW_GENERATORS;
-  g.rwGeneratedFor = rwGeneratedFor;
-  g.rwHasGenerator = rwHasGenerator;
-  g.genTransition = genTransition;
-  g.genWordsContext = genWordsContext;
+  // Expose framework + generators (rwgen2.js augments RW_GENERATORS and reuses
+  // the helpers below).
+  G.RW_GENERATORS = RW_GENERATORS;
+  G.rwGeneratedFor = rwGeneratedFor;
+  G.rwHasGenerator = rwHasGenerator;
+  G.rwgenFinalize = finalize;
+  G.rwgenBuildChoices = buildChoices;
+  G.rwgenHelpers = { ri, pick, shuffle, cap, lower1 };
+  G.genTransition = genTransition;
+  G.genWordsContext = genWordsContext;
+  G.genBoundaries = genBoundaries;
+  G.genFormSense = genFormSense;
+  G.genSynthesis = genSynthesis;
 })();
