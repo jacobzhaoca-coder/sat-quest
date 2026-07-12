@@ -238,7 +238,7 @@ function qKey(q) {
 function qIsGenerated(q) { return !q.id && !!(q.variantId || q.sig); }
 
 /* ---- Runthrough ---- */
-const RUNTHROUGH_SEEN_CAP = 4000; // plenty for a long campaign; keeps storage bounded
+const RUNTHROUGH_SEEN_CAP = 8000; // covers the full doubled generated pool (~5,000 R&W scenarios + math) before any tracking-induced repeat; still storage-bounded (~a few hundred KB)
 function ensureRunthrough() {
   if (!STATE) return;
   if (!STATE.runthrough || !STATE.runthrough.id) {

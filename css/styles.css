@@ -813,6 +813,13 @@ body.has-fab #app { padding-bottom: calc(var(--nav-h) + 84px); }
 .mb-due .mb-count { color: var(--gold-bright); }
 .muted.small { font-size: .76rem; }
 
+/* Runthrough freshness meter */
+.fresh-meter { margin: 12px 0 4px; padding: 10px 12px; background: var(--ink-800); border: 1px solid var(--line); border-radius: 12px; }
+.fresh-meter-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: .84rem; }
+.bar.fresh-bar { height: 8px; margin: 4px 0; }
+.bar.fresh-bar .bar-fill { background: linear-gradient(90deg, var(--teal), #7ff0c4); box-shadow: 0 0 10px rgba(69,224,168,.45); }
+.fresh-meter p { margin: 6px 0 0; }
+
 /* Flagged-questions list */
 .flag-list { display: flex; flex-direction: column; gap: 10px; }
 .flag-item { border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--ink-700); }

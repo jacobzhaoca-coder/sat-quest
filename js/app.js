@@ -1525,11 +1525,18 @@ route('settings', () => {
 /* Runthrough status + control. A runthrough is one campaign session; while it
    runs, fresh practice (levels, bosses, Daily Tower, Simulation Gate) avoids
    serving questions you've already seen this run. */
+// Approximate size of the original-practice content pool, from scripts/measure_pool.mjs.
+// Used only to show daily users how much fresh material remains; it is an unofficial
+// estimate, not a guarantee. Update alongside content passes.
+const POOL_ESTIMATE = { rwScenarios: 5600, mathVariants: 260000 };
+
 function runthroughCard() {
   ensureRunthrough();
   const rt = STATE.runthrough;
   const seenIds = (rt.seenIds || []).length, seenSigs = (rt.seenSigs || []).length;
   const started = new Date(rt.startedAt || Date.now());
+  const rwLeft = Math.max(0, POOL_ESTIMATE.rwScenarios - seenIds);
+  const explored = Math.min(100, Math.round((seenIds / POOL_ESTIMATE.rwScenarios) * 100));
   const card = el('section', { class: 'card' }, [
     el('h2', { text: '🧭 Runthrough' }),
     el('p', { class: 'muted', text: 'Fresh practice prioritizes questions you have not seen yet this runthrough. The Review Dungeon is the exception — it intentionally resurfaces missed questions.' }),
@@ -1537,6 +1544,15 @@ function runthroughCard() {
       statChip('👁️', 'R&W seen', seenIds),
       statChip('🔢', 'Math seen', seenSigs),
       statChip('📅', 'Started', `${started.getMonth() + 1}/${started.getDate()}`),
+    ]),
+    // Freshness meter — shows how much of the original-practice pool is still unseen.
+    el('div', { class: 'fresh-meter' }, [
+      el('div', { class: 'fresh-meter-head' }, [
+        el('span', { text: '🌱 Fresh pool remaining' }),
+        el('span', { class: 'muted small', text: `~${explored}% explored` }),
+      ]),
+      progressBar(explored / 100, 'fresh-bar'),
+      el('p', { class: 'muted small', text: `About ${rwLeft.toLocaleString()} unseen R&W scenarios and 250,000+ math variants remain this runthrough — repeats stay rare until a pool is genuinely exhausted. (Unofficial practice estimate.)` }),
     ]),
     el('button', { class: 'btn btn-ghost btn-block', text: '🔄 Start New Runthrough', onclick: startNewRunthroughFlow }),
     el('p', { class: 'muted small', text: 'Starting a new runthrough resets only which questions count as “seen,” so fresh practice can serve them again. Your XP, levels, badges, mistakes, question history, and flags are kept.' }),
