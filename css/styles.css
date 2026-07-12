@@ -864,3 +864,23 @@ body.has-fab #app { padding-bottom: calc(var(--nav-h) + 84px); }
 .drill-mtypes { margin: 4px 0 0; padding-left: 18px; font-size: .84rem; color: var(--text-dim); }
 .drill-mtypes li { margin: 3px 0; }
 .delta.up { color: var(--teal); } .delta.down { color: var(--ember); } .delta.flat { color: var(--text-dim); }
+
+/* Learning-tuning pass additions */
+.mini-example { color: var(--text-faint) !important; font-style: italic; }
+.mini-lesson .mini-example strong { color: var(--text-dim); font-style: normal; }
+/* Diagnosis confidence tint: high = purple (default), medium/low softer */
+.feedback-diagnosis.medium { background: rgba(167,139,250,.07); border-color: rgba(167,139,250,.22); }
+.feedback-diagnosis.low { background: rgba(148,163,184,.08); border-color: rgba(148,163,184,.24); }
+.feedback-diagnosis.low .diag-badge { color: var(--text-dim); background: rgba(148,163,184,.16); }
+.drill-modes { justify-content: center; gap: 8px; margin-top: 6px; }
+.next-action { font-size: .84rem; color: var(--text-dim); margin: 6px 0 0; line-height: 1.5; }
+.next-action strong { color: var(--teal); }
+.review-timing { font-size: .8rem; color: var(--text-faint); margin: 4px 0 0; line-height: 1.5; }
+.review-summary { display: flex; flex-direction: column; gap: 8px; }
+.review-comp { margin: 2px 0 0; padding-left: 18px; font-size: .84rem; color: var(--text-dim); }
+.review-comp li { margin: 3px 0; }
+/* Error Notebook filter bar */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.filter-chip { font-size: .78rem; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--ink-600); color: var(--text-dim); cursor: pointer; }
+.filter-chip.active { background: rgba(124,92,240,.18); border-color: var(--purple); color: var(--purple); font-weight: 600; }
+.filter-chip.alt { margin-left: auto; }

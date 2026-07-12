@@ -248,6 +248,20 @@ function buildReviewQuiz(skillIds, count = 6, tier = null) {
     usedText.add(q.text); out.push(q);
   }
 
+  // 1b) Questions the player flagged as confusing/hard — resurface authored ones
+  //     by id, so "flag for review" actually brings the item back to review.
+  const flagCap = Math.max(1, Math.round(count * 0.34));
+  const reviewFlags = (typeof flaggedQuestions === 'function')
+    ? flaggedQuestions().filter(f => /Confusing|unclear|Too hard|seems wrong/i.test(f.reason)) : [];
+  for (const f of reviewFlags) {
+    if (out.length >= authoredCap + flagCap) break;
+    if (f.source === 'generated' || typeof rwById !== 'function') continue;
+    const q = rwById(f.key);
+    if (!q || usedText.has(q.text)) continue;
+    q.reviewReason = `You flagged this as “${f.reason.toLowerCase()}”`; q.reviewTag = 'flagged';
+    usedText.add(q.text); out.push(q);
+  }
+
   // 2) Fill with weak-skill practice, biased toward skills that have due items
   //    (this is how due MATH shows up — a fresh instance in the same skill).
   const dueSkills = [...new Set(due.map(d => d.skill).filter(Boolean))];
@@ -274,29 +288,51 @@ function buildReviewQuiz(skillIds, count = 6, tier = null) {
 }
 function pick2(a, b) { return Math.random() < 0.5 ? a : b; }
 
+/* Build a difficulty ramp of `count` tiers for a drill, centred on the player's
+   demonstrated level (base) so a struggling player stays gentle and a strong one
+   is stretched. Ordered easy→hard within the set so difficulty visibly climbs as
+   the player warms up. `mode` can override:
+     'challenge' → skews hard regardless of base ('Challenge Drill')
+     'quick'/'focused' → adaptive around base (differ only in length) */
+function drillTierPlan(base, count, mode) {
+  let lo, mid, hi; // proportions of easy / medium / hard
+  if (mode === 'challenge') { lo = 0; mid = 0.34; hi = 0.66; }
+  else if (base <= 1)       { lo = 0.5; mid = 0.4; hi = 0.1; }
+  else if (base >= 3)       { lo = 0.1; mid = 0.4; hi = 0.5; }
+  else                      { lo = 0.25; mid = 0.5; hi = 0.25; }
+  const nLo = Math.round(count * lo), nHi = Math.round(count * hi);
+  const nMid = Math.max(0, count - nLo - nHi);
+  const plan = [...Array(nLo).fill(1), ...Array(nMid).fill(2), ...Array(nHi).fill(3)];
+  while (plan.length < count) plan.push(base);
+  return plan.slice(0, count).sort((a, b) => a - b); // ascending = ramp
+}
+
 /* Targeted skill drill — a short, focused set on ONE skill. Fresh practice
-   (prefers unseen questions via makeQuestion's runthrough logic) across a spread
-   of difficulty so the drill both teaches and checks. Marks items seen so the
-   drill doesn't repeat within a runthrough. */
-function buildDrillQuiz(skillId, count = 6) {
+   (prefers unseen questions via makeQuestion's runthrough logic) across a
+   difficulty ramp adapted to the player's level so the drill both teaches and
+   checks without being trivial or brutal. Marks items seen so the drill doesn't
+   repeat within a runthrough.
+   opts.mode: 'quick' (6) | 'focused' (10) | 'challenge' (6, harder). */
+function buildDrillQuiz(skillId, count = 6, opts = {}) {
   if (!SKILLS[skillId]) return [];
+  const mode = opts.mode || 'quick';
+  if (mode === 'focused') count = Math.max(count, 10);
+  const base = (typeof adaptiveTier === 'function') ? adaptiveTier(skillId) : 2;
+  const tierPlan = drillTierPlan(base, count, mode);
   const used = new Set();
   const out = [];
-  // Difficulty spread: mostly medium, some easy and hard, so a drill is neither
-  // trivial nor brutal. Tiers cycle e/m/m/h across the set.
-  const tierPlan = [1, 2, 2, 3, 2, 1, 3, 2];
   for (let i = 0; i < count; i++) {
-    const tier = tierPlan[i % tierPlan.length];
+    const tier = tierPlan[i];
     let q = makeQuestion(skillId, tier, { exclude: used });
     // one retry to avoid an identical stem inside the drill
     if (used.has(q.text)) q = makeQuestion(skillId, tier, { exclude: used });
     used.add(q.text);
     out.push(q);
   }
-  const result = shuffleQuestions(out);
-  _noteRun(result);
-  debugQuizReport('drill ' + skillId, result);
-  return result;
+  // Keep the easy→hard ramp (do NOT shuffle) so difficulty climbs as they go.
+  _noteRun(out);
+  debugQuizReport('drill ' + skillId + ' [' + mode + ']', out);
+  return out;
 }
 
 /* Daily challenge tower: endless floors of escalating difficulty, mixed skills.

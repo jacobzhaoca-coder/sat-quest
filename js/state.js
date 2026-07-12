@@ -260,10 +260,13 @@ const MISTAKE_TYPES = {
   'too-narrow':       { label: 'Too narrow',            advice: 'Reject choices that fixate on a single detail.' },
   'transition-logic': { label: 'Transition logic',      advice: 'Name the relationship (contrast, cause, addition) before picking a connector.' },
   'grammar-boundary': { label: 'Grammar boundary',      advice: 'Check whether each side of the punctuation is a complete sentence.' },
+  'verb-form':        { label: 'Verb form / agreement', advice: 'Find the true subject and match the verb’s number and tense to it.' },
   'word-context':     { label: 'Word in context',       advice: 'Predict your own word for the blank, then match the closest choice.' },
   'rhetorical-goal':  { label: 'Rhetorical goal',       advice: 'Re-read the stated goal and keep only the choice that does exactly that.' },
   'cross-text':       { label: 'Cross-text relationship', advice: 'State each author’s position, then find how the second responds to the first.' },
   'careless':         { label: 'Careless reading',      advice: 'Reread the stem and the finalist choices slowly before committing.' },
+  // Low-confidence fallback when nothing else fits — never claim certainty.
+  'strategy-mismatch':{ label: 'Strategy mismatch',     advice: 'Review the explanation and the skill card before drilling this skill.' },
 };
 
 // Ordered [regex, type] rules scanned against the chosen distractor's reason.
@@ -285,6 +288,7 @@ const _RW_MISTAKE_RULES = [
   [/not supported|no evidence|does not (say|state|show|claim)|unsupported|nothing (in the text|suggests)|never (says|stated)|beyond the text/, 'missed-evidence'],
   [/main (idea|point|purpose)|overall|as a whole|central/, 'main-idea'],
   [/contrast|addition|cause|however|therefore|relationship|transition|connect/, 'transition-logic'],
+  [/subject.?verb|agreement|verb (form|tense)|singular|plural|tense|modifier|parallel/, 'verb-form'],
   [/clause|comma splice|independent|complete sentence|punctuat|semicolon|boundary/, 'grammar-boundary'],
   [/means|word|context|definition|synonym|tone/, 'word-context'],
   [/goal|synthesis|the student wants|emphasize|the intended/, 'rhetorical-goal'],
@@ -304,22 +308,38 @@ const _SKILL_DEFAULT_MISTAKE = {
   'boundaries': 'grammar-boundary', 'form-sense': 'grammar-boundary',
 };
 
+// Returns { type, label, advice, note, confidence, lead }.
+//   confidence: 'high'   — matched the distractor's own labeled reason (most reliable)
+//               'medium' — inferred from the skill (no reason text to read)
+//               'low'    — a reason existed but fit no pattern, or the skill is unmapped
+//   lead: the softened phrase the UI shows so we never overclaim certainty
+//         ('Likely mistake' / 'Watch for' / 'Possible trap' / 'Likely issue').
 function classifyMistake(q, chosen) {
   if (!q) return null;
   const section = (typeof SKILLS !== 'undefined' && SKILLS[q.skill]) ? SKILLS[q.skill].section : 'math';
   const isGrid = q.type === 'grid';
   // A blank/timeout on a grid-in is usually a formatting or time issue, not a concept slip.
   if (isGrid && (chosen === '' || chosen == null || /ran out of time/.test(String(chosen)))) {
-    return { type: 'careless', ...MISTAKE_TYPES.careless, note: 'Grid-ins have no choices — double-check the format (integer, decimal, or fraction) and pacing.' };
+    return { type: 'careless', ...MISTAKE_TYPES.careless, confidence: 'medium', lead: 'Watch for',
+      note: 'Grid-ins have no choices — double-check the format (integer, decimal, or fraction) and pacing.' };
   }
   const reason = (!isGrid && q.whyWrong && q.whyWrong[chosen]) ? String(q.whyWrong[chosen]) : '';
   const hay = reason.toLowerCase();
   const rules = section === 'math' ? _MATH_MISTAKE_RULES : _RW_MISTAKE_RULES;
-  let type = null;
+  let type = null, confidence, lead;
   if (hay) for (const [re, t] of rules) { if (re.test(hay)) { type = t; break; } }
-  if (!type) type = _SKILL_DEFAULT_MISTAKE[q.skill] || (section === 'math' ? 'arithmetic' : 'careless');
-  const def = MISTAKE_TYPES[type] || MISTAKE_TYPES.careless;
-  return { type, label: def.label, advice: def.advice, note: reason || def.advice };
+  if (type) {
+    confidence = 'high'; lead = 'Likely mistake';       // the trap's own reason named the slip
+  } else if (_SKILL_DEFAULT_MISTAKE[q.skill]) {
+    type = _SKILL_DEFAULT_MISTAKE[q.skill];
+    confidence = hay ? 'low' : 'medium';                 // a reason that fit nothing → low; pure skill guess → medium
+    lead = hay ? 'Possible trap' : 'Watch for';
+  } else {
+    type = 'strategy-mismatch'; confidence = 'low'; lead = 'Likely issue';
+  }
+  const def = MISTAKE_TYPES[type] || MISTAKE_TYPES['strategy-mismatch'];
+  const note = type === 'strategy-mismatch' ? def.advice : (reason || def.advice);
+  return { type, label: def.label, advice: def.advice, note, confidence, lead };
 }
 
 // Count auto-classified mistake types, optionally restricted to one skill.
@@ -348,6 +368,24 @@ function skillTrend(skillId) {
   const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
   const d = avg(newer) - avg(older);
   return d > 0.15 ? 'up' : d < -0.15 ? 'down' : 'flat';
+}
+
+/* Difficulty a drill/practice set should center on for this skill, from the
+   player's demonstrated accuracy (and nudged by recent trend). This makes the
+   difficulty the player actually experiences adapt to them, independent of how
+   well any single generator scales its own parameters by tier:
+     weak (<50%) → Easy start, struggling stays gentle
+     mid  (50–80%) → Medium
+     strong (≥80%) → Hard, and a rising trend can bump a mid skill up.
+   Returns a base tier 1–3; callers may still spread ± around it. */
+function adaptiveTier(skillId) {
+  const acc = skillAccuracy(skillId);
+  if (acc == null) return 2;                 // unknown skill → start at Medium
+  let base = acc < 0.5 ? 1 : acc < 0.8 ? 2 : 3;
+  const trend = skillTrend(skillId);
+  if (base === 2 && trend === 'up' && acc >= 0.72) base = 3;   // clearly improving → stretch
+  if (base === 2 && trend === 'down' && acc <= 0.58) base = 1; // slipping → ease off
+  return base;
 }
 
 function reflectMistake(id, category) {
@@ -700,8 +738,40 @@ function defeatBoss(bossId) {
   return first;
 }
 
-/* ---- Daily study path: an ordered, personalized set of today's tasks ---- */
+/* Accuracy of a whole section ('math' | 'rw') so the study path can balance the
+   two — steering the player toward the section they're weaker in. */
+function sectionAccuracy(section) {
+  let correct = 0, seen = 0;
+  for (const id of Object.keys(SKILLS)) {
+    if (SKILLS[id].section !== section) continue;
+    const s = STATE.skillStats[id];
+    if (s) { correct += s.correct; seen += s.seen; }
+  }
+  return { acc: seen ? correct / seen : null, seen };
+}
+
+/* ---- Daily study path: an ordered, personalized set of today's tasks ----
+   Considers, in priority order: how much history exists (starter plan for new
+   players), questions due for spaced review, the weakest/most-due skill and its
+   recent mistake pattern, flagged-for-review questions, section balance
+   (Math vs R&W), progress on the map, and a boss/tower capstone. */
 function dailyStudyPath() {
+  const attemptedSkills = Object.keys(STATE.skillStats).filter(id => (STATE.skillStats[id] || {}).seen > 0).length;
+
+  // Starter plan: too little data to personalise — get one level of each section
+  // played so the app can learn the player's weak spots.
+  if (STATE.stats.totalAnswered < 6 || attemptedSkills < 2) {
+    const tasks = [];
+    const firstMath = allLevels().find(l => l.section === 'math' && isLevelUnlocked(l.id) && !STATE.levelsCompleted[l.id]);
+    const firstRW = allLevels().find(l => l.section === 'rw' && isLevelUnlocked(l.id) && !STATE.levelsCompleted[l.id]);
+    if (firstRW) tasks.push({ kind: 'level', icon: regionById(firstRW.region).icon, title: `Start here: ${firstRW.title}`,
+      sub: 'A Reading & Writing level so SAT Quest can learn your R&W level.', levelId: firstRW.id });
+    if (firstMath) tasks.push({ kind: 'level', icon: regionById(firstMath.region).icon, title: `Then: ${firstMath.title}`,
+      sub: 'A Math level so SAT Quest can spot your weak Math skills.', levelId: firstMath.id });
+    tasks.push({ kind: 'tower', icon: '🗼', title: 'Try the Daily Tower', sub: 'A quick mixed warm-up once you’ve played a level or two.' });
+    return tasks.slice(0, 4);
+  }
+
   const tasks = [];
   // 1. Retention first: clear anything due for spaced review (missed before).
   const dueCount = (typeof dueReviewQuestions === 'function') ? dueReviewQuestions(60).length : 0;
@@ -709,7 +779,8 @@ function dailyStudyPath() {
     tasks.push({ kind: 'review', icon: '🔁', title: 'Review Dungeon',
       sub: `${dueCount} question${dueCount === 1 ? '' : 's'} due for review — clear these first.` });
   }
-  // 2. Targeted drill of the weakest / most-due skill (active weak-spot work).
+  // 2. Targeted drill of the weakest / most-due skill (active weak-spot work),
+  //    naming the recent mistake pattern so the player knows what to watch for.
   const weak = spacedReviewSkills(1)[0] || weakestSkills(1, 2)[0];
   if (weak) {
     const top = (typeof topMistakeType === 'function') ? topMistakeType(weak.id) : null;
@@ -718,10 +789,14 @@ function dailyStudyPath() {
                : `Your weak spot (${Math.round((weak.acc || 0) * 100)}% so far).`,
       skillId: weak.id });
   }
-  // 3. Progress: next unlocked, uncompleted level
-  const next = allLevels().find(l => !STATE.levelsCompleted[l.id] && isLevelUnlocked(l.id));
+  // 3. Progress — but steer toward the weaker section when both have data.
+  const mathAcc = sectionAccuracy('math'), rwAcc = sectionAccuracy('rw');
+  let preferred = null;
+  if (mathAcc.acc != null && rwAcc.acc != null) preferred = mathAcc.acc <= rwAcc.acc ? 'math' : 'rw';
+  const levelsLeft = allLevels().filter(l => !STATE.levelsCompleted[l.id] && isLevelUnlocked(l.id));
+  const next = (preferred && levelsLeft.find(l => l.section === preferred)) || levelsLeft[0];
   if (next) tasks.push({ kind: 'level', icon: regionById(next.region).icon, title: `New ground: ${next.title}`,
-    sub: `${regionById(next.region).name} · ${TIER_LABEL[next.tier]}`, levelId: next.id });
+    sub: `${regionById(next.region).name} · ${TIER_LABEL[next.tier]}${preferred && next.section === preferred ? ' · your weaker section' : ''}`, levelId: next.id });
   // 4. A boss if one is ready, else the Daily Tower.
   let added = false;
   for (const b of allBosses()) if (isBossUnlocked(b.id) && !STATE.bossesDefeated[b.id]) {

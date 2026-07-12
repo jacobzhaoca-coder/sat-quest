@@ -54,11 +54,60 @@
     'exponentials': [gen4grid_exp_growth, gen5grid_exp_halflife, gen10grid_exp_rule],
     'scatterplots': [gen8grid_residual, gen8grid_bestfit_predict],
   };
+  /* ---- Tier-aware selection (difficulty calibration) ----
+     Uniform selection made each skill's difficulty nearly tier-invariant: a
+     random generator was chosen regardless of tier, so the Easy/Medium/Hard
+     label averaged out (confirmed by scripts/audit_difficulty.mjs). Fix: rank
+     each generator in a skill by a cheap complexity proxy (measured once at
+     load), then bias selection toward simpler generators at tier 1 and more
+     complex ones at tier 3. The bias is SOFT — every generator keeps a nonzero
+     weight — so variety and the near-repeat profile are preserved while the
+     experienced difficulty actually rises with the tier. No generator's own
+     content is changed; only which one is picked how often. */
+  const _cx = (text) => {
+    const t = String(text || '');
+    const nums = (t.match(/-?\d+(\.\d+)?/g) || []).map(Number);
+    const distinct = new Set(nums.map(n => Math.abs(n))).size;
+    const maxMag = nums.length ? Math.max.apply(null, nums.map(n => Math.abs(n))) : 0;
+    const neg = /(^|[\s(])-\d/.test(t) ? 1 : 0;
+    const frac = /\d\/\d|\d\.\d/.test(t) ? 1 : 0;
+    const ops = (t.match(/[+×÷^=<>]/g) || []).length;
+    const words = t.trim().split(/\s+/).length;
+    return distinct + Math.min(maxMag / 25, 6) + neg + frac + Math.min(ops, 8) * 0.6 + Math.min(words / 20, 6);
+  };
+  // Mean complexity of a generator over a few samples (mixed tiers), robust to throws.
+  const _rank = (g) => {
+    let sum = 0, n = 0;
+    for (let i = 0; i < 6; i++) {
+      try { const q = g((i % 3) + 1); if (q && q.text) { sum += _cx(q.text); n++; } } catch (e) { /* skip */ }
+    }
+    return n ? sum / n : 0;
+  };
+  const weightedPick = (pool, ranks, tier) => {
+    // target position in the easy→hard ordering for this tier
+    const target = tier <= 1 ? 0 : tier >= 3 ? 1 : 0.5;
+    let total = 0; const w = [];
+    for (let i = 0; i < pool.length; i++) {
+      // alignment in [0,1]: 1 when the generator's normalized rank matches the tier target
+      const align = 1 - Math.abs(ranks[i] - target);
+      const weight = 0.35 + 1.3 * align;   // soft: min 0.35 so nothing is starved
+      w.push(weight); total += weight;
+    }
+    let r = Math.random() * total;
+    for (let i = 0; i < pool.length; i++) { r -= w[i]; if (r <= 0) return pool[i]; }
+    return pool[pool.length - 1];
+  };
   const install = (registry, map) => {
     if (typeof registry === 'undefined') return;
     for (const [skill, gens] of Object.entries(map)) {
       const pool = gens.filter(g => typeof g === 'function');   // guard against any missing name
-      if (pool.length) registry[skill] = (tier) => pick(pool)(tier);
+      if (!pool.length) continue;
+      if (pool.length === 1) { registry[skill] = (tier) => pool[0](tier); continue; }
+      const raw = pool.map(_rank);
+      const lo = Math.min.apply(null, raw), hi = Math.max.apply(null, raw);
+      const span = (hi - lo) || 1;
+      const ranks = raw.map(v => (v - lo) / span);              // 0 = easiest gen, 1 = hardest
+      registry[skill] = (tier) => weightedPick(pool, ranks, tier)(tier);
     }
   };
   if (typeof MATH_GENERATORS !== 'undefined') install(MATH_GENERATORS, MC);

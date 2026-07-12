@@ -654,8 +654,8 @@ function feedbackBlock(q, chosen, correct, onNext, opts, session) {
   // Auto-diagnosis: name the likely mistake type so the miss becomes a lesson.
   if (!correct && typeof classifyMistake === 'function') {
     const diag = classifyMistake(q, chosen);
-    if (diag) block.appendChild(el('div', { class: 'feedback-diagnosis' }, [
-      el('span', { class: 'diag-badge', text: `🔍 Likely mistake: ${diag.label}` }),
+    if (diag) block.appendChild(el('div', { class: 'feedback-diagnosis ' + (diag.confidence || 'medium') }, [
+      el('span', { class: 'diag-badge', text: `🔍 ${diag.lead || 'Likely mistake'}: ${diag.label}` }),
       el('p', { class: 'diag-advice', text: diag.advice }),
     ]));
   }
@@ -1061,6 +1061,7 @@ function finishReview(s) {
   Sound.play(s.correct >= s.questions.length / 2 ? 'victory' : 'defeat');
   if (levelUps.length) setTimeout(() => { Sound.play('levelup'); toast(`Level up! Level ${levelUps[levelUps.length - 1]}`, '⭐'); }, 600);
 }
+const REVIEW_TAG_LABEL = { missed: 'missed recently', 'due-skill': 'due weak-skill', flagged: 'flagged', weak: 'weak-skill', check: 'mastery check' };
 function reviewResultScreen(r) {
   const body = [];
   body.push(el('div', { class: 'result-hero win' }, [
@@ -1069,8 +1070,33 @@ function reviewResultScreen(r) {
     el('p', { class: 'result-score', text: `${r.correct} / ${r.total} correct` }),
     el('div', { class: 'result-xp', text: `+${r.xp} XP` }),
   ]));
+
+  // Composition breakdown: what kinds of items this review covered, and how the
+  // still-weak skills fared — so the summary teaches, not just scores.
+  const comp = {};
+  (r.answers || []).forEach(a => { const t = a.q && a.q.reviewTag; if (t) comp[t] = (comp[t] || 0) + 1; });
+  const wrong = (r.answers || []).filter(a => !a.correct);
+  const sum = el('section', { class: 'card review-summary' }, [el('h2', { text: '📋 Review summary' })]);
+  if (Object.keys(comp).length) {
+    const list = el('ul', { class: 'review-comp' });
+    Object.entries(comp).sort((a, b) => b[1] - a[1]).forEach(([t, n]) =>
+      list.appendChild(el('li', { text: `${n} ${REVIEW_TAG_LABEL[t] || t} question${n === 1 ? '' : 's'}` })));
+    sum.appendChild(el('p', { text: 'Reviewed:' }));
+    sum.appendChild(list);
+  }
+  const lesson = (typeof sessionKeyLesson === 'function') ? sessionKeyLesson(r.answers) : null;
+  if (lesson) sum.appendChild(el('div', { class: 'key-lesson' }, [el('strong', { text: '🔑 Key lesson. ' }), document.createTextNode(lesson)]));
+  // Concrete next action.
+  const stillWeak = wrong.length ? (Object.entries(wrong.reduce((m, a) => { m[a.q.skill] = (m[a.q.skill] || 0) + 1; return m; }, {})).sort((a, b) => b[1] - a[1])[0]) : null;
+  if (stillWeak && SKILLS[stillWeak[0]]) {
+    sum.appendChild(el('p', { class: 'next-action' }, [el('strong', { text: '⏭️ Next. ' }),
+      document.createTextNode(`${SKILLS[stillWeak[0]].name} is still shaky — a 6-question drill tomorrow will help it stick.`)]));
+    sum.appendChild(el('button', { class: 'btn btn-primary small', text: `🎯 Drill ${SKILLS[stillWeak[0]].name}`, onclick: () => startDrill(stillWeak[0]) }));
+  } else {
+    sum.appendChild(el('p', { class: 'next-action', text: '⏭️ Clean review — these are sticking. Keep the daily habit and they’ll space out further.' }));
+  }
+  body.push(sum);
   body.push(recapCard(r.answers));
-  body.push(adviceCard(r.answers));
   body.push(el('div', { class: 'btn-row stacked' }, [
     el('button', { class: 'btn btn-primary btn-block', text: '🔁 Another review', onclick: () => startReview('due') }),
     el('button', { class: 'btn btn-ghost btn-block', text: '🌳 Weakness map', onclick: () => navigate('skills') }),
@@ -1219,6 +1245,7 @@ route('skills', () => {
    SKILL CLINIC — per-skill diagnosis + mini-lesson + targeted drill
    ================================================================ */
 const MISTAKE_TYPE_LABEL = (t) => (typeof MISTAKE_TYPES !== 'undefined' && MISTAKE_TYPES[t]) ? MISTAKE_TYPES[t].label : t;
+let MISTAKE_FILTER = 'all'; // all | math | rw  (Error Notebook section filter)
 const TREND_META = { up: { icon: '↑', cls: 'up', text: 'improving' }, down: { icon: '↓', cls: 'down', text: 'slipping' }, flat: { icon: '→', cls: 'flat', text: 'steady' } };
 
 route('clinic', () => {
@@ -1284,23 +1311,31 @@ function clinicSkillCard(skillId) {
   if (lesson) {
     const det = el('details', { class: 'mini-lesson' }, [el('summary', { text: '📘 Mini-lesson' })]);
     det.appendChild(el('p', {}, [el('strong', { text: 'Concept. ' }), document.createTextNode(lesson.concept)]));
-    det.appendChild(el('p', {}, [el('strong', { text: 'On the SAT. ' }), document.createTextNode(lesson.when)]));
+    if (lesson.recognize) det.appendChild(el('p', {}, [el('strong', { text: 'How to spot it. ' }), document.createTextNode(lesson.recognize)]));
     det.appendChild(el('p', {}, [el('strong', { text: 'Common trap. ' }), document.createTextNode(lesson.trap)]));
     det.appendChild(el('p', {}, [el('strong', { text: 'Strategy. ' }), document.createTextNode(lesson.strategy)]));
+    if (lesson.example) det.appendChild(el('p', { class: 'mini-example' }, [el('strong', { text: 'Example mistake. ' }), document.createTextNode(lesson.example)]));
     card.appendChild(det);
   }
-  card.appendChild(el('button', { class: 'btn btn-primary btn-block', text: `▶ Start ${skill.name} drill (6)`, onclick: () => startDrill(skillId) }));
+  // Drill modes: Quick (6, adaptive) is primary; Focused (10) and Challenge
+  // (harder) are compact secondary options so the picker stays uncluttered.
+  card.appendChild(el('button', { class: 'btn btn-primary btn-block', text: `▶ Quick drill (6)`, onclick: () => startDrill(skillId, 'quick') }));
+  card.appendChild(el('div', { class: 'btn-row drill-modes' }, [
+    el('button', { class: 'btn btn-ghost small', text: 'Focused (10)', onclick: () => startDrill(skillId, 'focused') }),
+    el('button', { class: 'btn btn-ghost small', text: 'Challenge (hard)', onclick: () => startDrill(skillId, 'challenge') }),
+  ]));
   return card;
 }
 
 /* ================================================================
    TARGETED SKILL DRILL
    ================================================================ */
-function startDrill(skillId) {
+function startDrill(skillId, mode = 'quick') {
   if (!SKILLS[skillId]) { toast('Unknown skill.', '⚠️'); return; }
-  const qs = buildDrillQuiz(skillId, 6);
+  const count = mode === 'focused' ? 10 : 6;
+  const qs = buildDrillQuiz(skillId, count, { mode });
   if (!qs.length) { toast('Could not build a drill for that skill.', '⚠️'); return; }
-  SESSION = { type: 'drill', skillId, questions: qs, idx: 0, correct: 0, answers: [], accBefore: skillAccuracy(skillId) };
+  SESSION = { type: 'drill', skillId, mode, questions: qs, idx: 0, correct: 0, answers: [], accBefore: skillAccuracy(skillId) };
   navigate('drill');
 }
 route('drill', () => {
@@ -1309,7 +1344,8 @@ route('drill', () => {
   const q = s.questions[s.idx];
   const skill = SKILLS[s.skillId];
   const body = [];
-  body.push(el('div', { class: 'dungeon-banner drill-banner' }, [el('span', { text: '🎯' }), el('span', { text: `${skill.name} drill — focused practice on one skill.` })]));
+  const modeLabel = s.mode === 'challenge' ? ' (challenge — harder)' : s.mode === 'focused' ? ' (focused — 10 questions)' : '';
+  body.push(el('div', { class: 'dungeon-banner drill-banner' }, [el('span', { text: '🎯' }), el('span', { text: `${skill.name} drill${modeLabel} — difficulty adapts to your level and climbs as you go.` })]));
   body.push(el('div', { class: 'q-progress' }, [progressBar(s.idx / s.questions.length, 'q-bar'), el('span', { class: 'q-count', text: `${s.idx + 1} / ${s.questions.length}` })]));
   body.push(questionCard(q, s, () => { Sound.play('click'); s.idx += 1; if (s.idx >= s.questions.length) finishDrill(s); else render(); }, { showTimer: STATE.settings.mode === 'study' }));
   return screen(skill.name, 'Skill drill', body, { back: { route: 'clinic' } });
@@ -1360,6 +1396,12 @@ function drillResultScreen(r) {
   }
   const lesson = sessionKeyLesson(r.answers, r.skillId);
   if (lesson) report.appendChild(el('div', { class: 'key-lesson' }, [el('strong', { text: '🔑 Key lesson. ' }), document.createTextNode(lesson)]));
+  // Next action + review timing so the report ends with something to DO.
+  if (wrong.length) {
+    report.appendChild(el('p', { class: 'next-action' }, [el('strong', { text: '⏭️ Next. ' }),
+      document.createTextNode(accNow != null && accNow < 0.6 ? 'Read the mini-lesson, then run one more drill on this skill.' : 'Keep this skill in rotation.')]));
+    report.appendChild(el('p', { class: 'review-timing', text: '🗓️ The questions you missed will resurface in the Review Dungeon — come back tomorrow to lock them in.' }));
+  }
   body.push(report);
 
   const nextWeak = weakestSkills(1, 2)[0];
@@ -1511,12 +1553,24 @@ route('mistakes', () => {
     body.push(sum);
   }
 
+  // Filter bar: focus the notebook on one section, or jump to flagged / due items.
+  const sectionOf = (m) => (SKILLS[m.skill] ? SKILLS[m.skill].section : 'math');
+  const filtered = STATE.mistakes.filter(m => MISTAKE_FILTER === 'all' ? true : sectionOf(m) === MISTAKE_FILTER);
+  const dueN = (typeof dueReviewQuestions === 'function') ? dueReviewQuestions(60).length : 0;
+  const flagN = (typeof flaggedQuestions === 'function') ? flaggedQuestions().length : 0;
+  const filterBar = el('div', { class: 'filter-bar' });
+  [['all', 'All'], ['math', 'Math'], ['rw', 'R&W']].forEach(([k, lbl]) =>
+    filterBar.appendChild(el('button', { class: 'filter-chip' + (MISTAKE_FILTER === k ? ' active' : ''), text: lbl, onclick: () => { MISTAKE_FILTER = k; render(); } })));
+  filterBar.appendChild(el('button', { class: 'filter-chip alt', text: `🚩 Flagged${flagN ? ' (' + flagN + ')' : ''}`, onclick: () => navigate('flags') }));
+  filterBar.appendChild(el('button', { class: 'filter-chip alt', text: `🔁 Due review${dueN ? ' (' + dueN + ')' : ''}`, onclick: () => startReview('due') }));
+  body.push(filterBar);
+
   body.push(el('div', { class: 'mistake-tools' }, [
-    el('span', { class: 'pill', text: `${STATE.mistakes.length} logged` }),
+    el('span', { class: 'pill', text: `${filtered.length} shown` }),
     el('button', { class: 'btn btn-ghost small', text: 'Clear log', onclick: () => { if (confirm('Clear all logged mistakes? Your skill stats stay.')) { STATE.mistakes = []; saveState(); render(); } } }),
   ]));
 
-  STATE.mistakes.slice(0, 60).forEach(m => {
+  filtered.slice(0, 60).forEach(m => {
     const catDef = m.category ? MISTAKE_CATEGORIES[m.category] : null;
     const detail = el('div', { class: 'mistake-detail' }, [
       (m.mtypeLabel || m.mtype) ? el('span', { class: 'diag-badge sm', text: `🔍 ${m.mtypeLabel || MISTAKE_TYPE_LABEL(m.mtype)}` }) : null,
@@ -1526,6 +1580,7 @@ route('mistakes', () => {
       m.whyWrong ? el('p', { class: 'mistake-exp', text: `Why your choice was wrong: ${m.whyWrong}` }) : null,
       el('p', { class: 'mistake-exp', text: `Why the answer is right: ${m.explanation}` }),
       m.tip ? tipCard(m.tip, 'Strategy') : null,
+      SKILLS[m.skill] ? el('button', { class: 'btn btn-primary small', text: `🎯 Drill ${m.skillName || SKILLS[m.skill].name}`, onclick: () => startDrill(m.skill) }) : null,
       catReflectRow(m),
     ]);
     body.push(el('details', { class: 'mistake' }, [
