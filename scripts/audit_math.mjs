@@ -29,7 +29,7 @@ vm.createContext(ctx);
 for (const f of [
   'js/data/worlds.js', 'js/data/tips.js', 'js/data/mathgen.js', 'js/data/gridgen.js', 'js/data/mathviz.js',
   'js/data/mathgen2.js', 'js/data/mathgen3.js', 'js/data/mathgen4.js', 'js/data/mathgen5.js',
-  'js/data/mathgen6.js', 'js/data/mathgen7.js', 'js/data/mathgen8.js', 'js/data/mathgen9.js', 'js/data/mathgen_flatten.js',
+  'js/data/mathgen6.js', 'js/data/mathgen7.js', 'js/data/mathgen8.js', 'js/data/mathgen9.js', 'js/data/mathgen10.js', 'js/data/mathgen_flatten.js',
   'js/state.js', 'js/upgrades.js', 'js/quiz.js', 'js/exam.js',
 ].filter(f => fs.existsSync(path.join(root, f)))) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
