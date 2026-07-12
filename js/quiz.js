@@ -274,6 +274,31 @@ function buildReviewQuiz(skillIds, count = 6, tier = null) {
 }
 function pick2(a, b) { return Math.random() < 0.5 ? a : b; }
 
+/* Targeted skill drill — a short, focused set on ONE skill. Fresh practice
+   (prefers unseen questions via makeQuestion's runthrough logic) across a spread
+   of difficulty so the drill both teaches and checks. Marks items seen so the
+   drill doesn't repeat within a runthrough. */
+function buildDrillQuiz(skillId, count = 6) {
+  if (!SKILLS[skillId]) return [];
+  const used = new Set();
+  const out = [];
+  // Difficulty spread: mostly medium, some easy and hard, so a drill is neither
+  // trivial nor brutal. Tiers cycle e/m/m/h across the set.
+  const tierPlan = [1, 2, 2, 3, 2, 1, 3, 2];
+  for (let i = 0; i < count; i++) {
+    const tier = tierPlan[i % tierPlan.length];
+    let q = makeQuestion(skillId, tier, { exclude: used });
+    // one retry to avoid an identical stem inside the drill
+    if (used.has(q.text)) q = makeQuestion(skillId, tier, { exclude: used });
+    used.add(q.text);
+    out.push(q);
+  }
+  const result = shuffleQuestions(out);
+  _noteRun(result);
+  debugQuizReport('drill ' + skillId, result);
+  return result;
+}
+
 /* Daily challenge tower: endless floors of escalating difficulty, mixed skills.
    Floor 1–3 easy, 4–7 medium, 8+ hard. Returns a single question for a floor. */
 function buildTowerQuestion(floor) {

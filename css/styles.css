@@ -829,3 +829,38 @@ body.has-fab #app { padding-bottom: calc(var(--nav-h) + 84px); }
 .flag-note { font-size: .82rem; color: var(--text-dim); font-style: italic; margin: 0 0 6px; }
 .flag-item-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .btn.tiny { padding: 5px 10px; font-size: .76rem; }
+
+/* ---- Learning layer: mistake diagnosis, Skill Clinic, drills, mini-lessons ---- */
+.feedback-diagnosis { margin: 4px 0 12px; padding: 9px 11px; background: rgba(167,139,250,.10); border: 1px solid rgba(167,139,250,.30); border-radius: 8px; }
+.diag-badge { display: inline-block; font-size: .78rem; font-weight: 600; color: var(--purple); background: rgba(124,92,240,.14); border-radius: 999px; padding: 3px 10px; }
+.diag-badge.sm { font-size: .72rem; align-self: flex-start; }
+.diag-advice { margin: 6px 0 0; font-size: .84rem; color: var(--text-dim); line-height: 1.5; }
+.cat-chip.mtype { color: var(--purple); border-color: rgba(167,139,250,.4); }
+
+.key-lesson { margin-top: 10px; padding: 10px 12px; background: linear-gradient(160deg, rgba(232,192,106,.10), rgba(124,92,240,.06)); border: 1px solid rgba(232,192,106,.30); border-radius: var(--radius-sm); font-size: .86rem; color: var(--text-dim); line-height: 1.55; }
+.key-lesson strong { color: var(--gold-bright); }
+
+/* Skill Clinic cards */
+.clinic-summary h2, .clinic-card .clinic-skill-name { line-height: 1.3; }
+.clinic-summary-sub { font-size: .78rem; color: var(--text-faint); margin: 4px 0 0; }
+.clinic-card { display: flex; flex-direction: column; gap: 8px; }
+.clinic-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.clinic-skill-name { font-weight: 600; font-size: .98rem; }
+.clinic-acc { font-weight: 700; font-variant-numeric: tabular-nums; }
+.clinic-acc.strong { color: var(--teal); } .clinic-acc.ok { color: var(--gold); } .clinic-acc.weak { color: var(--ember); }
+.clinic-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .76rem; color: var(--text-faint); }
+.clinic-meta .clinic-mtype { color: var(--text-dim); }
+.trend.up { color: var(--teal); } .trend.down { color: var(--ember); } .trend.flat { color: var(--text-dim); }
+.clinic-rec { font-size: .84rem; color: var(--text-dim); margin: 2px 0; }
+.mini-lesson { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 4px 12px; background: var(--ink-600); }
+.mini-lesson summary { cursor: pointer; font-size: .84rem; font-weight: 600; color: var(--purple); padding: 6px 0; }
+.mini-lesson p { margin: 6px 0; font-size: .82rem; color: var(--text-dim); line-height: 1.5; }
+.mini-lesson strong { color: var(--text); }
+
+/* Drill banner + report */
+.drill-banner { background: linear-gradient(160deg, rgba(69,224,168,.10), rgba(124,92,240,.06)); border-color: rgba(69,224,168,.3); }
+.drill-report { display: flex; flex-direction: column; gap: 8px; }
+.drill-line { font-size: .88rem; color: var(--text-dim); margin: 0; }
+.drill-mtypes { margin: 4px 0 0; padding-left: 18px; font-size: .84rem; color: var(--text-dim); }
+.drill-mtypes li { margin: 3px 0; }
+.delta.up { color: var(--teal); } .delta.down { color: var(--ember); } .delta.flat { color: var(--text-dim); }

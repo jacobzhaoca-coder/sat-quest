@@ -295,7 +295,8 @@ function dailyStudyPathCard() {
   return card;
 }
 function runPathTask(t) {
-  if (t.kind === 'review') startReview('custom', t.skillIds);
+  if (t.kind === 'review') startReview(t.skillIds ? 'custom' : 'due', t.skillIds);
+  else if (t.kind === 'drill') startDrill(t.skillId);
   else if (t.kind === 'level') navigate('level', { levelId: t.levelId });
   else if (t.kind === 'boss') navigate('boss', { bossId: t.bossId });
   else if (t.kind === 'tower') navigate('tower');
@@ -650,6 +651,14 @@ function feedbackBlock(q, chosen, correct, onNext, opts, session) {
   if (!isGrid && !correct && q.whyWrong && q.whyWrong[chosen]) {
     block.appendChild(el('div', { class: 'feedback-whywrong' }, [el('strong', { text: `Why ${chosen} is wrong. ` }), document.createTextNode(q.whyWrong[chosen])]));
   }
+  // Auto-diagnosis: name the likely mistake type so the miss becomes a lesson.
+  if (!correct && typeof classifyMistake === 'function') {
+    const diag = classifyMistake(q, chosen);
+    if (diag) block.appendChild(el('div', { class: 'feedback-diagnosis' }, [
+      el('span', { class: 'diag-badge', text: `🔍 Likely mistake: ${diag.label}` }),
+      el('p', { class: 'diag-advice', text: diag.advice }),
+    ]));
+  }
   if (!isGrid && q.whyWrong && Object.keys(q.whyWrong).length) {
     const det = el('details', { class: 'whywrong-all' }, [el('summary', { text: 'Why the other choices are wrong' })]);
     if (explanationBoost() >= 1) det.open = true; // Explanation Boost auto-expands
@@ -725,10 +734,13 @@ function handleAnswer(q, chosen, correct, session, elapsedMs) {
     const id = 'm' + Date.now() + Math.floor(Math.random() * 1000);
     rec.mistakeId = id;
     const isGrid = q.type === 'grid';
+    const diag = (typeof classifyMistake === 'function') ? classifyMistake(q, chosen) : null;
+    rec.diagnosis = diag;
     STATE.mistakes.unshift({ id, category: null, reflected: false,
       question: q.text, chosen, chosenText: isGrid ? '' : (q.choices.find(c => c.letter === chosen) || {}).text || '',
       correct: isGrid ? String(q.answer) : q.answer, correctText: isGrid ? '' : (q.choices.find(c => c.letter === q.answer) || {}).text || '',
       explanation: q.explanation, whyWrong: (!isGrid && q.whyWrong) ? q.whyWrong[chosen] : '', tip: q.tip,
+      mtype: diag ? diag.type : null, mtypeLabel: diag ? diag.label : null,
       skill: q.skill, skillName: SKILLS[q.skill] ? SKILLS[q.skill].name : q.skill, when: Date.now() });
     if (STATE.mistakes.length > 200) STATE.mistakes.length = 200;
   }
@@ -763,6 +775,7 @@ route('result', (r) => {
   if (r.kind === 'boss') return bossResultScreen(r);
   if (r.kind === 'tower') return towerResultScreen(r);
   if (r.kind === 'review') return reviewResultScreen(r);
+  if (r.kind === 'drill') return drillResultScreen(r);
   const lv = levelById(r.levelId);
   const nextLevel = nextLevelAfter(r.levelId);
   const body = [];
@@ -814,12 +827,18 @@ function adviceCard(answers) {
   const tally = {}; wrong.forEach(a => { tally[a.q.skill] = (tally[a.q.skill] || 0) + 1; });
   const worst = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
   const skillName = SKILLS[worst[0]] ? SKILLS[worst[0]].name : worst[0];
-  return el('section', { class: 'card advice-card' }, [
+  const card = el('section', { class: 'card advice-card' }, [
     el('h2', { text: '🎯 Where to focus' }),
     el('p', { text: `You missed the most questions in ${skillName}. That is the skill to drill next.` }),
-    el('button', { class: 'btn btn-ghost small', text: `🔁 Quick review: ${skillName}`, onclick: () => startReview('custom', [worst[0]]) }),
-    tipCard(tipForSkill(worst[0]), `${skillName} strategy`),
   ]);
+  const lesson = (typeof sessionKeyLesson === 'function') ? sessionKeyLesson(answers) : null;
+  if (lesson) card.appendChild(el('div', { class: 'key-lesson' }, [el('strong', { text: '🔑 Key lesson. ' }), document.createTextNode(lesson)]));
+  card.appendChild(el('div', { class: 'btn-row' }, [
+    el('button', { class: 'btn btn-primary small', text: `🎯 Drill ${skillName}`, onclick: () => startDrill(worst[0]) }),
+    el('button', { class: 'btn btn-ghost small', text: '🔁 Mixed review', onclick: () => startReview('custom', [worst[0]]) }),
+  ]));
+  card.appendChild(tipCard(tipForSkill(worst[0]), `${skillName} strategy`));
+  return card;
 }
 
 /* ================================================================
@@ -920,7 +939,7 @@ function bossFightScreen(boss) {
       s.focus = Math.max(0, s.focus - 20);
       s.answers.push({ q, chosen: null, correct: false });
       recordAnswer(q.skill, false, s.timePerQ * 1000, q.difficulty);
-      STATE.mistakes.unshift({ id: 'm' + Date.now(), category: 'time', reflected: true, question: q.text, chosen: '(ran out of time)', chosenText: '', correct: q.answer, correctText: (q.choices.find(c => c.letter === q.answer) || {}).text || '', explanation: q.explanation, tip: q.tip, skill: q.skill, skillName: SKILLS[q.skill] ? SKILLS[q.skill].name : q.skill, when: Date.now() });
+      STATE.mistakes.unshift({ id: 'm' + Date.now(), category: 'time', reflected: true, mtype: 'careless', mtypeLabel: 'Time pressure', question: q.text, chosen: '(ran out of time)', chosenText: '', correct: q.answer, correctText: (q.choices.find(c => c.letter === q.answer) || {}).text || '', explanation: q.explanation, tip: q.tip, skill: q.skill, skillName: SKILLS[q.skill] ? SKILLS[q.skill].name : q.skill, when: Date.now() });
       Sound.play('playerhit'); flashDamage(hud, '-20', 'you'); updateHUD(hud, s);
       card.querySelectorAll('.choice').forEach(b => { b.classList.add('revealed'); b.disabled = true; if (b.dataset.letter === q.answer) b.classList.add('correct'); });
       card.appendChild(el('div', { class: 'feedback no' }, [
@@ -1156,8 +1175,8 @@ route('skills', () => {
   body.push(el('p', { class: 'map-intro', text: 'Your mastery across every SAT skill. Bars fill as you answer correctly; the app steers you toward the reddest bars.' }));
 
   body.push(el('div', { class: 'skills-actions' }, [
-    el('button', { class: 'btn btn-primary', text: '🔁 Review weak skills', onclick: () => startReview('due') }),
-    el('button', { class: 'btn btn-ghost', text: '📈 Weekly report', onclick: () => navigate('weekly') }),
+    el('button', { class: 'btn btn-primary', text: '🩺 Skill Clinic', onclick: () => navigate('clinic') }),
+    el('button', { class: 'btn btn-ghost', text: '🔁 Review weak skills', onclick: () => startReview('due') }),
   ]));
 
   const weak = weakestSkills(3, 3);
@@ -1195,6 +1214,179 @@ route('skills', () => {
   }
   return screen('Skill Tree', 'Your weakness map', body);
 });
+
+/* ================================================================
+   SKILL CLINIC — per-skill diagnosis + mini-lesson + targeted drill
+   ================================================================ */
+const MISTAKE_TYPE_LABEL = (t) => (typeof MISTAKE_TYPES !== 'undefined' && MISTAKE_TYPES[t]) ? MISTAKE_TYPES[t].label : t;
+const TREND_META = { up: { icon: '↑', cls: 'up', text: 'improving' }, down: { icon: '↓', cls: 'down', text: 'slipping' }, flat: { icon: '→', cls: 'flat', text: 'steady' } };
+
+route('clinic', () => {
+  const body = [];
+  body.push(el('p', { class: 'map-intro', text: 'Diagnosis for each skill you’ve practiced: accuracy, recent trend, your most common mistake, and what to do next. Start a focused 6-question drill from any skill.' }));
+
+  // Attempted skills, weakest first (these are the ones worth diagnosing).
+  const attempted = Object.keys(SKILLS)
+    .map(id => ({ id, acc: skillAccuracy(id), seen: (STATE.skillStats[id] || {}).seen || 0 }))
+    .filter(x => x.seen >= 1 && x.acc !== null)
+    .sort((a, b) => a.acc - b.acc);
+
+  if (attempted.length === 0) {
+    body.push(el('section', { class: 'card' }, [
+      el('p', { text: 'Answer a few questions first — play a level or the Daily Tower — and this clinic will diagnose your weak spots and recommend drills.' }),
+      el('button', { class: 'btn btn-primary btn-block', text: '🗺️ Open the World Map', onclick: () => navigate('map') }),
+    ]));
+    return screen('Skill Clinic', 'Diagnosis & drills', body, { back: { route: 'skills' } });
+  }
+
+  // Overall mistake-pattern summary.
+  const topType = (typeof topMistakeType === 'function') ? topMistakeType() : null;
+  if (topType && topType.count >= 2) {
+    body.push(el('section', { class: 'card clinic-summary' }, [
+      el('h2', { text: '🔍 Your most common mistake' }),
+      el('p', {}, [el('strong', { text: topType.label + '. ' }), document.createTextNode(topType.advice || '')]),
+      el('p', { class: 'clinic-summary-sub', text: `Seen ${topType.count} times across your misses.` }),
+    ]));
+  }
+
+  attempted.slice(0, 8).forEach(x => body.push(clinicSkillCard(x.id)));
+  if (attempted.length > 8) body.push(el('button', { class: 'btn btn-ghost btn-block', text: '🌳 See the full skill tree', onclick: () => navigate('skills') }));
+  return screen('Skill Clinic', 'Diagnosis & drills', body, { back: { route: 'skills' } });
+});
+
+function clinicSkillCard(skillId) {
+  const skill = SKILLS[skillId];
+  const acc = skillAccuracy(skillId), stat = STATE.skillStats[skillId] || {};
+  const pct = Math.round((acc || 0) * 100);
+  const cls = acc >= 0.85 ? 'strong' : acc >= 0.6 ? 'ok' : 'weak';
+  const trend = (typeof skillTrend === 'function') ? skillTrend(skillId) : null;
+  const top = (typeof topMistakeType === 'function') ? topMistakeType(skillId) : null;
+  const lesson = (typeof miniLesson === 'function') ? miniLesson(skillId) : null;
+
+  // Recommended next action based on accuracy.
+  const rec = acc < 0.6 ? 'Do a 6-question drill and review the mini-lesson below.'
+            : acc < 0.85 ? 'Drill 6 questions to push this from shaky to solid.'
+            : 'Strong — a quick mastery-check drill keeps it sharp.';
+
+  const head = el('div', { class: 'clinic-head' }, [
+    el('span', { class: 'clinic-skill-name', text: skill.name }),
+    el('span', { class: 'clinic-acc ' + cls, text: `${pct}%` }),
+  ]);
+  const meta = el('div', { class: 'clinic-meta' }, [
+    el('span', { text: `${stat.seen || 0} attempted` }),
+    trend ? el('span', { class: 'trend ' + TREND_META[trend].cls, text: `${TREND_META[trend].icon} ${TREND_META[trend].text}` }) : null,
+    top ? el('span', { class: 'clinic-mtype', text: `Common miss: ${top.label}` }) : null,
+  ].filter(Boolean));
+
+  const card = el('section', { class: 'card clinic-card ' + cls }, [head, meta, progressBar(acc || 0, 'skill-bar ' + cls),
+    el('p', { class: 'clinic-rec', text: '👉 ' + rec })]);
+
+  if (lesson) {
+    const det = el('details', { class: 'mini-lesson' }, [el('summary', { text: '📘 Mini-lesson' })]);
+    det.appendChild(el('p', {}, [el('strong', { text: 'Concept. ' }), document.createTextNode(lesson.concept)]));
+    det.appendChild(el('p', {}, [el('strong', { text: 'On the SAT. ' }), document.createTextNode(lesson.when)]));
+    det.appendChild(el('p', {}, [el('strong', { text: 'Common trap. ' }), document.createTextNode(lesson.trap)]));
+    det.appendChild(el('p', {}, [el('strong', { text: 'Strategy. ' }), document.createTextNode(lesson.strategy)]));
+    card.appendChild(det);
+  }
+  card.appendChild(el('button', { class: 'btn btn-primary btn-block', text: `▶ Start ${skill.name} drill (6)`, onclick: () => startDrill(skillId) }));
+  return card;
+}
+
+/* ================================================================
+   TARGETED SKILL DRILL
+   ================================================================ */
+function startDrill(skillId) {
+  if (!SKILLS[skillId]) { toast('Unknown skill.', '⚠️'); return; }
+  const qs = buildDrillQuiz(skillId, 6);
+  if (!qs.length) { toast('Could not build a drill for that skill.', '⚠️'); return; }
+  SESSION = { type: 'drill', skillId, questions: qs, idx: 0, correct: 0, answers: [], accBefore: skillAccuracy(skillId) };
+  navigate('drill');
+}
+route('drill', () => {
+  const s = SESSION;
+  if (!s || s.type !== 'drill') { navigate('clinic'); return document.createElement('div'); }
+  const q = s.questions[s.idx];
+  const skill = SKILLS[s.skillId];
+  const body = [];
+  body.push(el('div', { class: 'dungeon-banner drill-banner' }, [el('span', { text: '🎯' }), el('span', { text: `${skill.name} drill — focused practice on one skill.` })]));
+  body.push(el('div', { class: 'q-progress' }, [progressBar(s.idx / s.questions.length, 'q-bar'), el('span', { class: 'q-count', text: `${s.idx + 1} / ${s.questions.length}` })]));
+  body.push(questionCard(q, s, () => { Sound.play('click'); s.idx += 1; if (s.idx >= s.questions.length) finishDrill(s); else render(); }, { showTimer: STATE.settings.mode === 'study' }));
+  return screen(skill.name, 'Skill drill', body, { back: { route: 'clinic' } });
+});
+function finishDrill(s) {
+  const xp = 15 + s.correct * 8;
+  markActiveToday();
+  const levelUps = addXP(xp);
+  saveState();
+  currentRoute = { name: 'result', kind: 'drill', skillId: s.skillId, correct: s.correct, total: s.questions.length, xp, answers: s.answers, accBefore: s.accBefore, levelUps };
+  SESSION = null;
+  render(); updateNav();
+  Sound.play(s.correct >= s.questions.length / 2 ? 'victory' : 'defeat');
+  if (levelUps.length) setTimeout(() => { Sound.play('levelup'); toast(`Level up! Level ${levelUps[levelUps.length - 1]}`, '⭐'); }, 600);
+}
+function drillResultScreen(r) {
+  const skill = SKILLS[r.skillId];
+  const pct = Math.round((r.correct / r.total) * 100);
+  const accNow = skillAccuracy(r.skillId);
+  const body = [];
+  body.push(el('div', { class: 'result-hero ' + (pct >= 67 ? 'win' : 'lose') }, [
+    el('div', { class: 'result-emblem', text: '🎯' }),
+    el('h1', { class: 'display-title', text: `${skill.name} Drill` }),
+    el('p', { class: 'result-score', text: `${r.correct} / ${r.total} correct · ${pct}%` }),
+    el('div', { class: 'result-xp', text: `+${r.xp} XP` }),
+  ]));
+
+  // Mini-report: mistake types this session + before/after skill accuracy.
+  const wrong = r.answers.filter(a => !a.correct);
+  const report = el('section', { class: 'card drill-report' }, [el('h2', { text: '📋 Drill report' })]);
+  if (r.accBefore != null && accNow != null) {
+    const delta = Math.round((accNow - r.accBefore) * 100);
+    report.appendChild(el('p', { class: 'drill-line' }, [
+      el('strong', { text: 'Skill accuracy: ' }),
+      document.createTextNode(`${Math.round(r.accBefore * 100)}% → ${Math.round(accNow * 100)}% `),
+      el('span', { class: 'delta ' + (delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat'), text: delta > 0 ? `(+${delta})` : delta < 0 ? `(${delta})` : '(±0)' }),
+    ]));
+  }
+  if (wrong.length === 0) {
+    report.appendChild(el('p', { text: '✅ Clean sweep — no mistakes this drill. This skill is looking solid.' }));
+  } else {
+    const tally = {};
+    wrong.forEach(a => { const t = a.diagnosis ? a.diagnosis.type : 'careless'; tally[t] = (tally[t] || 0) + 1; });
+    const list = el('ul', { class: 'drill-mtypes' });
+    Object.entries(tally).sort((a, b) => b[1] - a[1]).forEach(([t, n]) => list.appendChild(el('li', { text: `${MISTAKE_TYPE_LABEL(t)} — ${n}×` })));
+    report.appendChild(el('p', { text: `You missed ${wrong.length} of ${r.total}. Mistake pattern:` }));
+    report.appendChild(list);
+  }
+  const lesson = sessionKeyLesson(r.answers, r.skillId);
+  if (lesson) report.appendChild(el('div', { class: 'key-lesson' }, [el('strong', { text: '🔑 Key lesson. ' }), document.createTextNode(lesson)]));
+  body.push(report);
+
+  const nextWeak = weakestSkills(1, 2)[0];
+  const actions = el('div', { class: 'btn-row stacked' }, [
+    el('button', { class: 'btn btn-primary btn-block big', text: `↻ Another ${skill.name} drill`, onclick: () => startDrill(r.skillId) }),
+  ]);
+  if (nextWeak && nextWeak.id !== r.skillId) actions.appendChild(el('button', { class: 'btn btn-ghost btn-block', text: `🎯 Drill next weak skill: ${SKILLS[nextWeak.id].name}`, onclick: () => startDrill(nextWeak.id) }));
+  actions.appendChild(el('button', { class: 'btn btn-ghost btn-block', text: '🩺 Skill Clinic', onclick: () => navigate('clinic') }));
+  actions.appendChild(el('button', { class: 'btn btn-ghost btn-block', text: '🏰 Home', onclick: () => navigate('home') }));
+  body.push(actions);
+  return screen(skill.name, 'Drill complete', body);
+}
+
+/* One actionable takeaway from a session's misses: the dominant mistake type,
+   phrased as advice. Returns null on a clean session. */
+function sessionKeyLesson(answers, skillId = null) {
+  const wrong = (answers || []).filter(a => !a.correct);
+  if (!wrong.length) return null;
+  const tally = {};
+  wrong.forEach(a => { const t = a.diagnosis ? a.diagnosis.type : null; if (t) tally[t] = (tally[t] || 0) + 1; });
+  const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+  if (!top) return null;
+  const def = (typeof MISTAKE_TYPES !== 'undefined') ? MISTAKE_TYPES[top[0]] : null;
+  if (!def) return null;
+  const many = top[1] > 1 ? `Most of your misses were the same kind — ${def.label.toLowerCase()}. ` : `Watch for ${def.label.toLowerCase()}. `;
+  return many + def.advice;
+}
 
 /* ================================================================
    WEEKLY PROGRESS SUMMARY
@@ -1293,7 +1485,21 @@ route('mistakes', () => {
     return screen('Mistake Log', 'Learn from every miss', body);
   }
 
-  // category summary
+  // Auto-classified mistake-type summary (the "most repeated mistake types").
+  const mtCounts = (typeof mistakeTypeCounts === 'function') ? mistakeTypeCounts() : {};
+  if (Object.keys(mtCounts).length) {
+    const sum = el('section', { class: 'card cat-summary' }, [el('h2', { text: '🔍 Most repeated mistake types' })]);
+    const row = el('div', { class: 'cat-chips' });
+    Object.entries(mtCounts).sort((a, b) => b[1] - a[1]).slice(0, 6).forEach(([t, n]) =>
+      row.appendChild(el('span', { class: 'cat-chip mtype', text: `${MISTAKE_TYPE_LABEL(t)}: ${n}` })));
+    sum.appendChild(row);
+    const top = Object.entries(mtCounts).sort((a, b) => b[1] - a[1])[0];
+    if (top && MISTAKE_TYPES[top[0]]) sum.appendChild(el('p', { class: 'cat-advice', text: `💡 ${MISTAKE_TYPES[top[0]].label}. ${MISTAKE_TYPES[top[0]].advice}` }));
+    sum.appendChild(el('button', { class: 'btn btn-primary small', text: '🩺 Open Skill Clinic', onclick: () => navigate('clinic') }));
+    body.push(sum);
+  }
+
+  // category summary (your own reflections)
   const counts = mistakeCategoryCounts();
   if (Object.keys(counts).length) {
     const sum = el('section', { class: 'card cat-summary' }, [el('h2', { text: 'By category' })]);
@@ -1313,6 +1519,7 @@ route('mistakes', () => {
   STATE.mistakes.slice(0, 60).forEach(m => {
     const catDef = m.category ? MISTAKE_CATEGORIES[m.category] : null;
     const detail = el('div', { class: 'mistake-detail' }, [
+      (m.mtypeLabel || m.mtype) ? el('span', { class: 'diag-badge sm', text: `🔍 ${m.mtypeLabel || MISTAKE_TYPE_LABEL(m.mtype)}` }) : null,
       el('p', { class: 'mistake-q', text: lastLine(m.question) }),
       el('p', { class: 'mistake-line wrong', text: `Your answer: ${m.chosen}${m.chosenText ? ' · ' + m.chosenText : ''}` }),
       el('p', { class: 'mistake-line right', text: `Correct: ${m.correct}${m.correctText ? ' · ' + m.correctText : ''}` }),
@@ -1415,6 +1622,7 @@ route('profile', () => {
     linkRow('🚩', 'Flagged questions', flagCount ? `${flagCount} flagged for quality review` : 'Report confusing or wrong questions', () => navigate('flags')),
     linkRow('🧪', 'Practice test', 'Full-length Digital SAT simulation', () => navigate('exam', { style: 'sim' })),
     linkRow('📈', 'Weekly report', 'Accuracy, time, and activity', () => navigate('weekly')),
+    linkRow('🩺', 'Skill Clinic', 'Diagnose weak skills, mini-lessons, and drills', () => navigate('clinic')),
     linkRow('🌳', 'Skill tree', 'Your weakness map', () => navigate('skills')),
     linkRow('⚙️', 'Settings', 'Modes, sound, goal, runthrough, backup', () => navigate('settings')),
     linkRow('📚', 'Official resources', 'College Board, Bluebook, Khan Academy', () => navigate('resources')),

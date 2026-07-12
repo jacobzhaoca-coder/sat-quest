@@ -130,6 +130,11 @@ function recordAnswer(skillId, correct, timeMs = 0, difficulty = null) {
   if (correct) s.correct += 1;
   s.timeMs += timeMs;
   s.lastPracticed = Date.now();
+  // Rolling window of the last dozen results (1 = correct) so the Skill Clinic
+  // can show a real recent trend, not just the lifetime average.
+  if (!Array.isArray(s.recent)) s.recent = [];
+  s.recent.push(correct ? 1 : 0);
+  if (s.recent.length > 12) s.recent.splice(0, s.recent.length - 12);
   // Per-difficulty tally (powers the Accuracy Tracker upgrade). Filled going
   // forward; older answers simply aren't counted here.
   if (difficulty === 'Easy' || difficulty === 'Medium' || difficulty === 'Hard') {
@@ -228,6 +233,121 @@ const MISTAKE_CATEGORIES = {
 function recordMistake(entry) {
   STATE.mistakes.unshift({ id: 'm' + Date.now() + Math.floor(Math.random() * 1000), category: null, reflected: false, ...entry, when: Date.now() });
   if (STATE.mistakes.length > 200) STATE.mistakes.length = 200;
+}
+
+/* ---- Automatic mistake-type diagnosis ----
+   Classifies a wrong answer into a specific, SAT-relevant mistake type so the
+   app can teach from it. It leans on the generator's OWN labeled reason for the
+   chosen distractor (q.whyWrong[chosen]) — which already encodes the exact slip
+   — and falls back to the skill when no keyword matches. Lightweight, transparent,
+   and offline: pure string matching, no model. */
+const MISTAKE_TYPES = {
+  // Math
+  'equation-setup':   { label: 'Equation setup',        advice: 'Before solving, write what each variable stands for and what the question actually asks for.' },
+  'algebra-manip':    { label: 'Algebra manipulation',  advice: 'Do one step at a time to both sides and watch signs when moving terms.' },
+  'wrong-formula':    { label: 'Wrong formula',         advice: 'Recall the right formula for the shape or quantity before plugging in.' },
+  'arithmetic':       { label: 'Arithmetic slip',       advice: 'Slow down on the final computation and recheck it.' },
+  'misread-question': { label: 'Misread the question',  advice: 'Underline exactly what is asked (which variable, which quantity) before choosing.' },
+  'graph-table':      { label: 'Graph/table reading',   advice: 'Read the actual values off the figure before reasoning about them.' },
+  'unit-rate':        { label: 'Unit / rate error',     advice: 'Track units and make sure the rate is right-side up.' },
+  'percent-change':   { label: 'Percent error',         advice: 'Separate “percent of” from “percent change”; divide by the correct base.' },
+  'geometry-rel':     { label: 'Geometry relationship', advice: 'Name the rule (angle sum, similarity, radius vs. diameter) before computing.' },
+  'function-notation':{ label: 'Function notation',     advice: 'Work inside-out: evaluate the inner function first.' },
+  // R&W
+  'main-idea':        { label: 'Main idea',             advice: 'Summarize the whole text in your own words, then match.' },
+  'missed-evidence':  { label: 'Unsupported choice',    advice: 'Keep only what the text actually states or directly implies.' },
+  'too-broad':        { label: 'Too broad',             advice: 'Reject choices that overreach beyond what the text supports.' },
+  'too-narrow':       { label: 'Too narrow',            advice: 'Reject choices that fixate on a single detail.' },
+  'transition-logic': { label: 'Transition logic',      advice: 'Name the relationship (contrast, cause, addition) before picking a connector.' },
+  'grammar-boundary': { label: 'Grammar boundary',      advice: 'Check whether each side of the punctuation is a complete sentence.' },
+  'word-context':     { label: 'Word in context',       advice: 'Predict your own word for the blank, then match the closest choice.' },
+  'rhetorical-goal':  { label: 'Rhetorical goal',       advice: 'Re-read the stated goal and keep only the choice that does exactly that.' },
+  'cross-text':       { label: 'Cross-text relationship', advice: 'State each author’s position, then find how the second responds to the first.' },
+  'careless':         { label: 'Careless reading',      advice: 'Reread the stem and the finalist choices slowly before committing.' },
+};
+
+// Ordered [regex, type] rules scanned against the chosen distractor's reason.
+const _MATH_MISTAKE_RULES = [
+  [/set up|represent|should (be|have)|models|translate|total (cost|amount)|per (item|unit|month|mile)/, 'equation-setup'],
+  [/\bsign\b|distribut|both sides|isolate|combine|like terms|flip|inverse operation|move the/, 'algebra-manip'],
+  [/formula|area|volume|circumference|pythag|slope is|½|surface area|use the/, 'wrong-formula'],
+  [/percent|%/, 'percent-change'],
+  [/unit|convert|rate|per\b|scale by|proportion/, 'unit-rate'],
+  [/graph|table|axis|scatter|best fit|residual|read (the|off)|data point/, 'graph-table'],
+  [/angle|triangle|similar|parallel|radius|diameter|degree|arc|sector|inscribed/, 'geometry-rel'],
+  [/f\(|g\(|function|compose|composition|inside|notation/, 'function-notation'],
+  [/asked|question asks|what is being|the value of x|which (variable|quantity)|solve for/, 'misread-question'],
+  [/arithmet|add|subtract|multipl|divide|off by|miscalc|computation|rounding/, 'arithmetic'],
+];
+const _RW_MISTAKE_RULES = [
+  [/too broad|overly (general|broad)|sweeping|every|entire|all of|whole (genre|field)/, 'too-broad'],
+  [/too narrow|only (one|a single)|single detail|just one|fixate|one example/, 'too-narrow'],
+  [/not supported|no evidence|does not (say|state|show|claim)|unsupported|nothing (in the text|suggests)|never (says|stated)|beyond the text/, 'missed-evidence'],
+  [/main (idea|point|purpose)|overall|as a whole|central/, 'main-idea'],
+  [/contrast|addition|cause|however|therefore|relationship|transition|connect/, 'transition-logic'],
+  [/clause|comma splice|independent|complete sentence|punctuat|semicolon|boundary/, 'grammar-boundary'],
+  [/means|word|context|definition|synonym|tone/, 'word-context'],
+  [/goal|synthesis|the student wants|emphasize|the intended/, 'rhetorical-goal'],
+  [/text 1|text 2|other author|both texts|second text|first text/, 'cross-text'],
+];
+// Default mistake type per skill when the reason text doesn't match a rule.
+const _SKILL_DEFAULT_MISTAKE = {
+  'linear-eq': 'algebra-manip', 'linear-func': 'graph-table', 'systems': 'equation-setup',
+  'inequalities': 'algebra-manip', 'equivalent': 'algebra-manip', 'quadratics': 'algebra-manip',
+  'exponentials': 'wrong-formula', 'radicals': 'algebra-manip', 'functions': 'function-notation',
+  'ratios': 'unit-rate', 'percentages': 'percent-change', 'statistics': 'graph-table',
+  'scatterplots': 'graph-table', 'probability': 'graph-table', 'sampling': 'graph-table',
+  'angles': 'geometry-rel', 'area-volume': 'wrong-formula', 'circles': 'geometry-rel', 'trig': 'geometry-rel',
+  'central-ideas': 'main-idea', 'evidence-text': 'missed-evidence', 'evidence-quant': 'missed-evidence',
+  'inferences': 'missed-evidence', 'words-context': 'word-context', 'structure': 'main-idea',
+  'cross-text': 'cross-text', 'transitions': 'transition-logic', 'synthesis': 'rhetorical-goal',
+  'boundaries': 'grammar-boundary', 'form-sense': 'grammar-boundary',
+};
+
+function classifyMistake(q, chosen) {
+  if (!q) return null;
+  const section = (typeof SKILLS !== 'undefined' && SKILLS[q.skill]) ? SKILLS[q.skill].section : 'math';
+  const isGrid = q.type === 'grid';
+  // A blank/timeout on a grid-in is usually a formatting or time issue, not a concept slip.
+  if (isGrid && (chosen === '' || chosen == null || /ran out of time/.test(String(chosen)))) {
+    return { type: 'careless', ...MISTAKE_TYPES.careless, note: 'Grid-ins have no choices — double-check the format (integer, decimal, or fraction) and pacing.' };
+  }
+  const reason = (!isGrid && q.whyWrong && q.whyWrong[chosen]) ? String(q.whyWrong[chosen]) : '';
+  const hay = reason.toLowerCase();
+  const rules = section === 'math' ? _MATH_MISTAKE_RULES : _RW_MISTAKE_RULES;
+  let type = null;
+  if (hay) for (const [re, t] of rules) { if (re.test(hay)) { type = t; break; } }
+  if (!type) type = _SKILL_DEFAULT_MISTAKE[q.skill] || (section === 'math' ? 'arithmetic' : 'careless');
+  const def = MISTAKE_TYPES[type] || MISTAKE_TYPES.careless;
+  return { type, label: def.label, advice: def.advice, note: reason || def.advice };
+}
+
+// Count auto-classified mistake types, optionally restricted to one skill.
+function mistakeTypeCounts(skillId = null) {
+  const counts = {};
+  for (const m of STATE.mistakes) {
+    if (skillId && m.skill !== skillId) continue;
+    const t = m.mtype;
+    if (t) counts[t] = (counts[t] || 0) + 1;
+  }
+  return counts;
+}
+function topMistakeType(skillId = null) {
+  const c = mistakeTypeCounts(skillId);
+  const top = Object.entries(c).sort((a, b) => b[1] - a[1])[0];
+  return top ? { type: top[0], count: top[1], ...(MISTAKE_TYPES[top[0]] || {}) } : null;
+}
+
+// Recent per-skill trend from the rolling window: compares the older half of the
+// window to the newer half. Returns 'up' | 'down' | 'flat' | null (too little data).
+function skillTrend(skillId) {
+  const s = STATE.skillStats[skillId];
+  if (!s || !Array.isArray(s.recent) || s.recent.length < 4) return null;
+  const r = s.recent, mid = Math.floor(r.length / 2);
+  const older = r.slice(0, mid), newer = r.slice(mid);
+  const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+  const d = avg(newer) - avg(older);
+  return d > 0.15 ? 'up' : d < -0.15 ? 'down' : 'flat';
 }
 
 function reflectMistake(id, category) {
@@ -583,23 +703,31 @@ function defeatBoss(bossId) {
 /* ---- Daily study path: an ordered, personalized set of today's tasks ---- */
 function dailyStudyPath() {
   const tasks = [];
-  // 1. Warm-up: review a weak or due skill
-  const due = spacedReviewSkills(1)[0] || weakestSkills(1, 2)[0];
-  if (due) {
-    tasks.push({ kind: 'review', icon: '🔁', title: `Warm-up: ${SKILLS[due.id].name}`,
-      sub: `Spaced review of a skill that needs it (${Math.round((due.acc || 0) * 100)}% so far).`,
-      skillIds: [due.id] });
+  // 1. Retention first: clear anything due for spaced review (missed before).
+  const dueCount = (typeof dueReviewQuestions === 'function') ? dueReviewQuestions(60).length : 0;
+  if (dueCount > 0) {
+    tasks.push({ kind: 'review', icon: '🔁', title: 'Review Dungeon',
+      sub: `${dueCount} question${dueCount === 1 ? '' : 's'} due for review — clear these first.` });
   }
-  // 2. Progress: next unlocked, uncompleted level
+  // 2. Targeted drill of the weakest / most-due skill (active weak-spot work).
+  const weak = spacedReviewSkills(1)[0] || weakestSkills(1, 2)[0];
+  if (weak) {
+    const top = (typeof topMistakeType === 'function') ? topMistakeType(weak.id) : null;
+    tasks.push({ kind: 'drill', icon: '🎯', title: `Drill: ${SKILLS[weak.id].name}`,
+      sub: top ? `Your weak spot (${Math.round((weak.acc || 0) * 100)}%). Common miss: ${top.label}.`
+               : `Your weak spot (${Math.round((weak.acc || 0) * 100)}% so far).`,
+      skillId: weak.id });
+  }
+  // 3. Progress: next unlocked, uncompleted level
   const next = allLevels().find(l => !STATE.levelsCompleted[l.id] && isLevelUnlocked(l.id));
   if (next) tasks.push({ kind: 'level', icon: regionById(next.region).icon, title: `New ground: ${next.title}`,
     sub: `${regionById(next.region).name} · ${TIER_LABEL[next.tier]}`, levelId: next.id });
-  // 3. A boss if one is ready
+  // 4. A boss if one is ready, else the Daily Tower.
+  let added = false;
   for (const b of allBosses()) if (isBossUnlocked(b.id) && !STATE.bossesDefeated[b.id]) {
-    tasks.push({ kind: 'boss', icon: b.icon, title: `Boss ready: ${b.name}`, sub: 'Unlocked and waiting.', bossId: b.id }); break;
+    tasks.push({ kind: 'boss', icon: b.icon, title: `Boss ready: ${b.name}`, sub: 'Unlocked and waiting.', bossId: b.id }); added = true; break;
   }
-  // 4. Tower challenge
-  tasks.push({ kind: 'tower', icon: '🗼', title: 'Climb the Daily Tower', sub: 'Endless escalating questions — how high can you go?' });
+  if (!added) tasks.push({ kind: 'tower', icon: '🗼', title: 'Climb the Daily Tower', sub: 'Endless escalating questions — how high can you go?' });
   return tasks.slice(0, 4);
 }
 
