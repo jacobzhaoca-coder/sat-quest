@@ -26,7 +26,7 @@ function render() {
    question, a boss fight, the exam, onboarding, results) where it would overlap
    the primary button or content — and on the hub itself, where it is redundant.
    The Upgrade Hub stays reachable there via the bottom-nav Upgrades tab. */
-const FAB_HIDDEN_ROUTES = new Set(['onboarding', 'level', 'practice', 'boss', 'exam', 'result', 'upgrades']);
+const FAB_HIDDEN_ROUTES = new Set(['onboarding', 'level', 'practice', 'boss', 'exam', 'result', 'upgrades', 'review', 'tower']);
 function updateFabVisibility() {
   const fab = document.getElementById('upgrade-fab');
   if (!fab) return;
@@ -137,7 +137,7 @@ function buildNav() {
 function updateNav() {
   const nav = document.getElementById('nav');
   const map = { map: 'map', section: 'map', region: 'map', level: 'map', practice: 'map', boss: 'map', result: 'map', exam: 'map',
-    profile: 'profile', settings: 'profile', resources: 'profile', weekly: 'profile',
+    profile: 'profile', settings: 'profile', resources: 'profile', weekly: 'profile', flags: 'profile',
     tower: 'home', review: 'skills' };
   const active = map[currentRoute.name] || currentRoute.name;
   nav.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.route === active));
@@ -1092,22 +1092,30 @@ function towerPlayScreen() {
     el('div', { class: 'tower-floor', text: `Floor ${t.floor}` }),
     el('div', { class: 'tower-best', text: `Best: ${STATE.tower.bestFloor}` }),
   ]));
-  body.push(questionCard(t.question, { answers: [], correct: 0 }, () => {}, {
+  // Answer, then read the explanation and tap Next yourself — no auto-advance,
+  // so you can learn from every question (including the miss that ends a run).
+  const opts = {
+    nextLabel: 'Next floor →',
     onAnswered: (correct) => {
       recordAnswer(t.question.skill, correct, 0);
+      t._lastCorrect = correct;
       if (correct) {
         t.correct += 1; t.floor += 1;
         STATE.tower.bestFloor = Math.max(STATE.tower.bestFloor, t.floor - 1);
         STATE.tower.lastPlayedDay = todayKey(); STATE.tower.todayFloor = t.floor - 1;
         questProgress('tower', { amount: t.floor - 1 });
         if (t.floor - 1 >= 10) awardBadge('tower-10');
-        saveState();
-        setTimeout(() => { t.question = buildTowerQuestion(t.floor); Sound.play('unlock'); render(); }, 900);
       } else {
-        setTimeout(() => finishTower(), 900);
+        opts.nextLabel = 'See results →';
       }
+      saveState();
     },
-  }));
+  };
+  const onNext = () => {
+    if (t._lastCorrect) { t.question = buildTowerQuestion(t.floor); Sound.play('unlock'); render(); }
+    else finishTower();
+  };
+  body.push(questionCard(t.question, { answers: [], correct: 0 }, onNext, opts));
   return screen('Daily Tower', `Floor ${t.floor}`, body, { back: { route: 'home' } });
 }
 function finishTower() {
@@ -1345,7 +1353,7 @@ route('profile', () => {
     statChip('⚡', 'Skill Pts', STATE.skillPoints || 0),
     statChip('✅', 'Accuracy', acc + '%'),
     statChip('🗺️', 'Levels', allLevels().filter(l => STATE.levelsCompleted[l.id]).length + '/80'),
-    statChip('⚔️', 'Bosses', Object.keys(STATE.bossesDefeated).length + '/11'),
+    statChip('⚔️', 'Bosses', allBosses().filter(b => STATE.bossesDefeated[b.id]).length + '/11'),
     statChip('🧪', 'Best test', (STATE.examStats && STATE.examStats.bestTotal) || '—'),
   ]));
 
@@ -1533,26 +1541,25 @@ const POOL_ESTIMATE = { rwScenarios: 5600, mathVariants: 260000 };
 function runthroughCard() {
   ensureRunthrough();
   const rt = STATE.runthrough;
-  const seenIds = (rt.seenIds || []).length, seenSigs = (rt.seenSigs || []).length;
+  // seenIds tracks items with a stable id (authored R&W); seenSigs tracks
+  // signature-based items (generated math AND generated R&W). Report the honest
+  // total rather than splitting them, since the split is not a clean R&W/Math line.
+  const seenTotal = (rt.seenIds || []).length + (rt.seenSigs || []).length;
   const started = new Date(rt.startedAt || Date.now());
-  const rwLeft = Math.max(0, POOL_ESTIMATE.rwScenarios - seenIds);
-  const explored = Math.min(100, Math.round((seenIds / POOL_ESTIMATE.rwScenarios) * 100));
   const card = el('section', { class: 'card' }, [
     el('h2', { text: '🧭 Runthrough' }),
     el('p', { class: 'muted', text: 'Fresh practice prioritizes questions you have not seen yet this runthrough. The Review Dungeon is the exception — it intentionally resurfaces missed questions.' }),
     el('div', { class: 'stat-grid tight' }, [
-      statChip('👁️', 'R&W seen', seenIds),
-      statChip('🔢', 'Math seen', seenSigs),
+      statChip('👁️', 'Seen this run', seenTotal.toLocaleString()),
       statChip('📅', 'Started', `${started.getMonth() + 1}/${started.getDate()}`),
     ]),
-    // Freshness meter — shows how much of the original-practice pool is still unseen.
+    // Freshness note — honest, count-based, no misleading depletion bar.
     el('div', { class: 'fresh-meter' }, [
       el('div', { class: 'fresh-meter-head' }, [
-        el('span', { text: '🌱 Fresh pool remaining' }),
-        el('span', { class: 'muted small', text: `~${explored}% explored` }),
+        el('span', { text: '🌱 Fresh pool' }),
+        el('span', { class: 'muted small', text: 'Unofficial estimate' }),
       ]),
-      progressBar(explored / 100, 'fresh-bar'),
-      el('p', { class: 'muted small', text: `About ${rwLeft.toLocaleString()} unseen R&W scenarios and 250,000+ math variants remain this runthrough — repeats stay rare until a pool is genuinely exhausted. (Unofficial practice estimate.)` }),
+      el('p', { class: 'muted small', text: `You've seen ${seenTotal.toLocaleString()} original question${seenTotal === 1 ? '' : 's'} this runthrough. The pool holds about ${POOL_ESTIMATE.rwScenarios.toLocaleString()} distinct Reading & Writing scenarios and ${POOL_ESTIMATE.mathVariants.toLocaleString()}+ Math variants, so fresh practice keeps serving unseen questions — repeats stay rare until a pool is genuinely exhausted.` }),
     ]),
     el('button', { class: 'btn btn-ghost btn-block', text: '🔄 Start New Runthrough', onclick: startNewRunthroughFlow }),
     el('p', { class: 'muted small', text: 'Starting a new runthrough resets only which questions count as “seen,” so fresh practice can serve them again. Your XP, levels, badges, mistakes, question history, and flags are kept.' }),
