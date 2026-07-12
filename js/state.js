@@ -124,12 +124,19 @@ function weeklySummary() {
 }
 
 /* ---- Skill tracking, weakness & spaced review ---- */
-function recordAnswer(skillId, correct, timeMs = 0) {
+function recordAnswer(skillId, correct, timeMs = 0, difficulty = null) {
   const s = STATE.skillStats[skillId] || { correct: 0, seen: 0, timeMs: 0, lastPracticed: 0 };
   s.seen += 1;
   if (correct) s.correct += 1;
   s.timeMs += timeMs;
   s.lastPracticed = Date.now();
+  // Per-difficulty tally (powers the Accuracy Tracker upgrade). Filled going
+  // forward; older answers simply aren't counted here.
+  if (difficulty === 'Easy' || difficulty === 'Medium' || difficulty === 'Hard') {
+    if (!s.byDiff) s.byDiff = {};
+    const d = s.byDiff[difficulty] || (s.byDiff[difficulty] = { correct: 0, seen: 0, timeMs: 0 });
+    d.seen += 1; if (correct) d.correct += 1; d.timeMs += timeMs;
+  }
   STATE.skillStats[skillId] = s;
   STATE.stats.totalAnswered += 1;
   STATE.stats.totalTimeMs += timeMs;
@@ -174,6 +181,25 @@ function spacedReviewSkills(limit = 6) {
   }
   due.sort((a, b) => (a.acc - b.acc) || (b.overdueDays - a.overdueDays));
   return due.slice(0, limit);
+}
+
+// Accuracy + pacing broken out by difficulty, across every skill. Powers the
+// Accuracy Tracker upgrade's analytics panel. Returns null buckets until data
+// accrues so the UI can show "not enough data yet".
+function accuracyByDifficulty() {
+  const out = { Easy: { correct: 0, seen: 0, timeMs: 0 }, Medium: { correct: 0, seen: 0, timeMs: 0 }, Hard: { correct: 0, seen: 0, timeMs: 0 } };
+  for (const sid of Object.keys(STATE.skillStats || {})) {
+    const bd = STATE.skillStats[sid].byDiff;
+    if (!bd) continue;
+    for (const lvl of ['Easy', 'Medium', 'Hard']) if (bd[lvl]) {
+      out[lvl].correct += bd[lvl].correct; out[lvl].seen += bd[lvl].seen; out[lvl].timeMs += bd[lvl].timeMs;
+    }
+  }
+  for (const lvl of ['Easy', 'Medium', 'Hard']) {
+    out[lvl].acc = out[lvl].seen ? out[lvl].correct / out[lvl].seen : null;
+    out[lvl].avgTimeSec = out[lvl].seen ? out[lvl].timeMs / out[lvl].seen / 1000 : null;
+  }
+  return out;
 }
 
 function accuracyByDomain() {

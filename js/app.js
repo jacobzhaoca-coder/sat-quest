@@ -715,7 +715,7 @@ function reflectionPrompt(mistakeId) {
 }
 
 function handleAnswer(q, chosen, correct, session, elapsedMs) {
-  recordAnswer(q.skill, correct, elapsedMs);
+  recordAnswer(q.skill, correct, elapsedMs, q.difficulty);
   if (typeof recordQuestionHistory === 'function') recordQuestionHistory(q, correct);
   session.correct += correct ? 1 : 0;
   const rec = { q, chosen, correct, elapsedMs, mistakeId: null };
@@ -919,7 +919,7 @@ function bossFightScreen(boss) {
       answered = true; stop();
       s.focus = Math.max(0, s.focus - 20);
       s.answers.push({ q, chosen: null, correct: false });
-      recordAnswer(q.skill, false, s.timePerQ * 1000);
+      recordAnswer(q.skill, false, s.timePerQ * 1000, q.difficulty);
       STATE.mistakes.unshift({ id: 'm' + Date.now(), category: 'time', reflected: true, question: q.text, chosen: '(ran out of time)', chosenText: '', correct: q.answer, correctText: (q.choices.find(c => c.letter === q.answer) || {}).text || '', explanation: q.explanation, tip: q.tip, skill: q.skill, skillName: SKILLS[q.skill] ? SKILLS[q.skill].name : q.skill, when: Date.now() });
       Sound.play('playerhit'); flashDamage(hud, '-20', 'you'); updateHUD(hud, s);
       card.querySelectorAll('.choice').forEach(b => { b.classList.add('revealed'); b.disabled = true; if (b.dataset.letter === q.answer) b.classList.add('correct'); });
@@ -1097,7 +1097,7 @@ function towerPlayScreen() {
   const opts = {
     nextLabel: 'Next floor →',
     onAnswered: (correct) => {
-      recordAnswer(t.question.skill, correct, 0);
+      recordAnswer(t.question.skill, correct, 0, t.question.difficulty);
       t._lastCorrect = correct;
       if (correct) {
         t.correct += 1; t.floor += 1;
@@ -1242,6 +1242,30 @@ route('weekly', () => {
     ]));
   });
   body.push(domCard);
+
+  // Accuracy Tracker upgrade: per-difficulty accuracy + pacing detail.
+  if (typeof analyticsUnlocked === 'function' && analyticsUnlocked()) {
+    const byDiff = accuracyByDifficulty();
+    const any = ['Easy', 'Medium', 'Hard'].some(l => byDiff[l].seen > 0);
+    const aCard = el('section', { class: 'card' }, [el('h2', { text: '📊 Accuracy by difficulty' }),
+      el('p', { class: 'muted small', text: 'Unlocked by the Accuracy Tracker upgrade. Counts questions answered from when you unlocked it.' })]);
+    if (!any) {
+      aCard.appendChild(el('p', { class: 'muted', text: 'Not enough data yet — answer a few questions and your Easy/Medium/Hard breakdown will appear here.' }));
+    } else {
+      ['Easy', 'Medium', 'Hard'].forEach(lvl => {
+        const d = byDiff[lvl];
+        const cls = d.acc === null ? 'untried' : d.acc >= 0.85 ? 'strong' : d.acc >= 0.6 ? 'ok' : 'weak';
+        aCard.appendChild(el('div', { class: 'skill-row ' + cls }, [
+          el('div', { class: 'skill-row-top' }, [
+            el('span', { class: 'skill-name', text: lvl }),
+            el('span', { class: 'skill-stat', text: d.seen === 0 ? 'Not tried' : `${Math.round(d.acc * 100)}% · ${d.seen} seen${d.avgTimeSec ? ` · ${Math.round(d.avgTimeSec)}s avg` : ''}` }),
+          ]),
+          progressBar(d.acc === null ? 0 : d.acc, 'skill-bar ' + cls),
+        ]));
+      });
+    }
+    body.push(aCard);
+  }
 
   // Weekly advice
   const weak = weakestSkills(2, 2);

@@ -129,7 +129,7 @@ function submitModule() {
   // Record answers into skill stats (counts toward the weakness map).
   m.questions.forEach((q, i) => {
     const ok = gradeExamQuestion(q, m.responses[i]);
-    recordAnswer(q.skill, ok, 0);
+    recordAnswer(q.skill, ok, 0, q.difficulty);
     if (m.responses[i] !== undefined && typeof recordQuestionHistory === 'function') recordQuestionHistory(q, ok);
     if (!ok && m.responses[i] !== undefined) {
       // log to mistake log
