@@ -388,6 +388,83 @@ function adaptiveTier(skillId) {
   return base;
 }
 
+/* How many tracked questions in a specific skill are currently due for review. */
+function skillDueCount(skillId) {
+  let n = 0;
+  for (const key of Object.keys(STATE.qhistory || {})) {
+    const h = STATE.qhistory[key];
+    if (h && h.sk === skillId && reviewDue(h)) n++;
+  }
+  return n;
+}
+
+/* Which drill mode fits this skill right now, with a one-line reason. Weak or
+   thin skills want more reps (Focused); solid skills want a stretch (Challenge);
+   the middle wants a Quick check. */
+function recommendedDrillMode(skillId) {
+  const acc = skillAccuracy(skillId);
+  const trend = skillTrend(skillId);
+  if (acc == null) return { mode: 'quick', label: 'Quick Drill', reason: 'Start with a quick set to gauge this skill.' };
+  if (acc < 0.55) return { mode: 'focused', label: 'Focused Drill', reason: 'Below 55% — a longer set builds the reps you need.' };
+  if (acc >= 0.85 && trend !== 'down') return { mode: 'challenge', label: 'Challenge Drill', reason: 'Strong here — harder questions keep it sharp.' };
+  return { mode: 'quick', label: 'Quick Drill', reason: 'A quick set to push this from shaky to solid.' };
+}
+
+/* Bundle everything the Skill Clinic wants to show for one skill. */
+function skillContext(skillId) {
+  return {
+    id: skillId,
+    name: (SKILLS[skillId] || {}).name || skillId,
+    section: (SKILLS[skillId] || {}).section || 'math',
+    acc: skillAccuracy(skillId),
+    seen: (STATE.skillStats[skillId] || {}).seen || 0,
+    trend: skillTrend(skillId),
+    due: skillDueCount(skillId),
+    topMistake: (typeof topMistakeType === 'function') ? topMistakeType(skillId) : null,
+    recommend: recommendedDrillMode(skillId),
+    related: (typeof relatedSkills === 'function') ? relatedSkills(skillId) : [],
+  };
+}
+
+/* Detect a repeated mistake pattern: a single mistake type the player has hit
+   several times recently. Returns { type, label, advice, count, skill? } or null.
+   Scans the most recent ~24 logged mistakes so the warning stays current. */
+function repeatedMistakePattern(threshold = 3) {
+  const recent = STATE.mistakes.slice(0, 24);
+  const byType = {};
+  for (const m of recent) if (m.mtype) {
+    (byType[m.mtype] || (byType[m.mtype] = { count: 0, skills: {} })).count++;
+    if (m.skill) byType[m.mtype].skills[m.skill] = (byType[m.mtype].skills[m.skill] || 0) + 1;
+  }
+  const top = Object.entries(byType).sort((a, b) => b[1].count - a[1].count)[0];
+  if (!top || top[1].count < threshold) return null;
+  const def = MISTAKE_TYPES[top[0]] || {};
+  const topSkill = Object.entries(top[1].skills).sort((a, b) => b[1] - a[1])[0];
+  return { type: top[0], label: def.label || top[0], advice: def.advice || '', count: top[1].count,
+    skill: topSkill ? topSkill[0] : null };
+}
+
+/* One-glance progress context for the Profile: weakest/strongest skills, the
+   most repeated mistake type, review-due count, section balance, and a single
+   recommended next step. All unofficial — no score prediction. */
+function progressContext() {
+  const rated = Object.keys(SKILLS)
+    .map(id => ({ id, name: SKILLS[id].name, section: SKILLS[id].section, acc: skillAccuracy(id), seen: (STATE.skillStats[id] || {}).seen || 0 }))
+    .filter(x => x.seen >= 2 && x.acc !== null);
+  const byAcc = rated.slice().sort((a, b) => a.acc - b.acc);
+  const weakest = byAcc.slice(0, 3);
+  const strongest = byAcc.slice().reverse().slice(0, 3);
+  const dueCount = (typeof dueReviewQuestions === 'function') ? dueReviewQuestions(60).length : 0;
+  const topMistake = (typeof topMistakeType === 'function') ? topMistakeType() : null;
+  const math = sectionAccuracy('math'), rw = sectionAccuracy('rw');
+  // Recommend the single most useful next step.
+  let recommend;
+  if (dueCount > 0) recommend = { kind: 'review', text: `Clear ${dueCount} due review question${dueCount === 1 ? '' : 's'} first — retention comes before new ground.` };
+  else if (weakest[0]) recommend = { kind: 'drill', skillId: weakest[0].id, text: `Drill ${weakest[0].name} — your lowest skill at ${Math.round(weakest[0].acc * 100)}%.` };
+  else recommend = { kind: 'level', text: 'Play a new level so the app can find your weak spots.' };
+  return { weakest, strongest, topMistake, dueCount, section: { math, rw }, recommend, rated: rated.length };
+}
+
 function reflectMistake(id, category) {
   const m = STATE.mistakes.find(x => x.id === id);
   if (m) { m.category = category; m.reflected = true; saveState(); questProgress('review'); }
@@ -765,10 +842,13 @@ function dailyStudyPath() {
     const firstMath = allLevels().find(l => l.section === 'math' && isLevelUnlocked(l.id) && !STATE.levelsCompleted[l.id]);
     const firstRW = allLevels().find(l => l.section === 'rw' && isLevelUnlocked(l.id) && !STATE.levelsCompleted[l.id]);
     if (firstRW) tasks.push({ kind: 'level', icon: regionById(firstRW.region).icon, title: `Start here: ${firstRW.title}`,
-      sub: 'A Reading & Writing level so SAT Quest can learn your R&W level.', levelId: firstRW.id });
+      sub: 'A Reading & Writing level so SAT Quest can learn your R&W level.', levelId: firstRW.id,
+      why: 'You’re new — one R&W level lets the app measure where you stand.' });
     if (firstMath) tasks.push({ kind: 'level', icon: regionById(firstMath.region).icon, title: `Then: ${firstMath.title}`,
-      sub: 'A Math level so SAT Quest can spot your weak Math skills.', levelId: firstMath.id });
-    tasks.push({ kind: 'tower', icon: '🗼', title: 'Try the Daily Tower', sub: 'A quick mixed warm-up once you’ve played a level or two.' });
+      sub: 'A Math level so SAT Quest can spot your weak Math skills.', levelId: firstMath.id,
+      why: 'A Math level gives the app the data it needs to personalize your plan.' });
+    tasks.push({ kind: 'tower', icon: '🗼', title: 'Try the Daily Tower', sub: 'A quick mixed warm-up once you’ve played a level or two.',
+      why: 'A short mixed warm-up builds the habit and samples many skills.' });
     return tasks.slice(0, 4);
   }
 
@@ -777,7 +857,8 @@ function dailyStudyPath() {
   const dueCount = (typeof dueReviewQuestions === 'function') ? dueReviewQuestions(60).length : 0;
   if (dueCount > 0) {
     tasks.push({ kind: 'review', icon: '🔁', title: 'Review Dungeon',
-      sub: `${dueCount} question${dueCount === 1 ? '' : 's'} due for review — clear these first.` });
+      sub: `${dueCount} question${dueCount === 1 ? '' : 's'} due for review — clear these first.`,
+      why: 'Spaced review catches older misses before they fade from memory.' });
   }
   // 2. Targeted drill of the weakest / most-due skill (active weak-spot work),
   //    naming the recent mistake pattern so the player knows what to watch for.
@@ -787,7 +868,9 @@ function dailyStudyPath() {
     tasks.push({ kind: 'drill', icon: '🎯', title: `Drill: ${SKILLS[weak.id].name}`,
       sub: top ? `Your weak spot (${Math.round((weak.acc || 0) * 100)}%). Common miss: ${top.label}.`
                : `Your weak spot (${Math.round((weak.acc || 0) * 100)}% so far).`,
-      skillId: weak.id });
+      skillId: weak.id,
+      why: top ? `Lowest recent accuracy (${Math.round((weak.acc || 0) * 100)}%), and ${top.label.toLowerCase()} keeps recurring — a focused drill targets exactly that.`
+               : `This is your lowest recent skill (${Math.round((weak.acc || 0) * 100)}%) — drilling it moves your score fastest.` });
   }
   // 3. Progress — but steer toward the weaker section when both have data.
   const mathAcc = sectionAccuracy('math'), rwAcc = sectionAccuracy('rw');
@@ -795,14 +878,21 @@ function dailyStudyPath() {
   if (mathAcc.acc != null && rwAcc.acc != null) preferred = mathAcc.acc <= rwAcc.acc ? 'math' : 'rw';
   const levelsLeft = allLevels().filter(l => !STATE.levelsCompleted[l.id] && isLevelUnlocked(l.id));
   const next = (preferred && levelsLeft.find(l => l.section === preferred)) || levelsLeft[0];
-  if (next) tasks.push({ kind: 'level', icon: regionById(next.region).icon, title: `New ground: ${next.title}`,
-    sub: `${regionById(next.region).name} · ${TIER_LABEL[next.tier]}${preferred && next.section === preferred ? ' · your weaker section' : ''}`, levelId: next.id });
+  if (next) {
+    const weaker = preferred && next.section === preferred;
+    tasks.push({ kind: 'level', icon: regionById(next.region).icon, title: `New ground: ${next.title}`,
+      sub: `${regionById(next.region).name} · ${TIER_LABEL[next.tier]}${weaker ? ' · your weaker section' : ''}`, levelId: next.id,
+      why: weaker ? `Your ${preferred === 'math' ? 'Math' : 'Reading & Writing'} accuracy is the lower of the two — new ground here balances your sections.`
+                  : 'Keeps your campaign progress moving and unlocks the next challenges.' });
+  }
   // 4. A boss if one is ready, else the Daily Tower.
   let added = false;
   for (const b of allBosses()) if (isBossUnlocked(b.id) && !STATE.bossesDefeated[b.id]) {
-    tasks.push({ kind: 'boss', icon: b.icon, title: `Boss ready: ${b.name}`, sub: 'Unlocked and waiting.', bossId: b.id }); added = true; break;
+    tasks.push({ kind: 'boss', icon: b.icon, title: `Boss ready: ${b.name}`, sub: 'Unlocked and waiting.', bossId: b.id,
+      why: 'A boss tests several skills under pressure — good for consolidating what you’ve learned.' }); added = true; break;
   }
-  if (!added) tasks.push({ kind: 'tower', icon: '🗼', title: 'Climb the Daily Tower', sub: 'Endless escalating questions — how high can you go?' });
+  if (!added) tasks.push({ kind: 'tower', icon: '🗼', title: 'Climb the Daily Tower', sub: 'Endless escalating questions — how high can you go?',
+    why: 'An optional challenge that samples every skill at rising difficulty.' });
   return tasks.slice(0, 4);
 }
 

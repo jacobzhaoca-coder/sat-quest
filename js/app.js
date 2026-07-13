@@ -118,6 +118,29 @@ function statChip(icon, label, value) {
   ]);
 }
 
+/* ---------------- Reusable context chips (standardized) ----------------
+   One consistent chip family (.ctx-chip + modifier) for skill, difficulty,
+   source, mistake-type, and review-reason tags so every screen reads the same. */
+function ctxChip(text, cls = '', title = '') { return el('span', { class: 'ctx-chip ' + cls, text, title }); }
+function skillChip(skillId) { return ctxChip((typeof SKILLS !== 'undefined' && SKILLS[skillId]) ? SKILLS[skillId].name : skillId, 'skill'); }
+function difficultyChip(difficulty) { return ctxChip(difficulty || 'Medium', 'diff diff-' + ({ Easy: 1, Medium: 2, Hard: 3 }[difficulty] || 2)); }
+function mistakeChip(type) { return ctxChip((typeof MISTAKE_TYPE_LABEL === 'function') ? MISTAKE_TYPE_LABEL(type) : type, 'mtype'); }
+function sourceChip(q, sessionType) {
+  const label = sessionType === 'review' ? 'Review' : sessionType === 'drill' ? 'Drill'
+    : (q && q.type === 'grid') ? 'Grid-in' : (q && q.origin === 'generated') ? 'Generated' : 'Authored';
+  return ctxChip(label, 'src', 'Original SAT-style practice');
+}
+
+/* Reusable recommendation / next-action card: title + why + one CTA. */
+function nextActionCard(icon, title, why, ctaLabel, onCta, extraCls = '') {
+  const card = el('section', { class: 'card next-action-card ' + extraCls }, [
+    el('div', { class: 'nac-head' }, [el('span', { class: 'nac-icon', text: icon }), el('span', { class: 'nac-title', text: title })]),
+  ]);
+  if (why) card.appendChild(el('p', { class: 'nac-why', text: why }));
+  if (ctaLabel && onCta) card.appendChild(el('button', { class: 'btn btn-primary btn-block', text: ctaLabel, onclick: onCta }));
+  return card;
+}
+
 /* ---------------- Bottom navigation ---------------- */
 const NAV_ITEMS = [
   { name: 'home', icon: '🏰', label: 'Home' },
@@ -285,10 +308,15 @@ function dailyStudyPathCard() {
   const tasks = dailyStudyPath();
   const card = el('section', { class: 'card path-card' }, [el('div', { class: 'card-head' }, [el('h2', { text: '🧭 Today’s Study Path' })])]);
   tasks.forEach((t, i) => {
+    const main = el('div', { class: 'path-main' }, [
+      el('div', { class: 'path-title', text: t.title }),
+      el('div', { class: 'path-sub', text: t.sub }),
+    ]);
+    if (t.why) main.appendChild(el('div', { class: 'path-why', text: `Why: ${t.why}` }));
     card.appendChild(el('button', { class: 'path-task', onclick: () => runPathTask(t) }, [
       el('span', { class: 'path-step', text: String(i + 1) }),
       el('span', { class: 'path-icon', text: t.icon }),
-      el('div', { class: 'path-main' }, [el('div', { class: 'path-title', text: t.title }), el('div', { class: 'path-sub', text: t.sub })]),
+      main,
       el('span', { class: 'rec-arrow', text: '›' }),
     ]));
   });
@@ -531,12 +559,12 @@ function advancePractice(s) {
 function questionCard(q, session, onNext, opts = {}) {
   const card = el('section', { class: 'card q-card' });
   const isGrid = q.type === 'grid';
+  const sessType = session ? session.type : null;
   card.appendChild(el('div', { class: 'q-meta' }, [
-    el('span', { class: 'pill subtle', text: SKILLS[q.skill] ? SKILLS[q.skill].name : q.skill }),
-    el('span', { class: 'pill difficulty-' + ({ Easy: 1, Medium: 2, Hard: 3 }[q.difficulty] || 2), text: q.difficulty }),
-    el('span', { class: 'pill subtle', text: `~${q.timeTarget || 60}s` }),
-    isGrid ? el('span', { class: 'pill spr', text: 'Grid-in' }) : null,
-    el('span', { class: 'origin-tag', text: isGrid ? 'Student-Produced Response · Original' : (q.origin === 'generated' ? 'Original · generated' : 'Original · authored') }),
+    skillChip(q.skill),
+    difficultyChip(q.difficulty),
+    ctxChip(`~${q.timeTarget || 60}s`, 'time'),
+    sourceChip(q, sessType),
   ]));
 
   // Review Dungeon: explain why this specific question was surfaced.
@@ -672,6 +700,20 @@ function feedbackBlock(q, chosen, correct, onNext, opts, session) {
     block.appendChild(el('p', { class: 'concept-note', text: `🔑 Key skill: ${SKILLS[q.skill] ? SKILLS[q.skill].name : q.skill}.` }));
   }
   if (q.tip) block.appendChild(tipCard(q.tip, 'Strategy'));
+
+  // Context footer: "what to notice" for next time + an inline mini-lesson, so a
+  // miss (or a lucky guess) becomes a teachable moment without leaving the quiz.
+  const lesson = (typeof miniLesson === 'function') ? miniLesson(q.skill) : null;
+  if (lesson) {
+    const ctx = el('div', { class: 'qc-context' });
+    if (lesson.recognize) ctx.appendChild(el('p', { class: 'qc-notice' }, [el('strong', { text: '🔎 What to notice. ' }), document.createTextNode(lesson.recognize)]));
+    const det = el('details', { class: 'mini-lesson inline' }, [el('summary', { text: `📘 ${SKILLS[q.skill] ? SKILLS[q.skill].name : 'Skill'} mini-lesson` })]);
+    det.appendChild(el('p', {}, [el('strong', { text: 'Concept. ' }), document.createTextNode(lesson.concept)]));
+    det.appendChild(el('p', {}, [el('strong', { text: 'Strategy. ' }), document.createTextNode(lesson.strategy)]));
+    if (lesson.trap) det.appendChild(el('p', {}, [el('strong', { text: 'Common trap. ' }), document.createTextNode(lesson.trap)]));
+    ctx.appendChild(det);
+    block.appendChild(ctx);
+  }
 
   if (!correct && session && session.answers && session.answers.length) {
     const last = session.answers[session.answers.length - 1];
@@ -1283,30 +1325,36 @@ route('clinic', () => {
 
 function clinicSkillCard(skillId) {
   const skill = SKILLS[skillId];
-  const acc = skillAccuracy(skillId), stat = STATE.skillStats[skillId] || {};
+  const ctx = (typeof skillContext === 'function') ? skillContext(skillId)
+    : { acc: skillAccuracy(skillId), seen: (STATE.skillStats[skillId] || {}).seen || 0, trend: null, due: 0, topMistake: null, recommend: { mode: 'quick', label: 'Quick Drill', reason: '' }, related: [] };
+  const acc = ctx.acc;
   const pct = Math.round((acc || 0) * 100);
   const cls = acc >= 0.85 ? 'strong' : acc >= 0.6 ? 'ok' : 'weak';
-  const trend = (typeof skillTrend === 'function') ? skillTrend(skillId) : null;
-  const top = (typeof topMistakeType === 'function') ? topMistakeType(skillId) : null;
+  const trend = ctx.trend;
+  const top = ctx.topMistake;
   const lesson = (typeof miniLesson === 'function') ? miniLesson(skillId) : null;
-
-  // Recommended next action based on accuracy.
-  const rec = acc < 0.6 ? 'Do a 6-question drill and review the mini-lesson below.'
-            : acc < 0.85 ? 'Drill 6 questions to push this from shaky to solid.'
-            : 'Strong — a quick mastery-check drill keeps it sharp.';
+  const rec = ctx.recommend || { mode: 'quick', label: 'Quick Drill', reason: '' };
 
   const head = el('div', { class: 'clinic-head' }, [
     el('span', { class: 'clinic-skill-name', text: skill.name }),
     el('span', { class: 'clinic-acc ' + cls, text: `${pct}%` }),
   ]);
   const meta = el('div', { class: 'clinic-meta' }, [
-    el('span', { text: `${stat.seen || 0} attempted` }),
+    el('span', { text: `${ctx.seen || 0} attempted` }),
     trend ? el('span', { class: 'trend ' + TREND_META[trend].cls, text: `${TREND_META[trend].icon} ${TREND_META[trend].text}` }) : null,
     top ? el('span', { class: 'clinic-mtype', text: `Common miss: ${top.label}` }) : null,
+    ctx.due > 0 ? el('span', { class: 'clinic-due', text: `⏰ ${ctx.due} due` }) : null,
   ].filter(Boolean));
 
   const card = el('section', { class: 'card clinic-card ' + cls }, [head, meta, progressBar(acc || 0, 'skill-bar ' + cls),
-    el('p', { class: 'clinic-rec', text: '👉 ' + rec })]);
+    el('p', { class: 'clinic-rec' }, [el('strong', { text: `👉 ${rec.label}. ` }), document.createTextNode(rec.reason)])]);
+
+  // Related skills — practice on neighbors reinforces this one.
+  if (ctx.related && ctx.related.length) {
+    const rel = el('div', { class: 'clinic-related' }, [el('span', { class: 'clinic-related-label', text: 'Related: ' })]);
+    ctx.related.forEach(rid => { if (SKILLS[rid]) rel.appendChild(el('button', { class: 'ctx-chip skill link', text: SKILLS[rid].name, onclick: () => startDrill(rid, 'quick') })); });
+    card.appendChild(rel);
+  }
 
   if (lesson) {
     const det = el('details', { class: 'mini-lesson' }, [el('summary', { text: '📘 Mini-lesson' })]);
@@ -1317,13 +1365,14 @@ function clinicSkillCard(skillId) {
     if (lesson.example) det.appendChild(el('p', { class: 'mini-example' }, [el('strong', { text: 'Example mistake. ' }), document.createTextNode(lesson.example)]));
     card.appendChild(det);
   }
-  // Drill modes: Quick (6, adaptive) is primary; Focused (10) and Challenge
-  // (harder) are compact secondary options so the picker stays uncluttered.
-  card.appendChild(el('button', { class: 'btn btn-primary btn-block', text: `▶ Quick drill (6)`, onclick: () => startDrill(skillId, 'quick') }));
-  card.appendChild(el('div', { class: 'btn-row drill-modes' }, [
-    el('button', { class: 'btn btn-ghost small', text: 'Focused (10)', onclick: () => startDrill(skillId, 'focused') }),
-    el('button', { class: 'btn btn-ghost small', text: 'Challenge (hard)', onclick: () => startDrill(skillId, 'challenge') }),
-  ]));
+  // Drill modes: the RECOMMENDED mode is the primary button; the other two stay
+  // as compact secondary options so the picker adapts yet stays uncluttered.
+  const MODE_LABEL = { quick: '▶ Quick drill (6)', focused: '▶ Focused drill (10)', challenge: '▶ Challenge drill (hard)' };
+  const others = ['quick', 'focused', 'challenge'].filter(m => m !== rec.mode);
+  const otherLabel = { quick: 'Quick (6)', focused: 'Focused (10)', challenge: 'Challenge (hard)' };
+  card.appendChild(el('button', { class: 'btn btn-primary btn-block', text: MODE_LABEL[rec.mode] || MODE_LABEL.quick, onclick: () => startDrill(skillId, rec.mode) }));
+  card.appendChild(el('div', { class: 'btn-row drill-modes' },
+    others.map(m => el('button', { class: 'btn btn-ghost small', text: otherLabel[m], onclick: () => startDrill(skillId, m) }))));
   return card;
 }
 
@@ -1527,6 +1576,22 @@ route('mistakes', () => {
     return screen('Mistake Log', 'Learn from every miss', body);
   }
 
+  // Repeated-pattern warning: a single mistake type hit several times recently.
+  const pattern = (typeof repeatedMistakePattern === 'function') ? repeatedMistakePattern(3) : null;
+  if (pattern) {
+    const card = el('section', { class: 'card pattern-warning' }, [
+      el('div', { class: 'pattern-head' }, [el('span', { class: 'pattern-icon', text: '🔁' }), el('span', { class: 'pattern-title', text: 'Repeated pattern' })]),
+      el('p', { class: 'pattern-body' }, [
+        document.createTextNode(`You’ve missed ${pattern.count} `),
+        el('strong', { text: pattern.label.toLowerCase() }),
+        document.createTextNode(` question${pattern.count === 1 ? '' : 's'} recently${pattern.skill && SKILLS[pattern.skill] ? ` (mostly in ${SKILLS[pattern.skill].name})` : ''}. `),
+      ]),
+      el('p', { class: 'pattern-advice', text: '💡 ' + pattern.advice }),
+    ]);
+    if (pattern.skill && SKILLS[pattern.skill]) card.appendChild(el('button', { class: 'btn btn-primary small', text: `🎯 Drill ${SKILLS[pattern.skill].name}`, onclick: () => startDrill(pattern.skill, 'focused') }));
+    body.push(card);
+  }
+
   // Auto-classified mistake-type summary (the "most repeated mistake types").
   const mtCounts = (typeof mistakeTypeCounts === 'function') ? mistakeTypeCounts() : {};
   if (Object.keys(mtCounts).length) {
@@ -1570,10 +1635,19 @@ route('mistakes', () => {
     el('button', { class: 'btn btn-ghost small', text: 'Clear log', onclick: () => { if (confirm('Clear all logged mistakes? Your skill stats stay.')) { STATE.mistakes = []; saveState(); render(); } } }),
   ]));
 
+  // Count each mistake-type × skill so we can flag "same mistake again" entries.
+  const repeatKey = (m) => `${m.mtype || '?'}|${m.skill || '?'}`;
+  const repeatCounts = {};
+  STATE.mistakes.forEach(m => { if (m.mtype) repeatCounts[repeatKey(m)] = (repeatCounts[repeatKey(m)] || 0) + 1; });
+
   filtered.slice(0, 60).forEach(m => {
     const catDef = m.category ? MISTAKE_CATEGORIES[m.category] : null;
+    const isRepeat = m.mtype && repeatCounts[repeatKey(m)] >= 2;
     const detail = el('div', { class: 'mistake-detail' }, [
-      (m.mtypeLabel || m.mtype) ? el('span', { class: 'diag-badge sm', text: `🔍 ${m.mtypeLabel || MISTAKE_TYPE_LABEL(m.mtype)}` }) : null,
+      el('div', { class: 'mistake-badges' }, [
+        (m.mtypeLabel || m.mtype) ? el('span', { class: 'diag-badge sm', text: `🔍 ${m.mtypeLabel || MISTAKE_TYPE_LABEL(m.mtype)}` }) : null,
+        isRepeat ? el('span', { class: 'again-badge', text: '🔁 Again' }) : null,
+      ].filter(Boolean)),
       el('p', { class: 'mistake-q', text: lastLine(m.question) }),
       el('p', { class: 'mistake-line wrong', text: `Your answer: ${m.chosen}${m.chosenText ? ' · ' + m.chosenText : ''}` }),
       el('p', { class: 'mistake-line right', text: `Correct: ${m.correct}${m.correctText ? ' · ' + m.correctText : ''}` }),
@@ -1586,7 +1660,8 @@ route('mistakes', () => {
     body.push(el('details', { class: 'mistake' }, [
       el('summary', {}, [
         el('span', { class: 'mistake-skill', text: m.skillName || m.skill }),
-        el('span', { class: 'mistake-snippet', text: shorten(lastLine(m.question), 58) }),
+        el('span', { class: 'mistake-snippet', text: shorten(lastLine(m.question), 52) }),
+        isRepeat ? el('span', { class: 'again-badge sm', text: '🔁' }) : null,
         catDef ? el('span', { class: 'mistake-cat', text: catDef.icon }) : null,
       ]),
       detail,
@@ -1643,6 +1718,8 @@ route('profile', () => {
     statChip('🧪', 'Best test', (STATE.examStats && STATE.examStats.bestTotal) || '—'),
   ]));
 
+  body.push(progressContextCard());
+
   // Domain mastery overview
   const masteryCard = el('section', { class: 'card' }, [el('h2', { text: '🏆 Domain Mastery' }), el('p', { class: 'muted', text: 'Grows as you answer correctly across each domain over time.' })]);
   for (const r of REGIONS) {
@@ -1684,6 +1761,44 @@ route('profile', () => {
   ]));
   return screen(p.name, 'Player profile', body);
 });
+
+/* One-glance learning snapshot: weak/strong skills, repeated mistake type,
+   review-due count, section balance, and the single best next step. Unofficial —
+   describes practice performance, never a projected SAT score. */
+function progressContextCard() {
+  const pc = (typeof progressContext === 'function') ? progressContext() : null;
+  const card = el('section', { class: 'card progress-context' }, [el('h2', { text: '🧭 Your learning snapshot' })]);
+  if (!pc || pc.rated === 0) {
+    card.appendChild(el('p', { class: 'muted', text: 'Answer a handful of questions across a few skills and this snapshot will show your weak spots, strengths, and the best next step.' }));
+    card.appendChild(el('button', { class: 'btn btn-primary small', text: '🗺️ Play a level', onclick: () => navigate('map') }));
+    return card;
+  }
+  const chipRow = (label, list, cls) => {
+    if (!list.length) return null;
+    const row = el('div', { class: 'pc-row' }, [el('span', { class: 'pc-label', text: label })]);
+    list.forEach(s => row.appendChild(ctxChip(`${s.name} ${Math.round(s.acc * 100)}%`, cls)));
+    return row;
+  };
+  card.appendChild(chipRow('Weakest', pc.weakest, 'weak'));
+  card.appendChild(chipRow('Strongest', pc.strongest, 'strong'));
+  if (pc.topMistake) card.appendChild(el('div', { class: 'pc-row' }, [el('span', { class: 'pc-label', text: 'Top mistake' }), mistakeChip(pc.topMistake.type)]));
+  // Section balance (unofficial practice accuracy, not a score).
+  const secLine = el('div', { class: 'pc-row' }, [el('span', { class: 'pc-label', text: 'Section balance' })]);
+  const secTxt = (name, s) => s.acc == null ? `${name} —` : `${name} ${Math.round(s.acc * 100)}%`;
+  secLine.appendChild(ctxChip(secTxt('Math', pc.section.math), 'src'));
+  secLine.appendChild(ctxChip(secTxt('R&W', pc.section.rw), 'src'));
+  card.appendChild(secLine);
+  if (pc.dueCount > 0) card.appendChild(el('div', { class: 'pc-row' }, [el('span', { class: 'pc-label', text: 'Review due' }), ctxChip(`${pc.dueCount} question${pc.dueCount === 1 ? '' : 's'}`, 'due')]));
+  // Single recommended next step, with a matching action.
+  const rec = pc.recommend;
+  const recRow = el('div', { class: 'pc-next' }, [el('p', {}, [el('strong', { text: '⏭️ Next step. ' }), document.createTextNode(rec.text)])]);
+  if (rec.kind === 'review') recRow.appendChild(el('button', { class: 'btn btn-primary small', text: '🔁 Start review', onclick: () => startReview('due') }));
+  else if (rec.kind === 'drill') recRow.appendChild(el('button', { class: 'btn btn-primary small', text: `🎯 Drill ${SKILLS[rec.skillId].name}`, onclick: () => startDrill(rec.skillId) }));
+  else recRow.appendChild(el('button', { class: 'btn btn-primary small', text: '🗺️ World Map', onclick: () => navigate('map') }));
+  card.appendChild(recRow);
+  card.appendChild(el('p', { class: 'pc-disclaimer', text: 'Unofficial practice estimate — not a College Board score.' }));
+  return card;
+}
 
 /* Compact question-history / mastery summary. Derives counts from qhistory. */
 function questionHistoryCard() {

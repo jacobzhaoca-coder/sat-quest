@@ -225,5 +225,54 @@ check('export→import preserves mistakes (with mistake type)', roundtrip.hasMis
 check('export→import preserves question history (spaced review)', roundtrip.hasHistory);
 check('export→import preserves per-skill recent window (trend)', roundtrip.hasRecent);
 
+console.log('\n=== SKILL CONTEXT ===');
+const relMissing = run(`Object.keys(SKILLS).filter(s => { const r = relatedSkills(s); return !Array.isArray(r) || r.length < 2 || r.some(x => !SKILLS[x]); })`);
+check('every skill has 2 valid related skills', relMissing.length === 0, relMissing.join(', '));
+const sctx = run(`(function(){
+  resetSave();
+  for (let i=0;i<10;i++) recordAnswer('percentages', i<4, 900, 'Medium'); // 40%
+  const c = skillContext('percentages');
+  const rec = recommendedDrillMode('percentages');
+  return { hasFields: !!(c.name && 'acc' in c && 'trend' in c && 'due' in c && c.recommend && Array.isArray(c.related)),
+           weakMode: rec.mode };
+})()`);
+check('skillContext bundles name/acc/trend/due/recommend/related', sctx.hasFields);
+check('recommendedDrillMode: a 40% skill → Focused Drill', sctx.weakMode === 'focused', 'got ' + sctx.weakMode);
+const strongMode = run(`(function(){ resetSave(); for(let i=0;i<12;i++) recordAnswer('trig', true, 900, 'Hard'); return recommendedDrillMode('trig').mode; })()`);
+check('recommendedDrillMode: a strong skill → Challenge Drill', strongMode === 'challenge', 'got ' + strongMode);
+
+console.log('\n=== MISTAKE CONTEXT ===');
+const rep = run(`(function(){
+  resetSave();
+  for (let i=0;i<4;i++) STATE.mistakes.unshift({ id:'r'+i, skill:'percentages', mtype:'percent-change', mtypeLabel:'Percent error' });
+  const p = repeatedMistakePattern(3);
+  return { has: !!p, type: p && p.type, count: p && p.count, skill: p && p.skill };
+})()`);
+check('repeatedMistakePattern flags a recurring type (4× percent-change)', rep.has && rep.type === 'percent-change' && rep.count === 4 && rep.skill === 'percentages', JSON.stringify(rep));
+const noRep = run(`(function(){ resetSave(); STATE.mistakes.unshift({ id:'a', skill:'trig', mtype:'geometry-rel' }); return repeatedMistakePattern(3); })()`);
+check('repeatedMistakePattern returns null below threshold', noRep === null);
+
+console.log('\n=== PROGRESS CONTEXT ===');
+const prog = run(`(function(){
+  resetSave();
+  for (let i=0;i<10;i++) recordAnswer('percentages', i<3, 900, 'Medium'); // weak 30%
+  for (let i=0;i<10;i++) recordAnswer('trig', i<9, 900, 'Hard');          // strong 90%
+  const pc = progressContext();
+  return { weakest: pc.weakest[0] && pc.weakest[0].id, strongest: pc.strongest[0] && pc.strongest[0].id,
+           hasSection: pc.section && 'math' in pc.section && 'rw' in pc.section, rec: pc.recommend && pc.recommend.kind };
+})()`);
+check('progressContext identifies weakest + strongest skills', prog.weakest === 'percentages' && prog.strongest === 'trig', JSON.stringify(prog));
+check('progressContext reports section balance + a next step', prog.hasSection && !!prog.rec);
+
+console.log('\n=== STUDY PATH "WHY" ===');
+const why = run(`(function(){
+  resetSave();
+  for (let i=0;i<10;i++) recordAnswer('percentages', i<4, 900, 'Medium');
+  STATE.stats.totalAnswered = 40;
+  const tasks = dailyStudyPath();
+  return { allHaveWhy: tasks.every(t => typeof t.why === 'string' && t.why.length > 0), n: tasks.length };
+})()`);
+check('every study-path task carries a "why" explanation', why.allHaveWhy, JSON.stringify(why));
+
 console.log(`\n${fail === 0 ? '✅' : '❌'} LEARNING TESTS — ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

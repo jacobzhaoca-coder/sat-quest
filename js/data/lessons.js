@@ -256,4 +256,26 @@ const MINI_LESSONS = {
 
 function miniLesson(skillId) { return MINI_LESSONS[skillId] || null; }
 
-if (typeof module !== 'undefined' && module.exports) module.exports = { MINI_LESSONS, miniLesson };
+/* Conceptually adjacent skills — used to suggest "related skills" in the Skill
+   Clinic so practice on one weak skill points to the neighbors that reinforce it.
+   Keyed by skill id; values are 2 sibling skill ids in the same section. */
+const RELATED_SKILLS = {
+  'central-ideas': ['structure', 'inferences'], 'evidence-text': ['evidence-quant', 'inferences'],
+  'evidence-quant': ['evidence-text', 'scatterplots'], 'inferences': ['central-ideas', 'evidence-text'],
+  'words-context': ['transitions', 'form-sense'], 'structure': ['central-ideas', 'transitions'],
+  'cross-text': ['central-ideas', 'inferences'], 'transitions': ['structure', 'boundaries'],
+  'synthesis': ['central-ideas', 'transitions'], 'boundaries': ['form-sense', 'transitions'],
+  'form-sense': ['boundaries', 'words-context'],
+  'linear-eq': ['linear-func', 'systems'], 'linear-func': ['linear-eq', 'systems'],
+  'systems': ['linear-eq', 'inequalities'], 'inequalities': ['linear-eq', 'systems'],
+  'equivalent': ['quadratics', 'functions'], 'quadratics': ['equivalent', 'functions'],
+  'exponentials': ['functions', 'percentages'], 'radicals': ['equivalent', 'quadratics'],
+  'functions': ['quadratics', 'equivalent'], 'ratios': ['percentages', 'linear-func'],
+  'percentages': ['ratios', 'statistics'], 'statistics': ['probability', 'scatterplots'],
+  'scatterplots': ['statistics', 'linear-func'], 'probability': ['statistics', 'sampling'],
+  'sampling': ['statistics', 'probability'], 'angles': ['area-volume', 'trig'],
+  'area-volume': ['angles', 'circles'], 'circles': ['area-volume', 'angles'], 'trig': ['angles', 'circles'],
+};
+function relatedSkills(skillId) { return RELATED_SKILLS[skillId] || []; }
+
+if (typeof module !== 'undefined' && module.exports) module.exports = { MINI_LESSONS, miniLesson, RELATED_SKILLS, relatedSkills };

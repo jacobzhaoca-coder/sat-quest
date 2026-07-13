@@ -884,3 +884,60 @@ body.has-fab #app { padding-bottom: calc(var(--nav-h) + 84px); }
 .filter-chip { font-size: .78rem; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--ink-600); color: var(--text-dim); cursor: pointer; }
 .filter-chip.active { background: rgba(124,92,240,.18); border-color: var(--purple); color: var(--purple); font-weight: 600; }
 .filter-chip.alt { margin-left: auto; }
+
+/* ===== Context-expansion pass: standardized chips + context components ===== */
+/* One consistent chip family used across quiz meta, clinic, mistakes, profile. */
+.ctx-chip { display: inline-flex; align-items: center; gap: 4px; font-size: .72rem; font-weight: 600; line-height: 1;
+  padding: 4px 9px; border-radius: 999px; border: 1px solid var(--line); background: var(--ink-600); color: var(--text-dim); white-space: nowrap; }
+.ctx-chip.skill { color: var(--text); border-color: var(--line); }
+.ctx-chip.skill.link { cursor: pointer; border-color: rgba(124,92,240,.4); color: var(--purple); background: rgba(124,92,240,.08); }
+.ctx-chip.time { color: var(--text-faint); }
+.ctx-chip.src { color: var(--text-faint); border-style: dashed; }
+.ctx-chip.mtype { color: var(--purple); border-color: rgba(167,139,250,.4); }
+.ctx-chip.due { color: var(--gold-bright); border-color: rgba(232,192,106,.4); }
+.ctx-chip.weak { color: var(--ember); border-color: rgba(255,107,122,.35); }
+.ctx-chip.strong { color: var(--teal); border-color: rgba(69,224,168,.35); }
+.ctx-chip.diff-1 { color: var(--teal); border-color: rgba(69,224,168,.4); }
+.ctx-chip.diff-2 { color: var(--gold); border-color: rgba(232,192,106,.4); }
+.ctx-chip.diff-3 { color: var(--ember); border-color: rgba(255,107,122,.4); }
+
+/* Quiz feedback context footer */
+.qc-context { margin: 10px 0 4px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.qc-notice { font-size: .84rem; color: var(--text-dim); line-height: 1.5; margin: 0 0 8px; }
+.qc-notice strong { color: var(--teal); }
+.mini-lesson.inline { background: var(--ink-700); }
+
+/* Skill Clinic extras */
+.clinic-due { color: var(--gold-bright); }
+.clinic-related { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.clinic-related-label { font-size: .76rem; color: var(--text-faint); }
+
+/* Repeated-mistake pattern warning */
+.pattern-warning { border-color: rgba(232,192,106,.4); background: linear-gradient(160deg, rgba(232,192,106,.10), rgba(255,107,122,.05)); display: flex; flex-direction: column; gap: 8px; }
+.pattern-head { display: flex; align-items: center; gap: 8px; }
+.pattern-icon { font-size: 1.1rem; }
+.pattern-title { font-weight: 700; color: var(--gold-bright); }
+.pattern-body { font-size: .88rem; color: var(--text); margin: 0; line-height: 1.5; }
+.pattern-advice { font-size: .84rem; color: var(--text-dim); margin: 0; line-height: 1.5; }
+.mistake-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.again-badge { display: inline-flex; align-items: center; font-size: .72rem; font-weight: 600; color: var(--ember); background: rgba(255,107,122,.14); border-radius: 999px; padding: 3px 9px; }
+.again-badge.sm { padding: 2px 6px; font-size: .8rem; margin-left: auto; }
+
+/* Daily study path "why" line */
+.path-why { font-size: .74rem; color: var(--text-faint); margin-top: 3px; line-height: 1.45; font-style: italic; }
+
+/* Reusable next-action card */
+.next-action-card { display: flex; flex-direction: column; gap: 8px; }
+.nac-head { display: flex; align-items: center; gap: 8px; }
+.nac-icon { font-size: 1.1rem; }
+.nac-title { font-weight: 700; }
+.nac-why { font-size: .84rem; color: var(--text-dim); margin: 0; line-height: 1.5; }
+
+/* Profile learning snapshot */
+.progress-context { display: flex; flex-direction: column; gap: 8px; }
+.pc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pc-label { font-size: .76rem; color: var(--text-faint); min-width: 92px; }
+.pc-next { margin-top: 4px; padding-top: 8px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.pc-next strong { color: var(--teal); }
+.pc-next p { margin: 0; font-size: .88rem; color: var(--text); line-height: 1.5; }
+.pc-disclaimer { font-size: .72rem; color: var(--text-faint); margin: 0; }
