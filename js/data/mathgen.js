@@ -414,11 +414,32 @@ function qSignature(q) {
   const ans = q.type === 'grid' ? String(q.answer) : (q.answer + '|' + (q.choices || []).map(c => c.text).join('¦'));
   return qHash((q.text || '') + '::' + ans);
 }
+/* ---- Structure / style signature (near-repeat detection) ------------------
+   Two instances of the SAME template differ only in their numbers, so masking
+   every number in the stem collapses them to one "skeleton". The style
+   signature = skill + answer-type + skeleton. Distinct style signatures =
+   genuinely distinct problem STRUCTURES, which a pure number-swap cannot
+   inflate. Used by scripts/audit_math.mjs and available at runtime. */
+function mathSkeleton(text) {
+  return String(text || '').replace(/-?\d+(?:\.\d+)?/g, '#').replace(/\s+/g, ' ').trim();
+}
+function mathAnswerType(q) {
+  if (q.type === 'grid') return 'grid';
+  const texts = (q.choices || []).map(c => (c && c.text != null ? c.text : c));
+  const avg = texts.reduce((a, s) => a + String(s).length, 0) / (texts.length || 1);
+  if (avg > 24) return 'mc-verbal';
+  if (texts.every(s => /^[-+]?[\d.,/\s]+$/.test(String(s)))) return 'mc-num';
+  return 'mc-str';
+}
+function mathStyleSignature(q) {
+  return `${q.skill || '?'}§${mathAnswerType(q)}§${mathSkeleton(q.text)}`;
+}
+
 /* Attach stable type + instance identifiers to a generated math question. */
 function stampMathIds(q, kind, skillId) {
   const typeId = `${kind}-${skillId}`;
   const sig = qSignature(q);
-  return { ...q, typeId, sig, variantId: `${typeId}#${sig}` };
+  return { ...q, typeId, sig, variantId: `${typeId}#${sig}`, styleSig: mathStyleSignature(q) };
 }
 
 function generateMathQuestion(skillId, tier) {

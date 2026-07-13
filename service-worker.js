@@ -1,7 +1,7 @@
 /* SAT Quest — service worker for offline play.
    Cache-first for app shell so the game works with no connection once installed. */
 
-const CACHE = 'sat-quest-v15';
+const CACHE = 'sat-quest-v16';
 const ASSETS = [
   './',
   './index.html',
@@ -16,6 +16,10 @@ const ASSETS = [
   './js/data/mathgen4.js',
   './js/data/mathgen5.js',
   './js/data/mathgen6.js',
+  './js/data/mathgen7.js',
+  './js/data/mathgen8.js',
+  './js/data/mathgen9.js',
+  './js/data/mathgen_flatten.js',
   './js/data/rw/information-ideas.js',
   './js/data/rw/craft-structure.js',
   './js/data/rw/expression-ideas.js',
